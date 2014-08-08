@@ -1,11 +1,11 @@
 language: objective-c
 env:
 global:
-   - MODULE_NAME=ti.barcode
+    - "MODULE_NAME=ti.barcode"
 before_install:
-    - MODULE_ROOT=/Users/mdadu/documents/Git/ti.barcode
+    - MODULE_ROOT=$PWD
 install:
-    - cd 
+    - cd $MODULE_ROOT
     - curl -o install.sh https://raw.githubusercontent.com/appcelerator-modules/ci/master/travis/install.sh
     - source install.sh -s 3.2.2.GA
 script: 
