@@ -1277,6 +1277,7 @@
 					"-Wall",
 					"-Wextra",
 					"-Werror",
+					"-Wno-unused-private-field",
 					"-Wno-unused-parameter",
 				);
 			};
@@ -1303,6 +1304,7 @@
 					"-Wall",
 					"-Wextra",
 					"-Werror",
+					"-Wno-unused-private-field",
 					"-Wno-unused-parameter",
 				);
 			};
