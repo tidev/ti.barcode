@@ -2,7 +2,7 @@
 # this is your module manifest and used by Titanium
 # during compilation, packaging, distribution, etc.
 #
-version: 1.9
+version: 1.9.0
 apiversion: 2
 architectures: armv7 i386 x86_64 arm64
 description: Lets you process 1D/2D barcodes.
@@ -16,4 +16,4 @@ name: barcode
 moduleid: ti.barcode
 guid: fe2e658e-0eaf-44a6-b6d1-c074d6b986a3
 platform: iphone
-minsdk: 3.4.1
+minsdk: 3.4.1.GA

@@ -1,6 +1,6 @@
 # Change Log
 <pre>
-v1.9 	 Updating module to support 64-bit.
+v1.9.0 	[MOD-18092] Updating module to support 64-bit.
 
 v1.8.3  [MOD-1265] Building with 2.1.3.GA and open sourcing 
 	
