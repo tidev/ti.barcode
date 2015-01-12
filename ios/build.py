@@ -67,7 +67,7 @@ def generate_doc(config):
 	return documentation
 
 def compile_js(manifest,config):
-	js_file = os.path.join(cwd,'assets','__MODULE_ID__.js')
+	js_file = os.path.join(cwd,'assets','ti.barcode.js')
 	if not os.path.exists(js_file): return
 
 	from compiler import Compiler
