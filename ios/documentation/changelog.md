@@ -1,5 +1,9 @@
 # Change Log
 <pre>
+v1.9.1  [TIMOB-18092] Fixed linker error when building with TiSDK 3.5.0+
+
+v1.9.0  [MOD-18092] Updating module to support 64-bit.
+
 v1.8.3  [MOD-1265] Building with 2.1.3.GA and open sourcing 
 	
 v1.8.2  [MOD-1087] Updating attribution
