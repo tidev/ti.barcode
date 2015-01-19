@@ -45,6 +45,13 @@ Parses a blob image for barcodes. Takes one required argument, a dictionary cont
 ### cancel()
 Cancels and closes the currently open capture window.
 
+### generateQRCode([args]) Android only
+Generates a black & white QR code bitmap as a blob.
+
+* content[string]: String content for QR code. Required.
+* size[int]: Size of the QR code, in pixels. QR codes are square. Default value is 100
+* error[string]: QR Code error correction level. Accepted values are "H" High - 30%, "M" Medium - 15% , "L" Low - 7%, and "Q" Quartile - 25%. Default value is "M"
+
 ## Events
 Use Ti.Barcode.addEventListener() to process the following events that are sent from the module:
 

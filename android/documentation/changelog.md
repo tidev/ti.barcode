@@ -1,5 +1,7 @@
 # Change Log
 <pre>
+v2.3.6 	[MOD-2071] Add support to generate QR codes
+
 v2.3.4  [MOD-1265] Open sourcing
 	
 v2.3.3  [MOD-1087][MOD-1104] Updating attribution and building with 2.1.3.GA to support x86 devices

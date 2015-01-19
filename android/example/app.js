@@ -13,8 +13,8 @@ var window = Ti.UI.createWindow({
     backgroundColor: 'white'
 });
 var scrollView = Ti.UI.createScrollView({
-    contentWidth: 'auto',
-    contentHeight: 'auto',
+    contentWidth: Ti.UI.SIZE || 'auto',
+    contentHeight: Ti.UI.SIZE || 'auto',
     top: 0,
     showVerticalScrollIndicator: true,
     layout: 'vertical'
@@ -103,6 +103,39 @@ scanImage.addEventListener('click', function () {
     });
 });
 scrollView.add(scanImage);
+
+/**
+ * Create a button that will generate a QR code to www.appcelerator.com. Android Only.
+ */
+if (Ti.Android) {
+    var generateCode = Ti.UI.createButton({
+        title: 'Generate QR Code',
+        width: 150,
+        height: 60,
+        top: 20
+    });
+    generateCode.addEventListener('click', function () {
+        reset();
+        var qrCodeBlob = Barcode.generateQRCode({
+            content:'http://www.appcelerator.com/',
+            size:600, // we set the blob size to 600, and the ImageView to 300, to account for high-density displays.
+            error:'M',
+        });
+        var win = Ti.UI.createWindow();
+        win.add(Ti.UI.createImageView({
+            height:300,
+            width:300,
+            image:qrCodeBlob,
+            touchEnabled:false,
+        }));
+        win.addEventListener('click',function(){
+            win.close();
+        });
+        win.open();
+    });
+    scrollView.add(generateCode);
+}
+
 /**
  * Now listen for various events from the Barcode module. This is the module's way of communicating with us.
  */
