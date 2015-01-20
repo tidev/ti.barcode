@@ -18,6 +18,9 @@ the iOS and Android modules in to full parity. When upgrading to 1.5, you will n
 - BREAKING CHANGE: Android now properly fires the "cancel" event, as documented. It was firing the "canceled" event.
 - Ensure that you assign the module object that is returned from "require('ti.barcode')" to a variable or your event listeners may not receive the barcode events
 
+## Warning for Android devices.
+The module feature-required entries have been modified so that your app can be installed on devices that do not have a main camera, like the Nexus 7. However, you now need to check for a camera before attempting to use the module in your app.
+
 ## Accessing the Ti.Barcode Module
 To access this module from JavaScript, you would do the following:
 
