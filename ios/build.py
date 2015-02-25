@@ -168,12 +168,21 @@ def build_module(manifest,config):
 	from tools import ensure_dev_path
 	ensure_dev_path()
 
-	rc = os.system("xcodebuild -sdk iphoneos -configuration Release")
-	if rc != 0:
-		die("xcodebuild failed")
-	rc = os.system("xcodebuild -sdk iphonesimulator -configuration Release")
-	if rc != 0:
-		die("xcodebuild failed")
+	if(cmd_exists("xctool") == True):
+		rc = os.system("xctool -sdk iphoneos -configuration Release -scheme barcode")
+		if rc != 0:
+			die("xctool failed")
+		rc = os.system("xctool -sdk iphonesimulator -configuration Release -scheme barcode")
+		if rc != 0:
+			die("xctool failed")
+	else:
+		rc = os.system("xcodebuild -sdk iphoneos -configuration Release")
+		if rc != 0:
+			die("xcodebuild failed")
+		rc = os.system("xcodebuild -sdk iphonesimulator -configuration Release")
+		if rc != 0:
+			die("xcodebuild failed")
+
     # build the merged library using lipo
 	moduleid = manifest['moduleid']
 	libpaths = ''
@@ -181,7 +190,11 @@ def build_module(manifest,config):
 		libpaths+='%s ' % libfile
 
 	os.system("lipo %s -create -output build/lib%s.a" %(libpaths,moduleid))
-	
+
+def cmd_exists(cmd):
+    return subprocess.call("type " + cmd, shell=True, 
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
+
 def generate_apidoc(apidoc_build_path):
 	global options
 	
