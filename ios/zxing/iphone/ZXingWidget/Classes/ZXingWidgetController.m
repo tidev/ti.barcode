@@ -165,6 +165,10 @@
     [self stopCapture];
 }
 
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+
 - (CGImageRef)CGImageRotated90:(CGImageRef)imgRef
 {
     CGFloat angleInRadians = -90 * (M_PI / 180);
