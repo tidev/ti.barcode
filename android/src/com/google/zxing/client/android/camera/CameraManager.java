@@ -269,29 +269,39 @@ public final class CameraManager {
    * @return The rectangle to draw on screen in window coordinates.
    */
   public Rect getFramingRect() {
-    if (framingRect == null) {
-      if (camera == null) {
-        return null;
-      }
-      Point screenResolution = configManager.getScreenResolution();
-      int width = screenResolution.x * 3 / 4;
-      if (width < MIN_FRAME_WIDTH) {
-        width = MIN_FRAME_WIDTH;
-      } else if (width > MAX_FRAME_WIDTH) {
-        width = MAX_FRAME_WIDTH;
-      }
-      int height = screenResolution.y * 3 / 4;
-      if (height < MIN_FRAME_HEIGHT) {
-        height = MIN_FRAME_HEIGHT;
-      } else if (height > MAX_FRAME_HEIGHT) {
-        height = MAX_FRAME_HEIGHT;
-      }
-      int leftOffset = (screenResolution.x - width) / 2;
-      int topOffset = (screenResolution.y - height) / 2;
-      framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
-      Log.d(TAG, "Calculated framing rect: " + framingRect);
-    }
-    return framingRect;
+	if (framingRect == null) {
+		if (camera == null) {
+			return null;
+		}
+		Point screenResolution = configManager.getScreenResolution();
+		if (screenResolution == null) {
+			// Called early, before init even finished
+			return null;
+		}
+
+		int width = findDesiredDimensionInRange(screenResolution.x,
+				MIN_FRAME_WIDTH, MAX_FRAME_WIDTH);
+		int height = findDesiredDimensionInRange(screenResolution.y,
+				MIN_FRAME_HEIGHT, MAX_FRAME_HEIGHT);
+
+		int leftOffset = (screenResolution.x - width) / 2;
+		int topOffset = (screenResolution.y - height) / 2;
+		framingRect = new Rect(leftOffset, topOffset, leftOffset + width,
+				topOffset + height);
+		Log.d(TAG, "Calculated framing rect: " + framingRect);
+	}
+	return framingRect;
+  }
+  
+  private static int findDesiredDimensionInRange(int resolution, int hardMin, int hardMax) {
+	int dim = 5 * resolution / 8; // Target 5/8 of each dimension
+	if (dim < hardMin) {
+		return hardMin;
+	}
+	if (dim > hardMax) {
+		return hardMax;
+	}
+	return dim;
   }
 
   /**
