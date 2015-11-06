@@ -166,7 +166,8 @@ static zxing::DecodeHints decodeHints;
     
     id blob = [args valueForKey:@"image"];
 	ENSURE_TYPE(blob, TiBlob);
-    UIImage* image = [blob image];
+    // TODO broken?
+    UIImage *image = [UIImage blob:image];
     
     bool tryHarder = [TiUtils boolValue:[self valueForUndefinedKey:@"allowRotation"] def:NO];
     id acceptedFormats = [args valueForKey:@"acceptedFormats"];
@@ -280,6 +281,8 @@ static zxing::DecodeHints decodeHints;
 		[self performSelector:@selector(zxingControllerDidCancel:) withObject:nil];
 	}
 }
+
+
 
 #pragma mark System Properties
 
