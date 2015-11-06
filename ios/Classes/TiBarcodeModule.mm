@@ -57,6 +57,7 @@ static zxing::DecodeHints decodeHints;
 	decodeHints.addFormat(zxing::BarcodeFormat_DATA_MATRIX);
 
 	zxing::MultiFormatReader *reader = new zxing::MultiFormatReader();
+
 	return [super initWithReader:reader];
 }
 
@@ -167,7 +168,7 @@ static zxing::DecodeHints decodeHints;
     id blob = [args valueForKey:@"image"];
 	ENSURE_TYPE(blob, TiBlob);
 
-	UIImage *image = nill;
+	UIImage *image = nil;
 	image = [(TiBlob*)blob image];
 
 
