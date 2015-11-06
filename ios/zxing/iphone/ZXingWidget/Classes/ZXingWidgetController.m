@@ -406,6 +406,14 @@
         self.prevLayer = [AVCaptureVideoPreviewLayer layerWithSession:self.captureSession];
     }
     // NSLog(@"prev %p %@", self.prevLayer, self.prevLayer);
+    
+    // TODO: get orientation
+    // see http://stackoverflow.com/a/9689874
+    // UIDeviceOrientation curDeviceOrientation = [[UIDevice currentDevice] orientation];
+    float_t angle = -M_PI/2;    // landscape left
+    CATransform3D transform =  CATransform3DMakeRotation(angle, 0, 0, 1.0);
+    self.prevLayer.transform =transform;
+    
     self.prevLayer.frame = self.view.bounds;
     self.prevLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
     [self.view.layer addSublayer: self.prevLayer];
