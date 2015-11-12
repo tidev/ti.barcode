@@ -51,6 +51,7 @@
 @synthesize readers;
 @synthesize customOverlay;
 @synthesize useFrontCamera;
+@synthesize forceHorizontal;
 
 
 - (id)initWithDelegate:(id<ZXingDelegate>)scanDelegate
@@ -58,6 +59,7 @@
          showRectangle:(BOOL)shouldShowRectangle
               keepOpen:(BOOL)shouldKeepOpen
         useFrontCamera:(BOOL)shouldUseFrontCamera
+        forceHorizontal:(BOOL)shouldForceHorizontal
               OneDMode:(BOOL)shouldUseOneDMode
            withOverlay:(UIView*)overlay {
     self = [super init];
@@ -69,7 +71,8 @@
         beepSound = -1;
         decoding = NO;
         self.useFrontCamera = shouldUseFrontCamera;
-        OverlayView *theOverlayView = [[OverlayView alloc] initWithFrame:[UIScreen mainScreen].bounds 
+        self.forceHorizontal = shouldForceHorizontal;
+        OverlayView *theOverlayView = [[OverlayView alloc] initWithFrame:[UIScreen mainScreen].bounds
                                                            cancelEnabled:shouldShowCancel
                                                         rectangleEnabled:shouldShowRectangle
                                                                 oneDMode:oneDMode
@@ -78,7 +81,7 @@
         self.overlayView = theOverlayView;
         [theOverlayView release];
     }
-    
+
     return self;
 }
 
@@ -90,9 +93,9 @@
     if (beepSound != (SystemSoundID)-1) {
         AudioServicesDisposeSystemSoundID(beepSound);
     }
-    
+
     [self stopCapture];
-    
+
     [soundToPlay release];
     [overlayView release];
     [readers release];
@@ -101,7 +104,7 @@
 
 - (void)cancelled {
     [self stopCapture];
-    
+
     wasCancelled = YES;
     if (delegate != nil) {
         [delegate zxingControllerDidCancel:self];
@@ -138,24 +141,24 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    
+
     decoding = YES;
-    
+
     [self initCapture];
     if (self.customOverlay) {
         [self.view addSubview:self.customOverlay];
     }
     else {
-        [self.view addSubview:overlayView];        
+        [self.view addSubview:overlayView];
     }
-    
+
     [overlayView setPoints:nil];
     wasCancelled = NO;
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
-    
+
     if (self.customOverlay) {
         [self.view addSubview:self.customOverlay];
     }
@@ -165,16 +168,20 @@
     [self stopCapture];
 }
 
+- (BOOL) shouldAutorotate {
+    return NO;
+}
+
 - (CGImageRef)CGImageRotated90:(CGImageRef)imgRef
 {
     CGFloat angleInRadians = -90 * (M_PI / 180);
     CGFloat width = CGImageGetWidth(imgRef);
     CGFloat height = CGImageGetHeight(imgRef);
-    
+
     CGRect imgRect = CGRectMake(0, 0, width, height);
     CGAffineTransform transform = CGAffineTransformMakeRotation(angleInRadians);
     CGRect rotatedRect = CGRectApplyAffineTransform(imgRect, transform);
-    
+
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     CGContextRef bmContext = CGBitmapContextCreate(NULL,
                                                    rotatedRect.size.width,
@@ -199,11 +206,11 @@
                                              rotatedRect.size.width,
                                              rotatedRect.size.height),
                        imgRef);
-    
+
     CGImageRef rotatedImage = CGBitmapContextCreateImage(bmContext);
     CFRelease(bmContext);
     [(id)rotatedImage autorelease];
-    
+
     return rotatedImage;
 }
 
@@ -212,7 +219,7 @@
     CGFloat angleInRadians = M_PI;
     CGFloat width = CGImageGetWidth(imgRef);
     CGFloat height = CGImageGetHeight(imgRef);
-    
+
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     CGContextRef bmContext = CGBitmapContextCreate(NULL,
                                                    width,
@@ -232,11 +239,11 @@
                           -(width/2),
                           -(height/2));
     CGContextDrawImage(bmContext, CGRectMake(0, 0, width, height), imgRef);
-    
+
     CGImageRef rotatedImage = CGBitmapContextCreateImage(bmContext);
     CFRelease(bmContext);
     [(id)rotatedImage autorelease];
-    
+
     return rotatedImage;
 }
 
@@ -297,13 +304,13 @@
  - (void)stopPreview:(NSNotification*)notification {
  // NSLog(@"stop preview");
  }
- 
+
  - (void)notification:(NSNotification*)notification {
  // NSLog(@"notification %@", notification.name);
  }
  */
 
-#pragma mark - 
+#pragma mark -
 #pragma mark AVFoundation
 
 - (AVCaptureDeviceInput*)grabDeviceInput {
@@ -332,7 +339,7 @@
     if (self.captureSession != nil) {
         AVCaptureDeviceInput* currentInput = [[self.captureSession inputs] objectAtIndex:0];
         AVCaptureDeviceInput* shouldUseInput = [self grabDeviceInput];
-        
+
         if ([currentInput device] != [shouldUseInput device]) {
             [self.captureSession removeInput:currentInput];
             [self.captureSession addInput:shouldUseInput];
@@ -344,89 +351,107 @@
 - (void)initCapture {
 #if HAS_AVFF
     AVCaptureDeviceInput *captureInput = [self grabDeviceInput];
-    AVCaptureVideoDataOutput *captureOutput = [[AVCaptureVideoDataOutput alloc] init]; 
-    captureOutput.alwaysDiscardsLateVideoFrames = YES; 
+    AVCaptureVideoDataOutput *captureOutput = [[AVCaptureVideoDataOutput alloc] init];
+    captureOutput.alwaysDiscardsLateVideoFrames = YES;
     [captureOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()];
-    NSString* key = (NSString*)kCVPixelBufferPixelFormatTypeKey; 
-    NSNumber* value = [NSNumber numberWithUnsignedInt:kCVPixelFormatType_32BGRA]; 
-    NSDictionary* videoSettings = [NSDictionary dictionaryWithObject:value forKey:key]; 
-    [captureOutput setVideoSettings:videoSettings]; 
+    NSString* key = (NSString*)kCVPixelBufferPixelFormatTypeKey;
+    NSNumber* value = [NSNumber numberWithUnsignedInt:kCVPixelFormatType_32BGRA];
+    NSDictionary* videoSettings = [NSDictionary dictionaryWithObject:value forKey:key];
+    [captureOutput setVideoSettings:videoSettings];
     self.captureSession = [[AVCaptureSession alloc] init];
     [self.captureSession release];
-    self.captureSession.sessionPreset = AVCaptureSessionPresetMedium; // 480x360 on a 4
-    
+    self.captureSession.sessionPreset = AVCaptureSessionPresetHigh;
+
     [self.captureSession addInput:captureInput];
     [self.captureSession addOutput:captureOutput];
-    
+
     [captureOutput release];
-    
+
     /*
      [[NSNotificationCenter defaultCenter]
      addObserver:self
      selector:@selector(stopPreview:)
      name:AVCaptureSessionDidStopRunningNotification
      object:self.captureSession];
-     
+
      [[NSNotificationCenter defaultCenter]
      addObserver:self
      selector:@selector(notification:)
      name:AVCaptureSessionDidStopRunningNotification
      object:self.captureSession];
-     
+
      [[NSNotificationCenter defaultCenter]
      addObserver:self
      selector:@selector(notification:)
      name:AVCaptureSessionRuntimeErrorNotification
      object:self.captureSession];
-     
+
      [[NSNotificationCenter defaultCenter]
      addObserver:self
      selector:@selector(notification:)
      name:AVCaptureSessionDidStartRunningNotification
      object:self.captureSession];
-     
+
      [[NSNotificationCenter defaultCenter]
      addObserver:self
      selector:@selector(notification:)
      name:AVCaptureSessionWasInterruptedNotification
      object:self.captureSession];
-     
+
      [[NSNotificationCenter defaultCenter]
      addObserver:self
      selector:@selector(notification:)
      name:AVCaptureSessionInterruptionEndedNotification
      object:self.captureSession];
      */
-    
+
     if (!self.prevLayer) {
         self.prevLayer = [AVCaptureVideoPreviewLayer layerWithSession:self.captureSession];
     }
     // NSLog(@"prev %p %@", self.prevLayer, self.prevLayer);
+
+    // TODO: get orientation
+    // see http://stackoverflow.com/a/9689874
+
+    UIDeviceOrientation curDeviceOrientation = [[UIDevice currentDevice] orientation];
+
+    float_t angle=0;
+    if (self.forceHorizontal){
+        angle=-M_PI/2;
+        if ((long)curDeviceOrientation==4){
+            angle = M_PI/2;
+        }
+    }
+
+
+    CATransform3D transform =  CATransform3DMakeRotation(angle, 0, 0, 1.0);
+    self.prevLayer.transform =transform;
+
     self.prevLayer.frame = self.view.bounds;
     self.prevLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
     [self.view.layer addSublayer: self.prevLayer];
-    
+
     [self.captureSession startRunning];
 #endif
 }
 
 #if HAS_AVFF
-- (void)captureOutput:(AVCaptureOutput *)captureOutput 
-didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer 
-       fromConnection:(AVCaptureConnection *)connection 
-{ 
+- (void)captureOutput:(AVCaptureOutput *)captureOutput
+didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
+       fromConnection:(AVCaptureConnection *)connection
+{
     if (!decoding) {
         return;
     }
-    CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer); 
+    CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     /*Lock the image buffer*/
-    CVPixelBufferLockBaseAddress(imageBuffer,0); 
+    CVPixelBufferLockBaseAddress(imageBuffer,0);
     /*Get information about the image*/
-    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer); 
-    size_t width = CVPixelBufferGetWidth(imageBuffer); 
-    size_t height = CVPixelBufferGetHeight(imageBuffer); 
-    
-    uint8_t* baseAddress = CVPixelBufferGetBaseAddress(imageBuffer); 
+    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
+    size_t width = CVPixelBufferGetWidth(imageBuffer);
+    size_t height = CVPixelBufferGetHeight(imageBuffer);
+
+    uint8_t* baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
     void* free_me = 0;
     if (true) { // iOS bug?
         uint8_t* tmp = baseAddress;
@@ -435,19 +460,19 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         baseAddress[0] = 0xdb;
         memcpy(baseAddress,tmp,bytes);
     }
-    
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB(); 
+
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     CGContextRef newContext =
     CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace,
-                          kCGBitmapByteOrder32Little | kCGImageAlphaNoneSkipFirst); 
-    
-    CGImageRef capture = CGBitmapContextCreateImage(newContext); 
+                          kCGBitmapByteOrder32Little | kCGImageAlphaNoneSkipFirst);
+
+    CGImageRef capture = CGBitmapContextCreateImage(newContext);
     CVPixelBufferUnlockBaseAddress(imageBuffer,0);
     free(free_me);
-    
-    CGContextRelease(newContext); 
+
+    CGContextRelease(newContext);
     CGColorSpaceRelease(colorSpace);
-    
+
     CGRect cropRect = [overlayView cropRect];
     if (oneDMode) {
         // let's just give the decoder a vertical band right above the red line
@@ -464,22 +489,22 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         cropRect.size.width = CGImageGetWidth(capture);
         cropRect.size.height = CGImageGetHeight(capture);
     }
-    
+
     // N.B.
     // - Won't work if the overlay becomes uncentered ...
     // - iOS always takes videos in landscape
     // - images are always 4x3; device is not
     // - iOS uses virtual pixels for non-image stuff
-    
+
     {
         float height = CGImageGetHeight(capture);
         float width = CGImageGetWidth(capture);
-        
+
         CGRect screen = UIScreen.mainScreen.bounds;
         float tmp = screen.size.width;
         screen.size.width = screen.size.height;;
         screen.size.height = tmp;
-        
+
         cropRect.origin.x = (width-cropRect.size.width)/2;
         cropRect.origin.y = (height-cropRect.size.height)/2;
     }
@@ -491,7 +516,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     d.keepOpen = keepOpen;
     d.readers = readers;
     d.delegate = self;
-    cropRect.origin.x = 0.0;  
+    cropRect.origin.x = 0.0;
     cropRect.origin.y = 0.0;
     decoding = [d decodeImage:scrn cropRect:cropRect] == YES ? NO : YES;
     if (keepOpen) {
@@ -500,7 +525,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     }
     [d release];
     [scrn release];
-} 
+}
 #endif
 
 - (void)stopCapture {
@@ -512,7 +537,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     AVCaptureVideoDataOutput* output = (AVCaptureVideoDataOutput*)[captureSession.outputs objectAtIndex:0];
     [captureSession removeOutput:output];
     [self.prevLayer removeFromSuperlayer];
-    
+
     /*
      // heebee jeebees here ... is iOS still writing into the layer?
      if (self.prevLayer) {
@@ -524,7 +549,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
      });
      }
      */
-    
+
     self.prevLayer = nil;
     self.captureSession = nil;
 #endif
@@ -540,9 +565,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 #if HAS_AVFF
     Class captureDeviceClass = NSClassFromString(@"AVCaptureDevice");
     if (captureDeviceClass != nil) {
-        
+
         AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-        
+
         [device lockForConfiguration:nil];
         if ( [device hasTorch] ) {
             if ( status ) {
@@ -552,7 +577,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
             }
         }
         [device unlockForConfiguration];
-        
+
     }
 #endif
 }
@@ -561,9 +586,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 #if HAS_AVFF
     Class captureDeviceClass = NSClassFromString(@"AVCaptureDevice");
     if (captureDeviceClass != nil) {
-        
+
         AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-        
+
         if ( [device hasTorch] ) {
             return [device torchMode] == AVCaptureTorchModeOn;
         }
