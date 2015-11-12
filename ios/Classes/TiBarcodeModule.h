@@ -16,6 +16,7 @@
     BOOL keepOpen;
     BOOL useFrontCamera;
     BOOL led;
+    BOOL forceHorizontal;
 }
 
 @property(nonatomic,readonly) NSNumber *UNKNOWN;

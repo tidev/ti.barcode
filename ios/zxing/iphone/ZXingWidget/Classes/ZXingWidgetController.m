@@ -51,6 +51,7 @@
 @synthesize readers;
 @synthesize customOverlay;
 @synthesize useFrontCamera;
+@synthesize forceHorizontal;
 
 
 - (id)initWithDelegate:(id<ZXingDelegate>)scanDelegate
@@ -58,6 +59,7 @@
          showRectangle:(BOOL)shouldShowRectangle
               keepOpen:(BOOL)shouldKeepOpen
         useFrontCamera:(BOOL)shouldUseFrontCamera
+        forceHorizontal:(BOOL)shouldForceHorizontal
               OneDMode:(BOOL)shouldUseOneDMode
            withOverlay:(UIView*)overlay {
     self = [super init];
@@ -69,6 +71,7 @@
         beepSound = -1;
         decoding = NO;
         self.useFrontCamera = shouldUseFrontCamera;
+        self.forceHorizontal = shouldForceHorizontal;
         OverlayView *theOverlayView = [[OverlayView alloc] initWithFrame:[UIScreen mainScreen].bounds
                                                            cancelEnabled:shouldShowCancel
                                                         rectangleEnabled:shouldShowRectangle
@@ -357,7 +360,7 @@
     [captureOutput setVideoSettings:videoSettings];
     self.captureSession = [[AVCaptureSession alloc] init];
     [self.captureSession release];
-    self.captureSession.sessionPreset = AVCaptureSessionPresetMedium; // 480x360 on a 4
+    self.captureSession.sessionPreset = AVCaptureSessionPresetHigh;
 
     [self.captureSession addInput:captureInput];
     [self.captureSession addOutput:captureOutput];
@@ -411,17 +414,15 @@
     // see http://stackoverflow.com/a/9689874
 
     UIDeviceOrientation curDeviceOrientation = [[UIDevice currentDevice] orientation];
-    NSLog(@"[WARN] rotation  %ld" , (long)curDeviceOrientation);
-
 
     float_t angle=0;
-    if ((long)curDeviceOrientation==2){
-        angle = M_PI;
-    } else if ((long)curDeviceOrientation==3){
-        angle = -M_PI/2;
-    }else if ((long)curDeviceOrientation==4){
-        angle = M_PI/2;   
+    if (self.forceHorizontal){
+        angle=-M_PI/2;
+        if ((long)curDeviceOrientation==4){
+            angle = M_PI/2;
+        }
     }
+
 
     CATransform3D transform =  CATransform3DMakeRotation(angle, 0, 0, 1.0);
     self.prevLayer.transform =transform;

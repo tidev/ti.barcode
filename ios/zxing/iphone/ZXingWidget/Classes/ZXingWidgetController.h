@@ -56,6 +56,7 @@
 @property (nonatomic, retain ) NSSet *readers;
 @property (nonatomic, assign) id<ZXingDelegate> delegate;
 @property bool useFrontCamera;
+@property bool forceHorizontal;
 @property (nonatomic, retain) NSURL *soundToPlay;
 @property (nonatomic, retain) ParsedResult *result;
 @property (nonatomic, retain) OverlayView *overlayView;
@@ -66,6 +67,7 @@
          showRectangle:(BOOL)shouldShowRectangle
               keepOpen:(BOOL)shouldKeepOpen
         useFrontCamera:(BOOL)shouldUseFrontCamera
+        forceHorizontal:(BOOL)shouldForceHorizontal
               OneDMode:(BOOL)shouldUseoOneDMode
            withOverlay:(UIView*)overlay;
 

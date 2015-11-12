@@ -147,6 +147,22 @@ static zxing::DecodeHints decodeHints;
     }
 }
 
+-(id)forceHorizontal
+{
+    return NUMBOOL(forceHorizontal);
+}
+
+-(void)setForceHorizontal:(id)arg
+{
+    bool val = [TiUtils boolValue:arg def:NO];
+    forceHorizontal = val;
+    
+    if (controller != nil) {
+        controller.forceHorizontal = forceHorizontal;
+        [controller syncDeviceInput];
+    }
+}
+
 -(void)setUseLED:(id)arg
 {
     led = [TiUtils boolValue:arg def:NO];
@@ -234,6 +250,7 @@ static zxing::DecodeHints decodeHints;
                                                    showRectangle:[TiUtils boolValue:@"showRectangle" properties:args def:YES]
                                                         keepOpen:keepOpen
                                                   useFrontCamera:useFrontCamera
+                                                 forceHorizontal:forceHorizontal
                                                         OneDMode:NO
                                                      withOverlay:overlayView];
 
