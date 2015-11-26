@@ -1,4 +1,5 @@
 language: objective-c
+osx_image: xcode7.1
 env:
 global:
     - "MODULE_NAME=ti.barcode"
@@ -7,7 +8,7 @@ before_install:
 install:
     - cd $MODULE_ROOT
     - curl -o install.sh https://raw.githubusercontent.com/appcelerator-modules/ci/master/travis/install.sh
-    - source install.sh 
+    - source install.sh -s "--branch 5_1_X"
 script: 
     - curl -o script.sh https://raw.githubusercontent.com/appcelerator-modules/ci/master/travis/script.sh
     - source script.sh
