@@ -130,7 +130,7 @@ static zxing::DecodeHints decodeHints;
         [self forgetSelf];
 		controller.delegate = nil;
 		// [MOD-232] Animation controlled by caller
-        [controller dismissViewControllerAnimated:animate completion:nil];
+		[controller dismissViewControllerAnimated:animate completion:nil];
 	}
 	RELEASE_TO_NIL(controller);
 }
@@ -304,7 +304,7 @@ static zxing::DecodeHints decodeHints;
 		}
 	}
 	
-    [[[[TiApp app] controller] topPresentedController] presentViewController:controller animated:YES completion:nil];
+	[[[[TiApp app] controller] topPresentedController] presentViewController:controller animated:YES completion:nil];
 }
 
 -(void)cancel:(id)args
