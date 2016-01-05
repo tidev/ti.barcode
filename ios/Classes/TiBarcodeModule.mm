@@ -229,17 +229,36 @@ static zxing::DecodeHints decodeHints;
     keepOpen = [TiUtils boolValue:@"keepOpen" properties:args def:NO];
     
     // allow an overlay view
-    UIView *overlayView = nil;
     TiViewProxy *overlayProxy = [args objectForKey:@"overlay"];
-    if (overlayProxy != nil)
-    {
+    
+    if (overlayProxy != nil) {
         ENSURE_TYPE(overlayProxy, TiViewProxy);
-        overlayView = [overlayProxy view];
+        ENSURE_UI_THREAD(capture, args);
         
-        //[overlayProxy layoutChildren:NO];
-        [TiUtils setView:overlayView positionRect:[UIScreen mainScreen].bounds];
-        [overlayView setAutoresizingMask:UIViewAutoresizingNone];
+        [overlayProxy windowWillOpen];
+        
+        CGSize size = [overlayProxy view].bounds.size;
 
+#ifndef TI_USE_AUTOLAYOUT
+        CGFloat width = [overlayProxy autoWidthForSize:CGSizeMake(MAXFLOAT,MAXFLOAT)];
+        CGFloat height = [overlayProxy autoHeightForSize:CGSizeMake(width,0)];
+#else
+        CGSize s = [[overlayProxy view] sizeThatFits:CGSizeMake(MAXFLOAT,MAXFLOAT)];
+        CGFloat width = s.width;
+        CGFloat height = s.height;
+#endif
+        
+        if (width > 0 && height > 0) {
+            size = CGSizeMake(width, height);
+        }
+        
+        if (CGSizeEqualToSize(size, CGSizeZero) || width==0 || height == 0) {
+            size = [UIScreen mainScreen].bounds.size;
+        }
+        
+        CGRect rect = CGRectMake(0, 0, size.width, size.height);
+        [TiUtils setView:[overlayProxy view] positionRect:rect];
+        [overlayProxy layoutChildren:NO];
     }
     
 	controller = [[ZXingWidgetController alloc] initWithDelegate:self
@@ -248,7 +267,7 @@ static zxing::DecodeHints decodeHints;
                                                         keepOpen:keepOpen
                                                   useFrontCamera:useFrontCamera
                                                         OneDMode:NO
-                                                     withOverlay:overlayView];
+                                                     withOverlay:[overlayProxy view]];
     
     [controller setTorch:led];
 	
