@@ -33,6 +33,20 @@
 
 @end
 
+// MOD-2183: Fix the statusBarStyle by using the parent one.
+@interface ZXingWidgetController (StatusBarStyle)
+
+@end
+
+@implementation ZXingWidgetController (StatusBarStyle)
+
+-(UIStatusBarStyle)preferredStatusBarStyle
+{
+    return [[[TiApp app] controller] preferredStatusBarStyle];
+}
+
+@end
+
 @implementation CustomMultiFormatReader
 
 static zxing::DecodeHints decodeHints;
@@ -116,7 +130,7 @@ static zxing::DecodeHints decodeHints;
         [self forgetSelf];
 		controller.delegate = nil;
 		// [MOD-232] Animation controlled by caller
-		[controller dismissModalViewControllerAnimated:animate];
+        [controller dismissViewControllerAnimated:animate completion:nil];
 	}
 	RELEASE_TO_NIL(controller);
 }
@@ -148,6 +162,7 @@ static zxing::DecodeHints decodeHints;
 
 -(void)setUseLED:(id)arg
 {
+    ENSURE_TYPE(arg, NSNumber);
     led = [TiUtils boolValue:arg def:NO];
     
     if (controller != nil) {
@@ -166,7 +181,7 @@ static zxing::DecodeHints decodeHints;
     
     id blob = [args valueForKey:@"image"];
 	ENSURE_TYPE(blob, TiBlob);
-    UIImage* image = [blob image];
+    UIImage* image = [(TiBlob*)blob image];
     
     bool tryHarder = [TiUtils boolValue:[self valueForUndefinedKey:@"allowRotation"] def:NO];
     id acceptedFormats = [args valueForKey:@"acceptedFormats"];
@@ -223,6 +238,8 @@ static zxing::DecodeHints decodeHints;
         
         //[overlayProxy layoutChildren:NO];
         [TiUtils setView:overlayView positionRect:[UIScreen mainScreen].bounds];
+        [overlayView setAutoresizingMask:UIViewAutoresizingNone];
+
     }
     
 	controller = [[ZXingWidgetController alloc] initWithDelegate:self
@@ -268,7 +285,7 @@ static zxing::DecodeHints decodeHints;
 		}
 	}
 	
-	[[TiApp app] showModalController:controller animated:YES];
+    [[[[TiApp app] controller] topPresentedController] presentViewController:controller animated:YES completion:nil];
 }
 
 -(void)cancel:(id)args
