@@ -33,16 +33,27 @@
 
 @end
 
-// MOD-2183: Fix the statusBarStyle by using the parent one.
 @interface ZXingWidgetController (StatusBarStyle)
 
 @end
 
 @implementation ZXingWidgetController (StatusBarStyle)
 
+// MOD-2183: Fix the statusBarStyle by using the parent one.
 -(UIStatusBarStyle)preferredStatusBarStyle
 {
     return [[[TiApp app] controller] preferredStatusBarStyle];
+}
+
+// MOD-2190: Fix the orientation by using the parent one.
+-(UIInterfaceOrientationMask)supportedInterfaceOrientations
+{
+    return [[[TiApp app] controller] supportedInterfaceOrientations];
+}
+
+- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation
+{
+    return [[[TiApp app] controller] preferredInterfaceOrientationForPresentation];
 }
 
 @end
