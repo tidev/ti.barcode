@@ -46,14 +46,9 @@
 }
 
 // MOD-2190: Fix the orientation by using the parent one.
--(UIInterfaceOrientationMask)supportedInterfaceOrientations
-{
-    return [[[TiApp app] controller] supportedInterfaceOrientations];
-}
-
 - (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation
 {
-    return [[[TiApp app] controller] preferredInterfaceOrientationForPresentation];
+    return [[[[TiApp app] controller] topContainerController] preferredInterfaceOrientationForPresentation];
 }
 
 @end
