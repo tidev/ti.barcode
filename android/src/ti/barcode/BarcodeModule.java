@@ -6,7 +6,10 @@
 
 package ti.barcode;
 
+import java.io.ByteArrayOutputStream;
+import java.util.EnumMap;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Vector;
 import java.util.HashMap;
 
@@ -25,10 +28,14 @@ import org.appcelerator.titanium.view.TiDrawableReference;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.DecodeHintType;
+import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatReader;
+import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.Result;
 import com.google.zxing.ResultPoint;
+import com.google.zxing.WriterException;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.client.android.Intents;
 import com.google.zxing.client.android.PlanarYUVLuminanceSource;
@@ -36,6 +43,7 @@ import com.google.zxing.client.android.PreferencesActivity;
 import com.google.zxing.client.android.camera.CameraConfigurationManager;
 import com.google.zxing.client.result.ParsedResult;
 import com.google.zxing.client.result.ResultParser;
+import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 
 import android.app.Activity;
@@ -44,6 +52,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.preference.PreferenceManager;
 
 @Kroll.module(name = "Barcode", id = "ti.barcode", propertyAccessors = { "displayedMessage", "allowRotation", "allowMenu", "allowInstructions" })
@@ -51,6 +60,8 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 
 	// Standard Debugging variables
 	private static final String LCAT = "BarcodeModule";
+	private static final int WHITE = 0xFFFFFFFF;
+	private static final int BLACK = 0xFF000000;
 	private boolean keepOpen = false;
 
 	@Kroll.constant
@@ -310,6 +321,62 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 		TiActivitySupport activitySupport = (TiActivitySupport) activity;
 		final int resultCode = activitySupport.getUniqueResultCode();
 		activitySupport.launchActivityForResult(intent, resultCode, this);
+	}
+	
+	@Kroll.method
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public TiBlob generateQRCode(@Kroll.argument(optional = false) HashMap args) {
+		KrollDict argsDict = new KrollDict(args);
+		String content = argsDict.getString("content");
+		int dimension = argsDict.optInt("size", 100);
+		Map<EncodeHintType,Object> hints = new EnumMap<EncodeHintType,Object>(EncodeHintType.class);
+		
+		String ecl = argsDict.optString("error", "M");
+		ErrorCorrectionLevel ecLevel = ErrorCorrectionLevel.M;
+		if (ecl == "H") {
+			ecLevel = ErrorCorrectionLevel.H;
+		}
+		if (ecl == "L") {
+			ecLevel = ErrorCorrectionLevel.L;
+		}
+		if (ecl == "Q") {
+			ecLevel = ErrorCorrectionLevel.Q;
+		}
+		
+		hints.put(EncodeHintType.ERROR_CORRECTION, ecLevel);
+		
+		MultiFormatWriter writer = new MultiFormatWriter();
+		BitMatrix bm;
+		try {
+			bm = writer.encode(content, BarcodeFormat.QR_CODE, dimension, dimension, hints);
+		} catch (WriterException e) {
+			Log.e(LCAT, "Hit exception while generating QRCode! " + e.toString());
+			e.printStackTrace();
+			processFailed(12345);
+			return null;
+		}
+	    int width = bm.getWidth();
+	    int height = bm.getHeight();
+	    int[] pixels = new int[width * height];
+	    for (int y = 0; y < height; y++) {
+	      int offset = y * width;
+	      for (int x = 0; x < width; x++) {
+	        pixels[offset + x] = bm.get(x, y) ? BLACK : WHITE;
+	      }
+	    }
+
+	    Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+	    bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+	    
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		byte data[] = new byte[0];
+		if (bitmap.compress(CompressFormat.PNG, 100, bos)) {
+			data = bos.toByteArray();
+		}
+
+		TiBlob result = TiBlob.blobFromData(data, "image/png");
+		
+		return result;
 	}
 
 	private void disableInstructions() {

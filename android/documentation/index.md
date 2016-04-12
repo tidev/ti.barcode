@@ -18,6 +18,9 @@ the iOS and Android modules in to full parity. When upgrading to 1.5, you will n
 - BREAKING CHANGE: Android now properly fires the "cancel" event, as documented. It was firing the "canceled" event.
 - Ensure that you assign the module object that is returned from "require('ti.barcode')" to a variable or your event listeners may not receive the barcode events
 
+## Warning for Android devices.
+The module feature-required entries have been modified so that your app can be installed on devices that do not have a main camera, like the Nexus 7. However, you now need to check for a camera before attempting to use the module in your app.
+
 ## Accessing the Ti.Barcode Module
 To access this module from JavaScript, you would do the following:
 
@@ -44,6 +47,13 @@ Parses a blob image for barcodes. Takes one required argument, a dictionary cont
 
 ### cancel()
 Cancels and closes the currently open capture window.
+
+### generateQRCode([args]) Android only
+Generates a black & white QR code bitmap as a blob.
+
+* content[string]: String content for QR code. Required.
+* size[int]: Size of the QR code, in pixels. QR codes are square. Default value is 100
+* error[string]: QR Code error correction level. Accepted values are "H" High - 30%, "M" Medium - 15% , "L" Low - 7%, and "Q" Quartile - 25%. Default value is "M"
 
 ## Events
 Use Ti.Barcode.addEventListener() to process the following events that are sent from the module:
