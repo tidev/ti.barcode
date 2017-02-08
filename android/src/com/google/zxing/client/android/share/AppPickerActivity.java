@@ -43,11 +43,7 @@ public final class AppPickerActivity extends ListActivity {
   @Override
   protected void onListItemClick(ListView l, View view, int position, long id) {
     if (position >= 0 && position < labelsPackages.size()) {
-      String url = "market://details?id=" + labelsPackages.get(position)[1];
-      Intent intent = new Intent();
-      intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-      intent.putExtra(Browser.BookmarkColumns.URL, url);
-      setResult(RESULT_OK, intent);
+      // TODO: Update library to support this (AppInfo dependency)
     } else {
       setResult(RESULT_CANCELED);
     }
