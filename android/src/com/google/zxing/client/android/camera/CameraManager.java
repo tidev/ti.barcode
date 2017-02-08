@@ -294,13 +294,14 @@ public final class CameraManager {
            
            MIN_FRAME_WIDTH = Math.round(MIN_FRAME_WIDTH * density);
            MIN_FRAME_HEIGHT = Math.round(MIN_FRAME_HEIGHT * density);
-           MAX_FRAME_WIDTH = Math.round(barcodeModule.frameWidth * density);
-           MAX_FRAME_HEIGHT = Math.round(barcodeModule.frameHeight * density);
-           
+           int width = Math.round(barcodeModule.frameWidth * density);
+           int height = Math.round(barcodeModule.frameHeight * density);
+           /*
            int width = findDesiredDimensionInRange(screenResolution.x,
            MIN_FRAME_WIDTH, MAX_FRAME_WIDTH);
            int height = findDesiredDimensionInRange(screenResolution.y,
            MIN_FRAME_HEIGHT, MAX_FRAME_HEIGHT);
+           */
 
            int leftOffset = (screenResolution.x - width) / 2;
            int topOffset = (screenResolution.y - height) / 2;
