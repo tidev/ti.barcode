@@ -52,6 +52,8 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	// Standard Debugging variables
 	private static final String LCAT = "BarcodeModule";
 	private boolean keepOpen = false;
+	public int frameWidth = 1200;
+	public int frameHeight = 675;
 
 	@Kroll.constant
 	public static final int UNKNOWN = 0;
@@ -286,7 +288,8 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 
 			intent.putExtra(Intents.Scan.SHOW_RECTANGLE, argsDict.optBoolean("showRectangle", true));
 			intent.putExtra(Intents.Scan.KEEP_OPEN, argsDict.optBoolean("keepOpen", false));
-
+			frameWidth = argsDict.optInt("frameWidth",1200);
+			frameHeight = argsDict.optInt("frameHeight",675);
 		} else {
 			Intents.Scan.overlayProxy = null;
 			intent.putExtra(Intents.Scan.SHOW_RECTANGLE, true);
@@ -302,6 +305,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 		
 		intent.putExtra(Intents.Scan.PROMPT_MESSAGE, properties.optString("displayedMessage", null));
 
+		
 		// [MOD-217] -- Must set the package in order for it to automatically select the application as the source of the scanning activity.
 		intent.setPackage(TiApplication.getInstance().getPackageName());
 		CaptureActivity.PACKAGE_NAME = TiApplication.getInstance().getPackageName();

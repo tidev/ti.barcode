@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import ti.barcode.BarcodeModule;
+import android.util.DisplayMetrics;
 
 /**
  * This object wraps the Camera service object and expects to be the only one talking to it. The
@@ -44,10 +46,10 @@ public final class CameraManager {
 
   private static final String TAG = CameraManager.class.getSimpleName();
 
-  private static final int MIN_FRAME_WIDTH = 240;
-  private static final int MIN_FRAME_HEIGHT = 240;
-  private static final int MAX_FRAME_WIDTH = 1200; // = 5/8 * 1920
-  private static final int MAX_FRAME_HEIGHT = 675; // = 5/8 * 1080
+  private int MIN_FRAME_WIDTH = 240;
+  private int MIN_FRAME_HEIGHT = 240;
+  private int MAX_FRAME_WIDTH = 1200; // = 5/8 * 1920
+  private int MAX_FRAME_HEIGHT = 675; // = 5/8 * 1080
  
  
 
@@ -281,6 +283,20 @@ public final class CameraManager {
                return null;
            }
 
+           BarcodeModule barcodeModule = BarcodeModule.getInstance();
+           if (barcodeModule != null) {
+               MAX_FRAME_WIDTH = barcodeModule.frameWidth;
+               MAX_FRAME_HEIGHT = barcodeModule.frameHeight;
+           }
+           
+           DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+           float density = metrics.density;
+           
+           MIN_FRAME_WIDTH = Math.round(MIN_FRAME_WIDTH * density);
+           MIN_FRAME_HEIGHT = Math.round(MIN_FRAME_HEIGHT * density);
+           MAX_FRAME_WIDTH = Math.round(barcodeModule.frameWidth * density);
+           MAX_FRAME_HEIGHT = Math.round(barcodeModule.frameHeight * density);
+           
            int width = findDesiredDimensionInRange(screenResolution.x,
            MIN_FRAME_WIDTH, MAX_FRAME_WIDTH);
            int height = findDesiredDimensionInRange(screenResolution.y,
