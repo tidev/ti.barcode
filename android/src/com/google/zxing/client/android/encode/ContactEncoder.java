@@ -36,7 +36,7 @@ abstract class ContactEncoder {
                            Iterable<String> addresses,
                            Iterable<String> phones,
                            Iterable<String> emails,
-                           String url,
+                           Iterable<String> url,
                            String note);
 
   /**

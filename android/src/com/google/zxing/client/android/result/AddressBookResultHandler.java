@@ -128,7 +128,7 @@ public final class AddressBookResultHandler extends ResultHandler {
                    address1Type,
                    addressResult.getOrg(),
                    addressResult.getTitle(),
-                   addressResult.getURL(),
+                   addressResult.getURLs(),
                    addressResult.getBirthday());
         break;
       case 1:
@@ -185,7 +185,7 @@ public final class AddressBookResultHandler extends ResultHandler {
       }
     }
     ParsedResult.maybeAppend(result.getEmails(), contents);
-    ParsedResult.maybeAppend(result.getURL(), contents);
+    ParsedResult.maybeAppend(result.getURLs(), contents);
 
     String birthday = result.getBirthday();
     if (birthday != null && birthday.length() > 0) {

@@ -63,8 +63,8 @@ public final class CalendarResultHandler extends ResultHandler {
     CalendarParsedResult calendarResult = (CalendarParsedResult) getResult();
     if (index == 0) {
       addCalendarEvent(calendarResult.getSummary(),
-                       calendarResult.getStart(),
-                       calendarResult.getEnd(),
+                       calendarResult.getStart().toString(),
+                       calendarResult.getEnd().toString(),
                        calendarResult.getLocation(),
                        calendarResult.getDescription());
     }
@@ -75,17 +75,17 @@ public final class CalendarResultHandler extends ResultHandler {
     CalendarParsedResult calResult = (CalendarParsedResult) getResult();
     StringBuilder result = new StringBuilder(100);
     ParsedResult.maybeAppend(calResult.getSummary(), result);
-    String startString = calResult.getStart();
+    String startString = calResult.getStart().toString();
     appendTime(startString, result, false, false);
 
-    String endString = calResult.getEnd();
+    String endString = calResult.getEnd().toString();
     if (endString != null) {
       boolean sameStartEnd = startString.equals(endString);
       appendTime(endString, result, true, sameStartEnd);
     }
 
     ParsedResult.maybeAppend(calResult.getLocation(), result);
-    ParsedResult.maybeAppend(calResult.getAttendee(), result);
+    ParsedResult.maybeAppend(calResult.getAttendees(), result);
     ParsedResult.maybeAppend(calResult.getDescription(), result);
     return result.toString();
   }

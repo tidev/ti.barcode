@@ -304,7 +304,7 @@ public abstract class ResultHandler {
                         String addressType,
                         String org,
                         String title,
-                        String url,
+                        String[] url,
                         String birthday) {
 
     // Only use the first name in the array, if present.
@@ -338,7 +338,15 @@ public abstract class ResultHandler {
 
     // No field for URL, birthday; use notes
     StringBuilder aggregatedNotes = new StringBuilder();
-    for (String aNote : new String[] { url, birthday, note }) {
+    for (String aNote : new String[] { birthday, note }) {
+      if (aNote != null) {
+        if (aggregatedNotes.length() > 0) {
+          aggregatedNotes.append('\n');
+        }
+        aggregatedNotes.append(aNote);
+      }
+    }
+    for (String aNote : url) {
       if (aNote != null) {
         if (aggregatedNotes.length() > 0) {
           aggregatedNotes.append('\n');

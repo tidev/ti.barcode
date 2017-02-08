@@ -43,7 +43,7 @@ final class VCardContactEncoder extends ContactEncoder {
                          Iterable<String> addresses,
                          Iterable<String> phones,
                          Iterable<String> emails,
-                         String url,
+                         Iterable<String> url,
                          String note) {
     StringBuilder newContents = new StringBuilder(100);
     StringBuilder newDisplayContents = new StringBuilder(100);
@@ -58,7 +58,7 @@ final class VCardContactEncoder extends ContactEncoder {
       }
     });
     appendUpToUnique(newContents, newDisplayContents, "EMAIL", emails, Integer.MAX_VALUE, null);
-    append(newContents, newDisplayContents, "URL", url);
+    appendUpToUnique(newContents, newDisplayContents, "URL", url, Integer.MAX_VALUE, null);
     append(newContents, newDisplayContents, "NOTE", note);
     newContents.append("END:VCARD").append(TERMINATOR);
     return new String[] { newContents.toString(), newDisplayContents.toString() };
