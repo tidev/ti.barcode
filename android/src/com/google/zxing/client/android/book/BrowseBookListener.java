@@ -40,9 +40,13 @@ final class BrowseBookListener implements AdapterView.OnItemClickListener {
       // Clicked header, ignore it
       return;
     }
-    String pageId = items.get(position - 1).getPageId();
+    int itemOffset = position - 1;
+    if (itemOffset >= items.size()) {
+      return;
+    }
+    String pageId = items.get(itemOffset).getPageId();
     String query = SearchBookContentsResult.getQuery();
-    if (LocaleManager.isBookSearchUrl(activity.getISBN()) && pageId.length() > 0) {
+    if (LocaleManager.isBookSearchUrl(activity.getISBN()) && !pageId.isEmpty()) {
       String uri = activity.getISBN();
       int equals = uri.indexOf('=');
       String volumeId = uri.substring(equals + 1);

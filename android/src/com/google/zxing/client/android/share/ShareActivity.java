@@ -16,6 +16,7 @@
 
 package com.google.zxing.client.android.share;
 
+import android.os.Build;
 import android.provider.ContactsContract;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.android.Contents;
@@ -29,13 +30,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import android.provider.Browser;
-import android.text.ClipboardManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
+import com.google.zxing.client.android.clipboard.ClipboardInterface;
 
 /**
  * Barcode Scanner can share data like contacts and bookmarks by displaying a QR Code on screen,
@@ -51,9 +50,9 @@ public final class ShareActivity extends Activity {
   private static final int PICK_CONTACT = 1;
   private static final int PICK_APP = 2;
 
-  private Button clipboardButton;
+  private View clipboardButton;
 
-  private final Button.OnClickListener contactListener = new Button.OnClickListener() {
+  private final View.OnClickListener contactListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
       Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
@@ -62,7 +61,7 @@ public final class ShareActivity extends Activity {
     }
   };
 
-  private final Button.OnClickListener bookmarkListener = new Button.OnClickListener() {
+  private final View.OnClickListener bookmarkListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
       Intent intent = new Intent(Intent.ACTION_PICK);
@@ -72,7 +71,7 @@ public final class ShareActivity extends Activity {
     }
   };
 
-  private final Button.OnClickListener appListener = new Button.OnClickListener() {
+  private final View.OnClickListener appListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
       Intent intent = new Intent(Intent.ACTION_PICK);
@@ -82,13 +81,13 @@ public final class ShareActivity extends Activity {
     }
   };
 
-  private final Button.OnClickListener clipboardListener = new Button.OnClickListener() {
+  private final View.OnClickListener clipboardListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-      ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
       // Should always be true, because we grey out the clipboard button in onResume() if it's empty
-      if (clipboard.hasText()) {
-        launchSearch(clipboard.getText().toString());
+      CharSequence text = ClipboardInterface.getText(ShareActivity.this);
+      if (text != null) {
+        launchSearch(text.toString());
       }
     }
   };
@@ -98,7 +97,7 @@ public final class ShareActivity extends Activity {
     public boolean onKey(View view, int keyCode, KeyEvent event) {
       if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
         String text = ((TextView) view).getText().toString();
-        if (text != null && text.length() > 0) {
+        if (text != null && !text.isEmpty()) {
           launchSearch(text);
         }
         return true;
@@ -122,9 +121,14 @@ public final class ShareActivity extends Activity {
     setContentView(RHelper.getLayout("share"));
 
     findViewById(RHelper.getId("share_contact_button")).setOnClickListener(contactListener);
-    findViewById(RHelper.getId("share_bookmark_button")).setOnClickListener(bookmarkListener);
+    if (Build.VERSION.SDK_INT >= 23) { // Marshmallow / 6.0
+      // Can't access bookmarks in 6.0+
+      findViewById(RHelper.getId("share_bookmark_button")).setEnabled(false);
+    } else {
+      findViewById(RHelper.getId("share_bookmark_button")).setOnClickListener(bookmarkListener);
+    }
     findViewById(RHelper.getId("share_app_button")).setOnClickListener(appListener);
-    clipboardButton = (Button) findViewById(RHelper.getId("share_clipboard_button"));
+    clipboardButton = findViewById(RHelper.getId("share_clipboard_button"));
     clipboardButton.setOnClickListener(clipboardListener);
     findViewById(RHelper.getId("share_text_view")).setOnKeyListener(textListener);
   }
@@ -132,15 +136,7 @@ public final class ShareActivity extends Activity {
   @Override
   protected void onResume() {
     super.onResume();
-
-    ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-    if (clipboard.hasText()) {
-      clipboardButton.setEnabled(true);
-      clipboardButton.setText(RHelper.getString("button_share_clipboard"));
-    } else {
-      clipboardButton.setEnabled(false);
-      clipboardButton.setText(RHelper.getString("button_clipboard_empty"));
-    }
+    clipboardButton.setEnabled(ClipboardInterface.hasText(this));
   }
 
   @Override
@@ -184,13 +180,12 @@ public final class ShareActivity extends Activity {
       return; // Show error?
     }
     ContentResolver resolver = getContentResolver();
-    Bundle bundle = new Bundle();
 
     Cursor cursor;
     try {
       // We're seeing about six reports a week of this exception although I don't understand why.
       cursor = resolver.query(contactUri, null, null, null, null);
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException ignored) {
       return;
     }
     if (cursor == null) {
@@ -215,7 +210,8 @@ public final class ShareActivity extends Activity {
     }
 
     // Don't require a name to be present, this contact might be just a phone number.
-    if (name != null && name.length() > 0) {
+    Bundle bundle = new Bundle();
+    if (name != null && !name.isEmpty()) {
       bundle.putString(ContactsContract.Intents.Insert.NAME, massageContactData(name));
     }
 
@@ -229,9 +225,14 @@ public final class ShareActivity extends Activity {
         try {
           int foundPhone = 0;
           int phonesNumberColumn = phonesCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+          int phoneTypeColumn = phonesCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE);
           while (phonesCursor.moveToNext() && foundPhone < Contents.PHONE_KEYS.length) {
             String number = phonesCursor.getString(phonesNumberColumn);
-            bundle.putString(Contents.PHONE_KEYS[foundPhone], massageContactData(number));
+            if (number != null && !number.isEmpty()) {
+              bundle.putString(Contents.PHONE_KEYS[foundPhone], massageContactData(number));
+            }
+            int type = phonesCursor.getInt(phoneTypeColumn);
+            bundle.putInt(Contents.PHONE_TYPE_KEYS[foundPhone], type);
             foundPhone++;
           }
         } finally {
@@ -250,7 +251,9 @@ public final class ShareActivity extends Activity {
         if (methodsCursor.moveToNext()) {
           String data = methodsCursor.getString(
               methodsCursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS));
-          bundle.putString(ContactsContract.Intents.Insert.POSTAL, massageContactData(data));
+          if (data != null && !data.isEmpty()) {
+            bundle.putString(ContactsContract.Intents.Insert.POSTAL, massageContactData(data));
+          }
         }
       } finally {
         methodsCursor.close();
@@ -268,7 +271,9 @@ public final class ShareActivity extends Activity {
         int emailColumn = emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA);
         while (emailCursor.moveToNext() && foundEmail < Contents.EMAIL_KEYS.length) {
           String email = emailCursor.getString(emailColumn);
-          bundle.putString(Contents.EMAIL_KEYS[foundEmail], massageContactData(email));
+          if (email != null && !email.isEmpty()) {
+            bundle.putString(Contents.EMAIL_KEYS[foundEmail], massageContactData(email));
+          }
           foundEmail++;
         }
       } finally {

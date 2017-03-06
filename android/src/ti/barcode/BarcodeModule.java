@@ -31,9 +31,9 @@ import com.google.zxing.Result;
 import com.google.zxing.ResultPoint;
 import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.client.android.Intents;
-import com.google.zxing.client.android.PlanarYUVLuminanceSource;
+import com.google.zxing.PlanarYUVLuminanceSource;
 import com.google.zxing.client.android.PreferencesActivity;
-import com.google.zxing.client.android.camera.CameraConfigurationManager;
+import com.google.zxing.client.android.camera.CameraManager;
 import com.google.zxing.client.result.ParsedResult;
 import com.google.zxing.client.result.ResultParser;
 import com.google.zxing.common.HybridBinarizer;
@@ -102,6 +102,8 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	@Kroll.constant
 	public static final int FORMAT_ITF = 9;
 
+	private CameraManager cameraManager;
+
 	public BarcodeModule() {
 		super();
 	}
@@ -117,37 +119,38 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	@Kroll.method
 	public void cancel() {
 		_instance = null;
-		CaptureActivity.getInstance().cancel();
+		//CaptureActivity.getInstance().cancel();
 	}
 
 	@Kroll.method
 	@Kroll.getProperty
 	public boolean getUseFrontCamera() {
-		return new CameraConfigurationManager(getActivity()).getFrontCamera();
+		return true;//new CameraConfigurationManager(getActivity()).getFrontCamera();
 	}
 
 	@Kroll.method
 	@Kroll.setProperty
 	public void setUseFrontCamera(boolean value) {
-		new CameraConfigurationManager(getActivity()).setFrontCamera(value);
-		if (CaptureActivity.getInstance() != null) {
-			CaptureActivity.getInstance().reset();
-		}
+		//new CameraConfigurationManager(getActivity()).setFrontCamera(value);
+		// if (CaptureActivity.getInstance() != null) {
+		// 	CaptureActivity.getInstance().reset();
+		// }
 	}
 
 	@Kroll.method
 	@Kroll.getProperty
 	public boolean getUseLED() {
-		return new CameraConfigurationManager(getActivity()).getTorch();
+		//return new CameraConfigurationManager(getActivity()).getTorch();
+		return true;
 	}
 
 	@Kroll.method
 	@Kroll.setProperty
 	public void setUseLED(boolean value) {
-		new CameraConfigurationManager(getActivity()).setTorch(null, value);
-		if (CaptureActivity.getInstance() != null) {
-			CaptureActivity.getInstance().reset();
-		}
+		//new CameraConfigurationManager(getActivity()).setTorch(null, value);
+		// if (CaptureActivity.getInstance() != null) {
+		// 	CaptureActivity.getInstance().reset();
+		// }
 	}
 
 	static final Vector<BarcodeFormat> PRODUCT_FORMATS;
@@ -200,9 +203,9 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 			Activity activity = TiApplication.getAppCurrentActivity();
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 			decodeFormats = new Vector<BarcodeFormat>();
-			if (prefs.getBoolean(PreferencesActivity.KEY_DECODE_1D, true)) {
-				decodeFormats.addAll(ONE_D_FORMATS);
-			}
+			// if (prefs.getBoolean(PreferencesActivity.KEY_DECODE_1D, true)) {
+			// 	decodeFormats.addAll(ONE_D_FORMATS);
+			// }
 			if (prefs.getBoolean(PreferencesActivity.KEY_DECODE_QR, true)) {
 				decodeFormats.addAll(QR_CODE_FORMATS);
 			}
@@ -308,7 +311,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 		
 		// [MOD-217] -- Must set the package in order for it to automatically select the application as the source of the scanning activity.
 		intent.setPackage(TiApplication.getInstance().getPackageName());
-		CaptureActivity.PACKAGE_NAME = TiApplication.getInstance().getPackageName();
+		// CaptureActivity.PACKAGE_NAME = TiApplication.getInstance().getPackageName();
 
 		Activity activity = TiApplication.getAppCurrentActivity();
 		TiActivitySupport activitySupport = (TiActivitySupport) activity;
@@ -317,13 +320,13 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	}
 
 	private void disableInstructions() {
-		try {
-			PackageInfo info = getActivity().getPackageManager().getPackageInfo(TiApplication.getInstance().getPackageName(), 0);
-			PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putInt(PreferencesActivity.KEY_HELP_VERSION_SHOWN, info.versionCode)
-					.commit();
-		} catch (NameNotFoundException e) {
-			e.printStackTrace();
-		}
+		// try {
+		// 	PackageInfo info = getActivity().getPackageManager().getPackageInfo(TiApplication.getInstance().getPackageName(), 0);
+		// 	PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putInt(PreferencesActivity.KEY_HELP_VERSION_SHOWN, info.versionCode)
+		// 			.commit();
+		// } catch (NameNotFoundException e) {
+		// 	e.printStackTrace();
+		// }
 	}
 
 	@Override

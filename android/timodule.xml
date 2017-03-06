@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ti:module xmlns:ti="http://ti.appcelerator.org" xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Similar to tiapp.xml, but contains module/platform specific configuration in <iphone> and <android>/<android:manifest> sections -->
+    <property name="android.javac.target">1.7</property>       
+    <property name="android.javac.source">1.7</property> 
     <android>
         <manifest>
             <application>

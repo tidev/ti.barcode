@@ -28,7 +28,11 @@ public final class Intents {
   private Intents() {
   }
 
+  /**
+   * Constants related to the {@link Scan#ACTION} Intent.
+   */
   public static final class Scan {
+      
     public static final String USE_LED = "USE_LED";
     public static final String USE_FRONT_CAMERA = "USE_FRONT_CAMERA";
     public static final String SHOW_RECTANGLE = "SHOW_RECTANGLE";
@@ -36,7 +40,7 @@ public final class Intents {
     public static final String ALLOW_MENU = "ALLOW_MENU";
     public static final String ALLOW_INSTRUCTIONS = "ALLOW_INSTRUCTIONS";
     public static TiViewProxy overlayProxy = null;
-  
+    
     /**
      * Send this intent to open the Barcodes app in scanning mode, find a barcode, and return
      * the results.
@@ -75,13 +79,28 @@ public final class Intents {
     public static final String DATA_MATRIX_MODE = "DATA_MATRIX_MODE";
 
     /**
+     * Decode only Aztec.
+     */
+    public static final String AZTEC_MODE = "AZTEC_MODE";
+
+    /**
+     * Decode only PDF417.
+     */
+    public static final String PDF417_MODE = "PDF417_MODE";
+
+    /**
      * Comma-separated list of formats to scan for. The values must match the names of
      * {@link com.google.zxing.BarcodeFormat}s, e.g. {@link com.google.zxing.BarcodeFormat#EAN_13}.
-     * Example: "EAN_13,EAN_8,QR_CODE"
-     *
-     * This overrides {@link #MODE}.
+     * Example: "EAN_13,EAN_8,QR_CODE". This overrides {@link #MODE}.
      */
     public static final String FORMATS = "SCAN_FORMATS";
+
+    /**
+     * Optional parameter to specify the id of the camera from which to recognize barcodes.
+     * Overrides the default camera that would otherwise would have been selected.
+     * If provided, should be an int.
+     */
+    public static final String CAMERA_ID = "SCAN_CAMERA_ID";
 
     /**
      * @see com.google.zxing.DecodeHintType#CHARACTER_SET
@@ -109,38 +128,46 @@ public final class Intents {
     public static final String PROMPT_MESSAGE = "PROMPT_MESSAGE";
 
     /**
-     * If a barcode is found, Barcodes returns RESULT_OK to 
+     * If a barcode is found, Barcodes returns {@link android.app.Activity#RESULT_OK} to
      * {@link android.app.Activity#onActivityResult(int, int, android.content.Intent)}
      * of the app which requested the scan via
      * {@link android.app.Activity#startActivityForResult(android.content.Intent, int)}
      * The barcodes contents can be retrieved with
      * {@link android.content.Intent#getStringExtra(String)}. 
-     * If the user presses Back, the result code will be
-     * RESULT_CANCELED.
+     * If the user presses Back, the result code will be {@link android.app.Activity#RESULT_CANCELED}.
      */
     public static final String RESULT = "SCAN_RESULT";
 
     /**
-     * Call intent.getStringExtra(RESULT_FORMAT) to determine which barcode format was found.
-     * See Contents.Format for possible values.
+     * Call {@link android.content.Intent#getStringExtra(String)} with {@link #RESULT_FORMAT}
+     * to determine which barcode format was found.
+     * See {@link com.google.zxing.BarcodeFormat} for possible values.
      */
     public static final String RESULT_FORMAT = "SCAN_RESULT_FORMAT";
 
     /**
-     * Call intent.getByteArrayExtra(RESULT_BYTES) to get a {@code byte[]} of raw bytes in the
-     * barcode, if available.
+     * Call {@link android.content.Intent#getStringExtra(String)} with {@link #RESULT_UPC_EAN_EXTENSION}
+     * to return the content of any UPC extension barcode that was also found. Only applicable
+     * to {@link com.google.zxing.BarcodeFormat#UPC_A} and {@link com.google.zxing.BarcodeFormat#EAN_13}
+     * formats.
+     */
+    public static final String RESULT_UPC_EAN_EXTENSION = "SCAN_RESULT_UPC_EAN_EXTENSION";
+
+    /**
+     * Call {@link android.content.Intent#getByteArrayExtra(String)} with {@link #RESULT_BYTES}
+     * to get a {@code byte[]} of raw bytes in the barcode, if available.
      */
     public static final String RESULT_BYTES = "SCAN_RESULT_BYTES";
 
     /**
      * Key for the value of {@link com.google.zxing.ResultMetadataType#ORIENTATION}, if available.
-     * Call intent.getIntExtra(RESULT_ORIENTATION).
+     * Call {@link android.content.Intent#getIntArrayExtra(String)} with {@link #RESULT_ORIENTATION}.
      */
     public static final String RESULT_ORIENTATION = "SCAN_RESULT_ORIENTATION";
 
     /**
      * Key for the value of {@link com.google.zxing.ResultMetadataType#ERROR_CORRECTION_LEVEL}, if available.
-     * Call intent.getStringExtra(RESULT_ERROR_CORRECTION_LEVEL).
+     * Call {@link android.content.Intent#getStringExtra(String)} with {@link #RESULT_ERROR_CORRECTION_LEVEL}.
      */
     public static final String RESULT_ERROR_CORRECTION_LEVEL = "SCAN_RESULT_ERROR_CORRECTION_LEVEL";
 
@@ -148,11 +175,12 @@ public final class Intents {
      * Prefix for keys that map to the values of {@link com.google.zxing.ResultMetadataType#BYTE_SEGMENTS},
      * if available. The actual values will be set under a series of keys formed by adding 0, 1, 2, ...
      * to this prefix. So the first byte segment is under key "SCAN_RESULT_BYTE_SEGMENTS_0" for example.
+     * Call {@link android.content.Intent#getByteArrayExtra(String)} with these keys.
      */
     public static final String RESULT_BYTE_SEGMENTS_PREFIX = "SCAN_RESULT_BYTE_SEGMENTS_";
 
     /**
-     * Setting this to false will not save scanned codes in the history.
+     * Setting this to false will not save scanned codes in the history. Specified as a {@code boolean}.
      */
     public static final String SAVE_HISTORY = "SAVE_HISTORY";
 
@@ -160,6 +188,9 @@ public final class Intents {
     }
   }
 
+  /**
+   * Constants related to the scan history and retrieving history items.
+   */
   public static final class History {
 
     public static final String ITEM_NUMBER = "ITEM_NUMBER";
@@ -168,6 +199,9 @@ public final class Intents {
     }
   }
 
+  /**
+   * Constants related to the {@link Encode#ACTION} Intent.
+   */
   public static final class Encode {
     /**
      * Send this intent to encode a piece of data as a QR code and display it full screen, so
@@ -206,6 +240,9 @@ public final class Intents {
     }
   }
 
+  /**
+   * Constants related to the {@link SearchBookContents#ACTION} Intent.
+   */
   public static final class SearchBookContents {
     /**
      * Use Google Book Search to search the contents of the book provided.
@@ -226,6 +263,9 @@ public final class Intents {
     }
   }
 
+  /**
+   * Constants related to the {@link WifiConnect#ACTION} Intent.
+   */
   public static final class WifiConnect {
     /**
      * Internal intent used to trigger connection to a wi-fi network.
@@ -251,6 +291,9 @@ public final class Intents {
     }
   }
 
+  /**
+   * Constants related to the {@link Share#ACTION} Intent.
+   */
   public static final class Share {
     /**
      * Give the user a choice of items to encode as a barcode, then render it as a QR Code and

@@ -16,9 +16,11 @@
 
 package com.google.zxing.client.android;
 
+import android.graphics.Bitmap;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.DecodeHintType;
 import com.google.zxing.MultiFormatReader;
+import com.google.zxing.PlanarYUVLuminanceSource;
 import com.google.zxing.ReaderException;
 import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
@@ -29,6 +31,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Map;
 
 import ti.barcode.RHelper;
@@ -52,12 +55,12 @@ final class DecodeHandler extends Handler {
     if (!running) {
       return;
     }
-    if (message.what == RHelper.getId("decode")) {
-      decode((byte[]) message.obj, message.arg1, message.arg2);
-	} else if (message.what == RHelper.getId("quit")) {
-      running = false;
-      Looper.myLooper().quit();
-	}
+    if (message.what== RHelper.getId("decode")) {
+        decode((byte[]) message.obj, message.arg1, message.arg2);
+    } else if (message.what==RHelper.getId("quit")){
+        running = false;
+        Looper.myLooper().quit();
+    }
   }
 
   /**
@@ -91,7 +94,7 @@ final class DecodeHandler extends Handler {
       if (handler != null) {
         Message message = Message.obtain(handler, RHelper.getId("decode_succeeded"), rawResult);
         Bundle bundle = new Bundle();
-        bundle.putParcelable(DecodeThread.BARCODE_BITMAP, source.renderCroppedGreyscaleBitmap());
+        bundleThumbnail(source, bundle);        
         message.setData(bundle);
         message.sendToTarget();
       }
@@ -101,6 +104,17 @@ final class DecodeHandler extends Handler {
         message.sendToTarget();
       }
     }
+  }
+
+  private static void bundleThumbnail(PlanarYUVLuminanceSource source, Bundle bundle) {
+    int[] pixels = source.renderThumbnail();
+    int width = source.getThumbnailWidth();
+    int height = source.getThumbnailHeight();
+    Bitmap bitmap = Bitmap.createBitmap(pixels, 0, width, width, height, Bitmap.Config.ARGB_8888);
+    ByteArrayOutputStream out = new ByteArrayOutputStream();    
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out);
+    bundle.putByteArray(DecodeThread.BARCODE_BITMAP, out.toByteArray());
+    bundle.putFloat(DecodeThread.BARCODE_SCALED_FACTOR, (float) width / source.getWidth());
   }
 
 }
