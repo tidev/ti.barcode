@@ -102,7 +102,6 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	@Kroll.constant
 	public static final int FORMAT_ITF = 9;
 
-	private CameraManager cameraManager;
 
 	public BarcodeModule() {
 		super();
@@ -140,7 +139,6 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	@Kroll.method
 	@Kroll.getProperty
 	public boolean getUseLED() {
-		//return new CameraConfigurationManager(getActivity()).getTorch();
 		return true;
 	}
 

@@ -26,6 +26,8 @@ import android.view.SurfaceHolder;
 import com.google.zxing.PlanarYUVLuminanceSource;
 import com.google.zxing.client.android.camera.open.OpenCamera;
 import com.google.zxing.client.android.camera.open.OpenCameraInterface;
+import ti.barcode.BarcodeModule;
+import android.util.DisplayMetrics;
 
 import java.io.IOException;
 
@@ -41,10 +43,10 @@ public final class CameraManager {
 
   private static final String TAG = CameraManager.class.getSimpleName();
 
-  private static final int MIN_FRAME_WIDTH = 240;
-  private static final int MIN_FRAME_HEIGHT = 240;
-  private static final int MAX_FRAME_WIDTH = 1200; // = 5/8 * 1920
-  private static final int MAX_FRAME_HEIGHT = 675; // = 5/8 * 1080
+  private int MIN_FRAME_WIDTH = 240;
+  private int MIN_FRAME_HEIGHT = 240;
+  private int MAX_FRAME_WIDTH = 500; // = 5/8 * 1920
+  private int MAX_FRAME_HEIGHT = 428; // = 5/8 * 1080
 
   private final Context context;
   private final CameraConfigurationManager configManager;
@@ -223,12 +225,28 @@ public final class CameraManager {
         return null;
       }
 
-      int width = findDesiredDimensionInRange(screenResolution.x, MIN_FRAME_WIDTH, MAX_FRAME_WIDTH);
-      int height = findDesiredDimensionInRange(screenResolution.y, MIN_FRAME_HEIGHT, MAX_FRAME_HEIGHT);
+      BarcodeModule barcodeModule = BarcodeModule.getInstance();
+      DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+      float density = metrics.density;
+
+      MIN_FRAME_WIDTH = Math.round(MIN_FRAME_WIDTH * density);
+      MIN_FRAME_HEIGHT = Math.round(MIN_FRAME_HEIGHT * density);
+      MAX_FRAME_WIDTH = Math.round(MAX_FRAME_WIDTH * density);
+      MAX_FRAME_HEIGHT = Math.round(MAX_FRAME_HEIGHT * density);
+
+      if (barcodeModule != null) {
+          MAX_FRAME_WIDTH = Math.round(barcodeModule.frameWidth * density);
+          MAX_FRAME_HEIGHT = Math.round(barcodeModule.frameHeight * density);
+      }
+
+      // just use the max value
+      int width =  MAX_FRAME_WIDTH;
+      int height =  MAX_FRAME_HEIGHT;
 
       int leftOffset = (screenResolution.x - width) / 2;
       int topOffset = (screenResolution.y - height) / 2;
-      framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
+      framingRect = new Rect(leftOffset, topOffset, (leftOffset + width),( topOffset + height));
+
       Log.d(TAG, "Calculated framing rect: " + framingRect);
     }
     return framingRect;
