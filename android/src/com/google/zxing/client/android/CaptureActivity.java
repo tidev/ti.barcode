@@ -69,6 +69,7 @@ import java.text.DateFormat;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Map;
+import android.widget.FrameLayout;
 
 import ti.barcode.RHelper;
 /**
@@ -117,10 +118,32 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private AmbientLightManager ambientLightManager;
   
   private static final int SHARE_ID = Menu.FIRST;
-    private static final int HISTORY_ID = Menu.FIRST + 1;
-    private static final int SETTINGS_ID = Menu.FIRST + 2;
-    private static final int HELP_ID = Menu.FIRST + 3;
-    private static final int ABOUT_ID = Menu.FIRST + 4;
+  private static final int HISTORY_ID = Menu.FIRST + 1;
+  private static final int SETTINGS_ID = Menu.FIRST + 2;
+  private static final int HELP_ID = Menu.FIRST + 3;
+  private static final int ABOUT_ID = Menu.FIRST + 4;
+
+  private FrameLayout _layout;
+  private static CaptureActivity _instance;
+
+  public static CaptureActivity getInstance() {
+      return _instance;
+  }
+
+  public void cancel() {
+      setResult(RESULT_CANCELED);
+      finish();
+  }
+
+  public void reset() {
+      runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+              pause();
+              resume();
+          }
+      });
+  }
 
   ViewfinderView getViewfinderView() {
     return viewfinderView;
@@ -140,8 +163,17 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     Window window = getWindow();
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    setContentView(RHelper.getLayout("capture"));
+    _instance = this;
+    _layout = (FrameLayout) View.inflate(this, RHelper.getLayout("capture"), null);
+    
+    setContentView(_layout);
 
+    if (Intents.Scan.overlayProxy != null) {
+        View overlayView = Intents.Scan.overlayProxy.getOrCreateView().getNativeView();
+        _layout.addView(overlayView);
+        overlayView.bringToFront();
+    }
+    
     hasSurface = false;
     inactivityTimer = new InactivityTimer(this);
     beepManager = new BeepManager(this);
@@ -153,7 +185,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   @Override
   protected void onResume() {
     super.onResume();
-    
+    resume();
+  }
+
+  private void resume(){
     // historyManager must be initialized here to update the history preference
     historyManager = new HistoryManager(this);
     historyManager.trimHistory();
@@ -306,6 +341,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   @Override
   protected void onPause() {
+      pause();
+      super.onPause();
+  }
+
+  private void pause() {
     if (handler != null) {
       handler.quitSynchronously();
       handler = null;
@@ -325,6 +365,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   @Override
   protected void onDestroy() {
+    _instance = null;
+    if (Intents.Scan.overlayProxy != null) {
+        _layout.removeView(Intents.Scan.overlayProxy.getOrCreateView().getNativeView());
+    }
+
     inactivityTimer.shutdown();
     super.onDestroy();
   }

@@ -118,22 +118,23 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	@Kroll.method
 	public void cancel() {
 		_instance = null;
-		//CaptureActivity.getInstance().cancel();
+		CaptureActivity.getInstance().cancel();
 	}
 
 	@Kroll.method
 	@Kroll.getProperty
 	public boolean getUseFrontCamera() {
-		return true;//new CameraConfigurationManager(getActivity()).getFrontCamera();
+		//new CameraConfigurationManager(getActivity()).getFrontCamera();
+		return true;
 	}
 
 	@Kroll.method
 	@Kroll.setProperty
 	public void setUseFrontCamera(boolean value) {
 		//new CameraConfigurationManager(getActivity()).setFrontCamera(value);
-		// if (CaptureActivity.getInstance() != null) {
-		// 	CaptureActivity.getInstance().reset();
-		// }
+		if (CaptureActivity.getInstance() != null) {
+			CaptureActivity.getInstance().reset();
+		}
 	}
 
 	@Kroll.method
