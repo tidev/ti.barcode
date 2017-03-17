@@ -35,7 +35,7 @@ import com.google.zxing.client.android.camera.open.OpenCamera;
  * configure the camera hardware.
  */
 @SuppressWarnings("deprecation") // camera APIs
-final class CameraConfigurationManager {
+public final class CameraConfigurationManager {
 
   private static final String TAG = "CameraConfiguration";
 
@@ -47,7 +47,7 @@ final class CameraConfigurationManager {
   private Point bestPreviewSize;
   private Point previewSizeOnScreen;
 
-  CameraConfigurationManager(Context context) {
+  public CameraConfigurationManager(Context context) {
     this.context = context;
   }
 
@@ -230,12 +230,12 @@ final class CameraConfigurationManager {
     return false;
   }
 
-  void setTorch(Camera camera, boolean newSetting) {
-    Camera.Parameters parameters = camera.getParameters();
-    doSetTorch(parameters, newSetting, false);
-    camera.setParameters(parameters);
+  public void setTorch(Camera camera, boolean newSetting) {
+      Camera.Parameters parameters = camera.getParameters();
+      doSetTorch(parameters, newSetting, false);
+      camera.setParameters(parameters);
   }
-
+  
   private void initializeTorch(Camera.Parameters parameters, SharedPreferences prefs, boolean safeMode) {
     boolean currentSetting = FrontLightMode.readPref(prefs) == FrontLightMode.ON;
     doSetTorch(parameters, currentSetting, safeMode);
@@ -248,5 +248,25 @@ final class CameraConfigurationManager {
       CameraConfigurationUtils.setBestExposure(parameters, newSetting);
     }
   }
+
+
+
+    // custom code
+
+  
+    public void setFrontCamera(boolean newSetting) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean currentSetting = prefs.getBoolean(PreferencesActivity.KEY_FRONT_CAMERA, false);
+        if (currentSetting != newSetting) {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean(PreferencesActivity.KEY_FRONT_CAMERA, newSetting);
+            editor.commit();
+        }
+    }
+
+    public boolean getFrontCamera() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(PreferencesActivity.KEY_FRONT_CAMERA, false);
+    }
 
 }

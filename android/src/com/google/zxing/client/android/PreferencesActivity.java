@@ -69,4 +69,7 @@ public final class PreferencesActivity extends Activity {
   }
    */
 
+   // custom code
+    public static final String KEY_FRONT_CAMERA = "preferences_front_camera";
+    public static final String KEY_FRONT_LIGHT = "preferences_front_light";
 }

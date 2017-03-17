@@ -37,6 +37,9 @@ import com.google.zxing.client.android.camera.CameraManager;
 import com.google.zxing.client.result.ParsedResult;
 import com.google.zxing.client.result.ResultParser;
 import com.google.zxing.common.HybridBinarizer;
+import com.google.zxing.client.android.camera.CameraConfigurationManager;
+import com.google.zxing.client.android.camera.open.OpenCamera;
+import com.google.zxing.client.android.camera.open.OpenCameraInterface;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -52,6 +55,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	// Standard Debugging variables
 	private static final String LCAT = "BarcodeModule";
 	private boolean keepOpen = false;
+	
 	public int frameWidth = 1200;
 	public int frameHeight = 675;
 
@@ -124,14 +128,13 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	@Kroll.method
 	@Kroll.getProperty
 	public boolean getUseFrontCamera() {
-		//new CameraConfigurationManager(getActivity()).getFrontCamera();
-		return true;
+		return new CameraConfigurationManager(getActivity()).getFrontCamera();
 	}
 
 	@Kroll.method
 	@Kroll.setProperty
 	public void setUseFrontCamera(boolean value) {
-		//new CameraConfigurationManager(getActivity()).setFrontCamera(value);
+		new CameraConfigurationManager(getActivity()).setFrontCamera(value);
 		if (CaptureActivity.getInstance() != null) {
 			CaptureActivity.getInstance().reset();
 		}
@@ -140,16 +143,13 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	@Kroll.method
 	@Kroll.getProperty
 	public boolean getUseLED() {
-		return true;
+		return CaptureActivity.getInstance().getCameraManager().getTorch();
 	}
 
 	@Kroll.method
 	@Kroll.setProperty
 	public void setUseLED(boolean value) {
-		//new CameraConfigurationManager(getActivity()).setTorch(null, value);
-		// if (CaptureActivity.getInstance() != null) {
-		// 	CaptureActivity.getInstance().reset();
-		// }
+		CaptureActivity.getInstance().getCameraManager().setTorch(value);
 	}
 
 	static final Vector<BarcodeFormat> PRODUCT_FORMATS;

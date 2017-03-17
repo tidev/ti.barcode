@@ -168,6 +168,15 @@ public final class CameraManager {
     }
   }
 
+  public synchronized boolean getTorch() {
+      OpenCamera theCamera = camera;
+      if (theCamera != null) {
+          return configManager.getTorchState(theCamera.getCamera());
+      }
+      
+      return false;
+  }
+  
   /**
    * Convenience method for {@link com.google.zxing.client.android.CaptureActivity}
    *
