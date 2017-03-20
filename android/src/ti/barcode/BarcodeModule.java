@@ -49,15 +49,15 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
 
-@Kroll.module(name = "Barcode", id = "ti.barcode", propertyAccessors = { "displayedMessage", "allowRotation", "allowMenu", "allowInstructions" })
+@Kroll.module(name = "Barcode", id = "ti.barcode", propertyAccessors = { "displayedMessage", "allowRotation" })
 public class BarcodeModule extends KrollModule implements TiActivityResultHandler {
 
 	// Standard Debugging variables
 	private static final String LCAT = "BarcodeModule";
 	private boolean keepOpen = false;
 	
-	public int frameWidth = 1200;
-	public int frameHeight = 675;
+	public int frameWidth = 500;
+	public int frameHeight = 428;
 
 	@Kroll.constant
 	public static final int UNKNOWN = 0;
@@ -297,13 +297,6 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 			intent.putExtra(Intents.Scan.SHOW_RECTANGLE, true);
 			intent.putExtra(Intents.Scan.KEEP_OPEN, false);
 		}
-
-		if (!properties.optBoolean("allowInstructions", true)) {
-			disableInstructions();
-		}
-
-		intent.putExtra(Intents.Scan.ALLOW_MENU, properties.optBoolean("allowMenu", true));
-		intent.putExtra(Intents.Scan.ALLOW_INSTRUCTIONS, properties.optBoolean("allowInstructions", true));
 		
 		intent.putExtra(Intents.Scan.PROMPT_MESSAGE, properties.optString("displayedMessage", null));
 
@@ -318,15 +311,6 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 		activitySupport.launchActivityForResult(intent, resultCode, this);
 	}
 
-	private void disableInstructions() {
-		// try {
-		// 	PackageInfo info = getActivity().getPackageManager().getPackageInfo(TiApplication.getInstance().getPackageName(), 0);
-		// 	PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putInt(PreferencesActivity.KEY_HELP_VERSION_SHOWN, info.versionCode)
-		// 			.commit();
-		// } catch (NameNotFoundException e) {
-		// 	e.printStackTrace();
-		// }
-	}
 
 	@Override
 	public void onError(Activity activity, int requestCode, Exception e) {

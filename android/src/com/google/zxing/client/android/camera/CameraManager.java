@@ -28,6 +28,7 @@ import com.google.zxing.client.android.camera.open.OpenCamera;
 import com.google.zxing.client.android.camera.open.OpenCameraInterface;
 import ti.barcode.BarcodeModule;
 import android.util.DisplayMetrics;
+import java.lang.IllegalArgumentException;
 
 import java.io.IOException;
 
@@ -243,14 +244,28 @@ public final class CameraManager {
       MAX_FRAME_WIDTH = Math.round(MAX_FRAME_WIDTH * density);
       MAX_FRAME_HEIGHT = Math.round(MAX_FRAME_HEIGHT * density);
 
-      if (barcodeModule != null) {
-          MAX_FRAME_WIDTH = Math.round(barcodeModule.frameWidth * density);
-          MAX_FRAME_HEIGHT = Math.round(barcodeModule.frameHeight * density);
-      }
+	  int width = 100;
+	  int height = 100;
 
-      // just use the max value
-      int width =  MAX_FRAME_WIDTH;
-      int height =  MAX_FRAME_HEIGHT;
+      if (barcodeModule != null) {
+	      width =  Math.round(barcodeModule.frameWidth * density);
+	      height =  Math.round(barcodeModule.frameHeight * density);
+      } else {
+		  width = screenResolution.x * 3 / 4;
+		  if (width < MIN_FRAME_WIDTH) {
+			  width = MIN_FRAME_WIDTH;
+		  } else if (width > MAX_FRAME_WIDTH) {
+			  width = MAX_FRAME_WIDTH;
+		  }
+		  height = screenResolution.y * 3 / 4;
+		  if (height < MIN_FRAME_HEIGHT) {
+			  height = MIN_FRAME_HEIGHT;
+		  } else if (height > MAX_FRAME_HEIGHT) {
+			  height = MAX_FRAME_HEIGHT;
+		  }
+	  }
+
+      
 
       int leftOffset = (screenResolution.x - width) / 2;
       int topOffset = (screenResolution.y - height) / 2;
@@ -349,12 +364,19 @@ public final class CameraManager {
    */
   public PlanarYUVLuminanceSource buildLuminanceSource(byte[] data, int width, int height) {
     Rect rect = getFramingRectInPreview();
+	PlanarYUVLuminanceSource p;
+	
     if (rect == null) {
       return null;
     }
+	
+	try {
+		p = new PlanarYUVLuminanceSource(data, width, height, rect.left, rect.top,rect.width(), rect.height(), false);
+	} catch (IllegalArgumentException e) {
+		return null;
+	}
     // Go ahead and assume it's YUV rather than die.
-    return new PlanarYUVLuminanceSource(data, width, height, rect.left, rect.top,
-                                        rect.width(), rect.height(), false);
+    return p;
   }
 
 }
