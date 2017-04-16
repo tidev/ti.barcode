@@ -194,7 +194,7 @@ final class DecodeHintManager {
       Log.w(TAG, "Unsupported hint type '" + hintType + "' of type " + hintType.getValueType());
     }
 
-    Log.i(TAG, "Hints from the URI: " + hints);
+    Log.d(TAG, "Hints from the URI: " + hints);
     return hints;
   }
 
@@ -229,7 +229,7 @@ final class DecodeHintManager {
       }
     }
 
-    Log.i(TAG, "Hints from the Intent: " + hints);
+    Log.d(TAG, "Hints from the Intent: " + hints);
     return hints;
   }
 

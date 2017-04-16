@@ -29,6 +29,7 @@ import android.view.WindowManager;
 import com.google.zxing.client.android.PreferencesActivity;
 import com.google.zxing.client.android.camera.open.CameraFacing;
 import com.google.zxing.client.android.camera.open.OpenCamera;
+import com.google.zxing.client.android.camera.open.OpenCameraInterface;
 
 /**
  * A class which deals with reading, parsing, and setting the camera parameters which are used to
@@ -82,15 +83,15 @@ public final class CameraConfigurationManager {
           throw new IllegalArgumentException("Bad rotation: " + displayRotation);
         }
     }
-    Log.i(TAG, "Display at: " + cwRotationFromNaturalToDisplay);
+    Log.d(TAG, "Display at: " + cwRotationFromNaturalToDisplay);
 
     int cwRotationFromNaturalToCamera = camera.getOrientation();
-    Log.i(TAG, "Camera at: " + cwRotationFromNaturalToCamera);
+    Log.d(TAG, "Camera at: " + cwRotationFromNaturalToCamera);
 
     // Still not 100% sure about this. But acts like we need to flip this:
     if (camera.getFacing() == CameraFacing.FRONT) {
       cwRotationFromNaturalToCamera = (360 - cwRotationFromNaturalToCamera) % 360;
-      Log.i(TAG, "Front camera overriden to: " + cwRotationFromNaturalToCamera);
+      Log.d(TAG, "Front camera overriden to: " + cwRotationFromNaturalToCamera);
     }
 
     /*
@@ -102,30 +103,30 @@ public final class CameraConfigurationManager {
       overrideRotationString = prefs.getString(PreferencesActivity.KEY_FORCE_CAMERA_ORIENTATION, null);
     }
     if (overrideRotationString != null && !"-".equals(overrideRotationString)) {
-      Log.i(TAG, "Overriding camera manually to " + overrideRotationString);
+      Log.d(TAG, "Overriding camera manually to " + overrideRotationString);
       cwRotationFromNaturalToCamera = Integer.parseInt(overrideRotationString);
     }
      */
 
     cwRotationFromDisplayToCamera =
         (360 + cwRotationFromNaturalToCamera - cwRotationFromNaturalToDisplay) % 360;
-    Log.i(TAG, "Final display orientation: " + cwRotationFromDisplayToCamera);
+    Log.d(TAG, "Final display orientation: " + cwRotationFromDisplayToCamera);
     if (camera.getFacing() == CameraFacing.FRONT) {
-      Log.i(TAG, "Compensating rotation for front camera");
+      Log.d(TAG, "Compensating rotation for front camera");
       cwNeededRotation = (360 - cwRotationFromDisplayToCamera) % 360;
     } else {
       cwNeededRotation = cwRotationFromDisplayToCamera;
     }
-    Log.i(TAG, "Clockwise rotation from display to camera: " + cwNeededRotation);
+    Log.d(TAG, "Clockwise rotation from display to camera: " + cwNeededRotation);
 
     Point theScreenResolution = new Point();
     display.getSize(theScreenResolution);
     screenResolution = theScreenResolution;
-    Log.i(TAG, "Screen resolution in current orientation: " + screenResolution);
+    Log.d(TAG, "Screen resolution in current orientation: " + screenResolution);
     cameraResolution = CameraConfigurationUtils.findBestPreviewSizeValue(parameters, screenResolution);
-    Log.i(TAG, "Camera resolution: " + cameraResolution);
+    Log.d(TAG, "Camera resolution: " + cameraResolution);
     bestPreviewSize = CameraConfigurationUtils.findBestPreviewSizeValue(parameters, screenResolution);
-    Log.i(TAG, "Best available preview size: " + bestPreviewSize);
+    Log.d(TAG, "Best available preview size: " + bestPreviewSize);
 
     boolean isScreenPortrait = screenResolution.x < screenResolution.y;
     boolean isPreviewSizePortrait = bestPreviewSize.x < bestPreviewSize.y;
@@ -135,7 +136,7 @@ public final class CameraConfigurationManager {
     } else {
       previewSizeOnScreen = new Point(bestPreviewSize.y, bestPreviewSize.x);
     }
-    Log.i(TAG, "Preview size on screen: " + previewSizeOnScreen);
+    Log.d(TAG, "Preview size on screen: " + previewSizeOnScreen);
   }
 
   void setDesiredCameraParameters(OpenCamera camera, boolean safeMode) {
@@ -148,7 +149,7 @@ public final class CameraConfigurationManager {
       return;
     }
 
-    Log.i(TAG, "Initial camera parameters: " + parameters.flatten());
+    Log.d(TAG, "Initial camera parameters: " + parameters.flatten());
 
     if (safeMode) {
       Log.w(TAG, "In camera config safe mode -- most settings will not be honored");
@@ -178,7 +179,6 @@ public final class CameraConfigurationManager {
         CameraConfigurationUtils.setFocusArea(parameters);
         CameraConfigurationUtils.setMetering(parameters);
       }
-
     }
 
     parameters.setPreviewSize(bestPreviewSize.x, bestPreviewSize.y);
@@ -252,8 +252,6 @@ public final class CameraConfigurationManager {
 
 
     // custom code
-
-  
     public void setFrontCamera(boolean newSetting) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         boolean currentSetting = prefs.getBoolean(PreferencesActivity.KEY_FRONT_CAMERA, false);

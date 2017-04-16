@@ -29,6 +29,9 @@ import com.google.zxing.client.android.camera.open.OpenCameraInterface;
 import ti.barcode.BarcodeModule;
 import android.util.DisplayMetrics;
 import java.lang.IllegalArgumentException;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import com.google.zxing.client.android.PreferencesActivity;
 
 import java.io.IOException;
 
@@ -45,7 +48,7 @@ public final class CameraManager {
   private static final String TAG = CameraManager.class.getSimpleName();
 
   private int MIN_FRAME_WIDTH = 240;
-  private int MIN_FRAME_HEIGHT = 240;
+  private int MIN_FRAME_HEIGHT = 205;
   private int MAX_FRAME_WIDTH = 500; // = 5/8 * 1920
   private int MAX_FRAME_HEIGHT = 428; // = 5/8 * 1080
 
@@ -58,6 +61,7 @@ public final class CameraManager {
   private boolean initialized;
   private boolean previewing;
   private int requestedCameraId = OpenCameraInterface.NO_REQUESTED_CAMERA;
+  private int newCam = -1;
   private int requestedFramingRectWidth;
   private int requestedFramingRectHeight;
   /**
@@ -81,7 +85,12 @@ public final class CameraManager {
   public synchronized void openDriver(SurfaceHolder holder) throws IOException {
     OpenCamera theCamera = camera;
     if (theCamera == null) {
-      theCamera = OpenCameraInterface.open(requestedCameraId);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		if (prefs.getBoolean(PreferencesActivity.KEY_FRONT_CAMERA, false)) {
+			theCamera = OpenCameraInterface.open(0);
+		} else {
+			theCamera = OpenCameraInterface.open(1);
+		}
       if (theCamera == null) {
         throw new IOException("Camera.open() failed to return object from driver");
       }
@@ -106,7 +115,7 @@ public final class CameraManager {
     } catch (RuntimeException re) {
       // Driver failed
       Log.w(TAG, "Camera rejected parameters. Setting only minimal safe-mode parameters");
-      Log.i(TAG, "Resetting to saved camera params: " + parametersFlattened);
+      Log.d(TAG, "Resetting to saved camera params: " + parametersFlattened);
       // Reset:
       if (parametersFlattened != null) {
         parameters = cameraObject.getParameters();
@@ -238,34 +247,21 @@ public final class CameraManager {
       BarcodeModule barcodeModule = BarcodeModule.getInstance();
       DisplayMetrics metrics = context.getResources().getDisplayMetrics();
       float density = metrics.density;
-
+	  
       MIN_FRAME_WIDTH = Math.round(MIN_FRAME_WIDTH * density);
       MIN_FRAME_HEIGHT = Math.round(MIN_FRAME_HEIGHT * density);
       MAX_FRAME_WIDTH = Math.round(MAX_FRAME_WIDTH * density);
       MAX_FRAME_HEIGHT = Math.round(MAX_FRAME_HEIGHT * density);
-
-	  int width = 100;
-	  int height = 100;
-
-      if (barcodeModule != null) {
+	  int width = MIN_FRAME_WIDTH;
+	  int height = MIN_FRAME_HEIGHT;
+	  
+      if (barcodeModule != null && barcodeModule.frameWidth != 0 && barcodeModule.frameHeight != 0) {
 	      width =  Math.round(barcodeModule.frameWidth * density);
 	      height =  Math.round(barcodeModule.frameHeight * density);
       } else {
-		  width = screenResolution.x * 3 / 4;
-		  if (width < MIN_FRAME_WIDTH) {
-			  width = MIN_FRAME_WIDTH;
-		  } else if (width > MAX_FRAME_WIDTH) {
-			  width = MAX_FRAME_WIDTH;
-		  }
-		  height = screenResolution.y * 3 / 4;
-		  if (height < MIN_FRAME_HEIGHT) {
-			  height = MIN_FRAME_HEIGHT;
-		  } else if (height > MAX_FRAME_HEIGHT) {
-			  height = MAX_FRAME_HEIGHT;
-		  }
+		  width = findDesiredDimensionInRange(screenResolution.x, MIN_FRAME_WIDTH, MAX_FRAME_WIDTH);
+		  height = findDesiredDimensionInRange(screenResolution.y, MIN_FRAME_HEIGHT, MAX_FRAME_HEIGHT);
 	  }
-
-      
 
       int leftOffset = (screenResolution.x - width) / 2;
       int topOffset = (screenResolution.y - height) / 2;
@@ -324,6 +320,7 @@ public final class CameraManager {
    */
   public synchronized void setManualCameraId(int cameraId) {
     requestedCameraId = cameraId;
+    newCam = cameraId;
   }
   
   /**

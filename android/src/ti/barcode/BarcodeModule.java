@@ -56,8 +56,8 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	private static final String LCAT = "BarcodeModule";
 	private boolean keepOpen = false;
 	
-	public int frameWidth = 500;
-	public int frameHeight = 428;
+	public int frameWidth = 0;
+	public int frameHeight = 0;
 
 	@Kroll.constant
 	public static final int UNKNOWN = 0;
@@ -136,6 +136,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	public void setUseFrontCamera(boolean value) {
 		new CameraConfigurationManager(getActivity()).setFrontCamera(value);
 		if (CaptureActivity.getInstance() != null) {
+			CaptureActivity.getInstance().getCameraManager().setManualCameraId(1);
 			CaptureActivity.getInstance().reset();
 		}
 	}
@@ -283,15 +284,15 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 					for (Object acceptedFormat : acceptedFormats) {
 						formats += FORMAT_STRINGS[TiConvert.toInt(acceptedFormat)] + ",";
 					}
-					Log.i(LCAT, formats.substring(0, formats.length() - 1));
+					Log.d(LCAT, formats.substring(0, formats.length() - 1));
 					intent.putExtra(Intents.Scan.FORMATS, formats.substring(0, formats.length() - 1));
 				}
 			}
 
 			intent.putExtra(Intents.Scan.SHOW_RECTANGLE, argsDict.optBoolean("showRectangle", true));
 			intent.putExtra(Intents.Scan.KEEP_OPEN, argsDict.optBoolean("keepOpen", false));
-			frameWidth = argsDict.optInt("frameWidth",1200);
-			frameHeight = argsDict.optInt("frameHeight",675);
+			frameWidth = argsDict.optInt("frameWidth",0);
+			frameHeight = argsDict.optInt("frameHeight",0);
 		} else {
 			Intents.Scan.overlayProxy = null;
 			intent.putExtra(Intents.Scan.SHOW_RECTANGLE, true);

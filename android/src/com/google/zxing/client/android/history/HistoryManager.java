@@ -257,7 +257,7 @@ public final class HistoryManager {
       cursor.move(MAX_ITEMS);
       while (cursor.moveToNext()) {
         String id = cursor.getString(0);
-        Log.i(TAG, "Deleting scan history ID " + id);
+        Log.d(TAG, "Deleting scan history ID " + id);
         db.delete(DBHelper.TABLE_NAME, DBHelper.ID_COL + '=' + id, null);
       }
     } catch (SQLException sqle) {

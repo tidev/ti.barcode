@@ -156,7 +156,7 @@ public final class ShareActivity extends Activity {
   }
 
   private void showTextAsBarcode(String text) {
-    Log.i(TAG, "Showing text as barcode: " + text);
+    Log.d(TAG, "Showing text as barcode: " + text);
     if (text == null) {
       return; // Show error?
     }
@@ -175,7 +175,7 @@ public final class ShareActivity extends Activity {
    * @param contactUri A Uri of the form content://contacts/people/17
    */
   private void showContactAsBarcode(Uri contactUri) {
-    Log.i(TAG, "Showing contact URI as barcode: " + contactUri);
+    Log.d(TAG, "Showing contact URI as barcode: " + contactUri);
     if (contactUri == null) {
       return; // Show error?
     }
@@ -287,7 +287,7 @@ public final class ShareActivity extends Activity {
     intent.putExtra(Intents.Encode.DATA, bundle);
     intent.putExtra(Intents.Encode.FORMAT, BarcodeFormat.QR_CODE.toString());
 
-    Log.i(TAG, "Sending bundle for encoding: " + bundle);
+    Log.d(TAG, "Sending bundle for encoding: " + bundle);
     startActivity(intent);
   }
 

@@ -73,14 +73,14 @@ public final class OpenCameraInterface {
 
     Camera camera;
     if (index < numCameras) {
-      Log.i(TAG, "Opening camera #" + index);
+      Log.d(TAG, "Opening camera #" + index);
       camera = Camera.open(index);
     } else {
       if (explicitRequest) {
         Log.w(TAG, "Requested camera does not exist: " + cameraId);
         camera = null;
       } else {
-        Log.i(TAG, "No camera facing " + CameraFacing.BACK + "; returning camera #0");
+        Log.d(TAG, "No camera facing " + CameraFacing.BACK + "; returning camera #0");
         camera = Camera.open(0);
         selectedCameraInfo = new Camera.CameraInfo();
         Camera.getCameraInfo(0, selectedCameraInfo);
