@@ -66,19 +66,32 @@ var scanCode = Ti.UI.createButton({
     top: 20
 });
 scanCode.addEventListener('click', function () {
-    reset();
-    // Note: while the simulator will NOT show a camera stream in the simulator, you may still call "Barcode.capture"
-    // to test your barcode scanning overlay.
-    Barcode.capture({
-        animate: true,
-        overlay: overlay,
-        showCancel: false,
-        showRectangle: false,
-        keepOpen: true/*,
-        acceptedFormats: [
-            Barcode.FORMAT_QR_CODE
-        ]*/
-    });
+    var startCapture = function () {
+        reset();
+		// Note: while the simulator will NOT show a camera stream in the simulator, you may still call "Barcode.capture"
+		// to test your barcode scanning overlay.
+		Barcode.capture({
+			animate : true,
+			overlay : overlay,
+			showCancel : false,
+			showRectangle : false,
+			keepOpen : true/*,
+			 acceptedFormats: [
+			 Barcode.FORMAT_QR_CODE
+			 ]*/
+		});
+    }
+    if (Ti.Media.hasCameraPermissions()) {
+        startCapture();
+    } else {
+		Ti.Media.requestCameraPermissions(function(e) {
+			if (e.success === true) {
+				startCapture();
+			} else {
+				alert("You don't have permission to use the camera");
+			}
+		});
+    }
 });
 scrollView.add(scanCode);
 
