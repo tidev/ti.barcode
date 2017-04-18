@@ -309,7 +309,10 @@ static zxing::DecodeHints decodeHints;
 			[controller setSoundToPlay:soundURL];
 		}
 	}
-	
+    if(([UIDevice currentDevice].orientation == UIDeviceOrientationLandscapeLeft) || ([UIDevice currentDevice].orientation == UIDeviceOrientationLandscapeRight)||([UIDevice currentDevice].orientation == UIDeviceOrientationFaceUp) || ([UIDevice currentDevice].orientation == UIDeviceOrientationFaceDown)|| ([UIDevice currentDevice].orientation == UIDeviceOrientationUnknown)|| ([UIDevice currentDevice].orientation == UIDeviceOrientationPortraitUpsideDown))
+    {
+        [[UIDevice currentDevice] setValue:[NSNumber numberWithInteger: UIInterfaceOrientationPortrait] forKey:@"orientation"];
+    }
 	[[[[TiApp app] controller] topPresentedController] presentViewController:controller animated:YES completion:nil];
 }
 

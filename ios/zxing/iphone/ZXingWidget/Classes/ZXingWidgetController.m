@@ -86,6 +86,10 @@
     decoding = YES;
 }
 
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+
 - (void)dealloc {
     if (beepSound != (SystemSoundID)-1) {
         AudioServicesDisposeSystemSoundID(beepSound);
