@@ -40,6 +40,8 @@ import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.client.android.camera.CameraConfigurationManager;
 import com.google.zxing.client.android.camera.open.OpenCamera;
 import com.google.zxing.client.android.camera.open.OpenCameraInterface;
+import com.google.zxing.client.android.camera.open.CameraFacing;
+import ti.barcode.FrontCamera;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -136,7 +138,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	public void setUseFrontCamera(boolean value) {
 		new CameraConfigurationManager(getActivity()).setFrontCamera(value);
 		if (CaptureActivity.getInstance() != null) {
-			CaptureActivity.getInstance().getCameraManager().setManualCameraId(1);
+			CaptureActivity.getInstance().getCameraManager().setManualCameraId(FrontCamera.getFrontCamera());
 			CaptureActivity.getInstance().reset();
 		}
 	}

@@ -27,6 +27,7 @@ import com.google.zxing.PlanarYUVLuminanceSource;
 import com.google.zxing.client.android.camera.open.OpenCamera;
 import com.google.zxing.client.android.camera.open.OpenCameraInterface;
 import ti.barcode.BarcodeModule;
+import ti.barcode.FrontCamera;
 import android.util.DisplayMetrics;
 import java.lang.IllegalArgumentException;
 import android.content.SharedPreferences;
@@ -87,9 +88,9 @@ public final class CameraManager {
     if (theCamera == null) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		if (prefs.getBoolean(PreferencesActivity.KEY_FRONT_CAMERA, false)) {
-			theCamera = OpenCameraInterface.open(0);
+			theCamera = OpenCameraInterface.open(FrontCamera.getFrontCamera());
 		} else {
-			theCamera = OpenCameraInterface.open(1);
+			theCamera = OpenCameraInterface.open(-1);
 		}
       if (theCamera == null) {
         throw new IOException("Camera.open() failed to return object from driver");
