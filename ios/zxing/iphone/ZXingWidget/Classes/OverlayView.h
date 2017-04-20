@@ -43,7 +43,7 @@
         withOverlay:(UIView*)overlay;
 
 - (void)setPoint:(CGPoint)point;
-
+-(void)updateViewsWithFrame:(CGRect)newFrame;
 @end
 
 @protocol CancelDelegate

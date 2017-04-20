@@ -16,7 +16,7 @@
 
 #import "OverlayView.h"
 
-static const CGFloat kPadding = 10;
+CGFloat kPadding = 10;
 
 @interface OverlayView()
 @property (nonatomic,assign) UIButton *cancelButton;
@@ -42,42 +42,71 @@ static const CGFloat kPadding = 10;
     self = [super initWithFrame:theFrame];
     if( self ) {
         rectangleEnabled = isRectangleEnabled;
-        CGFloat rectSize = self.frame.size.width - kPadding * 2;
-        if (!oneDMode) {
-            cropRect = CGRectMake(kPadding, (self.frame.size.height - rectSize) / 2, rectSize, rectSize);
-        } else {
-            CGFloat rectSize2 = self.frame.size.height - kPadding * 2;
-            cropRect = CGRectMake(kPadding, kPadding, rectSize, rectSize2);		
-        }
-        
         self.backgroundColor = [UIColor clearColor];
         self.oneDMode = isOneDModeEnabled;
-        if (isCancelEnabled) {
+        
+        if (isCancelEnabled)
+        {
             UIButton *butt = [UIButton buttonWithType:UIButtonTypeRoundedRect]; 
             self.cancelButton = butt;
             [cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
-            if (oneDMode) {
-                [cancelButton setTransform:CGAffineTransformMakeRotation(M_PI/2)];
-                
-                [cancelButton setFrame:CGRectMake(20, 175, 45, 130)];
-            }
-            else {
-                CGSize theSize = CGSizeMake(100, 50);
-                CGRect theRect = CGRectMake((theFrame.size.width - theSize.width) / 2, cropRect.origin.y + cropRect.size.height + 20, theSize.width, theSize.height);
-                [cancelButton setFrame:theRect];
-                
-            }
-            
             [cancelButton addTarget:self action:@selector(cancel:) forControlEvents:UIControlEventTouchUpInside];
             [self addSubview:cancelButton];
             [self addSubview:imageView];
         }
         
-        if (overlay != nil) {
+        [self updateViewsWithFrame:theFrame];
+        
+        if (overlay != nil)
+        {
             [self addSubview:overlay];
         }
     }
     return self;
+}
+
+-(void)updateViewsWithFrame:(CGRect)newFrame
+{
+    self.frame = newFrame;
+    if (self.frame.size.width > self.frame.size.height)
+    {
+        kPadding = 70;
+    }
+    else
+    {
+        kPadding = 10;
+    }
+    CGFloat rectSize = self.frame.size.width - kPadding * 2;
+    if (!oneDMode)
+    {
+        CGFloat rectSize2 = rectSize;
+        if (self.frame.size.width > self.frame.size.height)
+        {
+            rectSize2 = self.frame.size.height - kPadding * 2;
+        }
+        cropRect = CGRectMake(kPadding, (self.frame.size.height - rectSize2) / 2, rectSize, rectSize2);
+    }
+    else
+    {
+        CGFloat rectSize2 = self.frame.size.height - kPadding * 2;
+        cropRect = CGRectMake(kPadding, kPadding, rectSize, rectSize2);
+    }
+    
+    if (self.cancelButton)
+    {
+        if (oneDMode)
+        {
+            [cancelButton setTransform:CGAffineTransformMakeRotation(M_PI/2)];
+        
+            [cancelButton setFrame:CGRectMake(20, 175, 45, 130)];
+        }
+        else
+        {
+            CGSize theSize = CGSizeMake(100, 50);
+            CGRect theRect = CGRectMake((self.frame.size.width - theSize.width) / 2, cropRect.origin.y + cropRect.size.height + 20, theSize.width, theSize.height);
+            [cancelButton setFrame:theRect];
+        }
+    }
 }
 
 - (void)cancel:(id)sender {

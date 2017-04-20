@@ -86,9 +86,42 @@
     decoding = YES;
 }
 
-- (BOOL)shouldAutorotate {
-    return NO;
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+    [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
+    [self applyRotation];
 }
+
+- (void)applyRotation
+{
+    [overlayView updateViewsWithFrame:[UIScreen mainScreen].bounds];
+
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    float captureRotation;
+    
+    switch (orientation)
+    {
+        case UIInterfaceOrientationPortrait:
+            captureRotation = 0;
+            break;
+        case UIInterfaceOrientationLandscapeLeft:
+            captureRotation = 90;
+            break;
+        case UIInterfaceOrientationLandscapeRight:
+            captureRotation = 270;
+            break;
+        case UIInterfaceOrientationPortraitUpsideDown:
+            captureRotation = 180;
+            break;
+        default:
+            captureRotation = 0;
+            break;
+    }
+    CGAffineTransform transform = CGAffineTransformMakeRotation((CGFloat) (captureRotation / 180 * M_PI));
+    self.prevLayer.affineTransform = transform;
+    self.prevLayer.frame = self.view.frame;
+}
+
 
 - (void)dealloc {
     if (beepSound != (SystemSoundID)-1) {
@@ -146,6 +179,8 @@
     decoding = YES;
     
     [self initCapture];
+    [self applyRotation];
+    
     if (self.customOverlay) {
         [self.view addSubview:self.customOverlay];
     }
