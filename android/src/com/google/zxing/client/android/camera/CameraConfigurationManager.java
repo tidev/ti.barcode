@@ -231,13 +231,22 @@ public final class CameraConfigurationManager {
   }
 
   public void setTorch(Camera camera, boolean newSetting) {
-      Camera.Parameters parameters = camera.getParameters();
-      doSetTorch(parameters, newSetting, false);
-      camera.setParameters(parameters);
+	  if (camera != null) {
+	      Camera.Parameters parameters = camera.getParameters();
+	      doSetTorch(parameters, newSetting, false);
+	      camera.setParameters(parameters);
+	  }
+	  SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+	  boolean currentSetting = prefs.getBoolean(PreferencesActivity.KEY_FRONT_LIGHT, false);
+	  if (currentSetting != newSetting) {
+	  	SharedPreferences.Editor editor = prefs.edit();
+	  	editor.putBoolean(PreferencesActivity.KEY_FRONT_LIGHT, newSetting);
+	  	editor.commit();
+	  }
   }
   
   private void initializeTorch(Camera.Parameters parameters, SharedPreferences prefs, boolean safeMode) {
-    boolean currentSetting = FrontLightMode.readPref(prefs) == FrontLightMode.ON;
+	boolean currentSetting = prefs.getBoolean(PreferencesActivity.KEY_FRONT_LIGHT, false);
     doSetTorch(parameters, currentSetting, safeMode);
   }
 

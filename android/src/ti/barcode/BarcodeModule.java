@@ -150,7 +150,10 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	@Kroll.method
 	@Kroll.setProperty
 	public void setUseLED(boolean value) {
-		CaptureActivity.getInstance().getCameraManager().setTorch(value);
+		new CameraConfigurationManager(getActivity()).setTorch(null, value);
+		if (CaptureActivity.getInstance() != null) {
+			CaptureActivity.getInstance().getCameraManager().setTorch(value);
+		}
 	}
 
 	static final Vector<BarcodeFormat> PRODUCT_FORMATS;
