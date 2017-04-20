@@ -20,11 +20,11 @@ public class FrontCamera {
 			Camera.getCameraInfo(index, cameraInfo);
 			CameraFacing reportedFacing = CameraFacing.values()[cameraInfo.facing];
 			if (reportedFacing == CameraFacing.FRONT) {
-				break;
+				return index;
 			}
 			index++;
 		}
 		
-		return index;
+		return -1;
 	}
 }
