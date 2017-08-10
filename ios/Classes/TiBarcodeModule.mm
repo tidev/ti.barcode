@@ -309,7 +309,7 @@ static zxing::DecodeHints decodeHints;
 			[controller setSoundToPlay:soundURL];
 		}
 	}
-	
+
 	[[[[TiApp app] controller] topPresentedController] presentViewController:controller animated:YES completion:nil];
 }
 
