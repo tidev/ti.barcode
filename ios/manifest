@@ -6,9 +6,9 @@ version: 1.10.1
 apiversion: 2
 architectures: armv7 i386 x86_64 arm64
 description: Lets you process 1D/2D barcodes.
-author: Stephen Tramer & Jeff English
+author: Stephen Tramer, Jeff English, Hans Knöchel, Vijay Singh
 license: Apache License, Version 2.0
-copyright: Copyright (c) 2010-2013 by Appcelerator, Inc.
+copyright: Copyright (c) 2010-Present by Axway Appcelerator.
 
 
 # these should not be edited
@@ -16,4 +16,4 @@ name: barcode
 moduleid: ti.barcode
 guid: fe2e658e-0eaf-44a6-b6d1-c074d6b986a3
 platform: iphone
-minsdk: 3.4.1.GA
+minsdk: 5.5.1.GA
