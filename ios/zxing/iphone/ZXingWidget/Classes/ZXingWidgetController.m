@@ -118,8 +118,10 @@
             break;
     }
     CGAffineTransform transform = CGAffineTransformMakeRotation((CGFloat) (captureRotation / 180 * M_PI));
+#if HAS_AVFF
     self.prevLayer.affineTransform = transform;
     self.prevLayer.frame = self.view.frame;
+#endif
 }
 
 
