@@ -3,7 +3,6 @@ tmp
 bin
 build
 dist
-*.zip
 */*/modules
 */*/modules*
 .apt_generated
