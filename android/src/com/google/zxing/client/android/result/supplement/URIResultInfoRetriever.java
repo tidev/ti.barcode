@@ -17,7 +17,6 @@
 package com.google.zxing.client.android.result.supplement;
 
 import android.content.Context;
-import android.os.Handler;
 import android.widget.TextView;
 import com.google.zxing.client.android.HttpHelper;
 import com.google.zxing.client.android.history.HistoryManager;
@@ -35,22 +34,18 @@ final class URIResultInfoRetriever extends SupplementalInfoRetriever {
   private final URIParsedResult result;
   private final String redirectString;
 
-  URIResultInfoRetriever(TextView textView,
-                         URIParsedResult result,
-                         Handler handler,
-                         HistoryManager historyManager,
-                         Context context) {
-    super(textView, handler, historyManager);
+  URIResultInfoRetriever(TextView textView, URIParsedResult result, HistoryManager historyManager, Context context) {
+    super(textView, historyManager);
     redirectString = context.getString(RHelper.getString("msg_redirect"));
     this.result = result;
   }
 
   @Override
-  void retrieveSupplementalInfo() throws IOException, InterruptedException {
+  void retrieveSupplementalInfo() throws IOException {
     URI oldURI;
     try {
       oldURI = new URI(result.getURI());
-    } catch (URISyntaxException e) {
+    } catch (URISyntaxException ignored) {
       return;
     }
     URI newURI = HttpHelper.unredirect(oldURI);

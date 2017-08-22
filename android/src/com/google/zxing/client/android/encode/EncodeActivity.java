@@ -16,9 +16,12 @@
 
 package com.google.zxing.client.android.encode;
 
+import android.graphics.Point;
 import android.view.Display;
+import android.view.MenuInflater;
 import android.view.WindowManager;
 import com.google.zxing.WriterException;
+import com.google.zxing.client.android.Contents;
 import com.google.zxing.client.android.FinishListener;
 import com.google.zxing.client.android.Intents;
 import ti.barcode.RHelper;
@@ -52,8 +55,6 @@ public final class EncodeActivity extends Activity {
 
   private static final String TAG = EncodeActivity.class.getSimpleName();
 
-  private static final int SHARE_MENU = Menu.FIRST;
-  private static final int ENCODE_FORMAT_MENU = Menu.FIRST + 1;
   private static final int MAX_BARCODE_FILENAME_LENGTH = 24;
   private static final Pattern NOT_ALPHANUMERIC = Pattern.compile("[^A-Za-z0-9]");
   private static final String USE_VCARD_KEY = "USE_VCARD";
@@ -63,43 +64,56 @@ public final class EncodeActivity extends Activity {
   @Override
   public void onCreate(Bundle icicle) {
     super.onCreate(icicle);
-
     Intent intent = getIntent();
-    if (intent != null) {
+    if (intent == null) {
+      finish();
+    } else {
       String action = intent.getAction();
-      if (action.equals(Intents.Encode.ACTION) || action.equals(Intent.ACTION_SEND)) {
+      if (Intents.Encode.ACTION.equals(action) || Intent.ACTION_SEND.equals(action)) {
         setContentView(RHelper.getLayout("encode"));
-        return;
+      } else {
+        finish();
       }
     }
-    finish();
   }
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
-    super.onCreateOptionsMenu(menu);
-    menu.add(Menu.NONE, SHARE_MENU, Menu.NONE, RHelper.getString("menu_share")).setIcon(RHelper.getDrawable("ic_menu_share"));
-    int encodeNameResource = qrCodeEncoder.isUseVCard() ? RHelper.getString("menu_encode_mecard") : RHelper.getString("menu_encode_vcard");
-    menu.add(Menu.NONE, ENCODE_FORMAT_MENU, Menu.NONE, encodeNameResource)
-        .setIcon(RHelper.getDrawable("ic_menu_sort_alphabetically"));
+    // MenuInflater menuInflater = getMenuInflater();
+    // menuInflater.inflate(R.menu.encode, menu);
+    // boolean useVcard = qrCodeEncoder != null && qrCodeEncoder.isUseVCard();
+    // int encodeNameResource = useVcard ? RHelper.getString("menu_encode_mecard") : RHelper.getString("menu_encode_vcard");
+    // MenuItem encodeItem = menu.findItem(RHelper.getId("menu_encode"));
+    // encodeItem.setTitle(encodeNameResource);
+    // Intent intent = getIntent();
+    // if (intent != null) {
+    //   String type = intent.getStringExtra(Intents.Encode.TYPE);
+    //   encodeItem.setVisible(Contents.Type.CONTACT.equals(type));
+    // }
+    // return super.onCreateOptionsMenu(menu);
     return true;
   }
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case SHARE_MENU:
-        share();
-        return true;
-      case ENCODE_FORMAT_MENU:
-        Intent intent = getIntent();
-        intent.putExtra(USE_VCARD_KEY, !qrCodeEncoder.isUseVCard());
-        startActivity(getIntent());
-        finish();
-        return true;
-      default:
-        return false;
-    }
+    // switch (item.getItemId()) {
+    //   case RHelper.getId("menu_share"):
+    //     share();
+    //     return true;
+    //   case RHelper.getId("menu_encode"):
+    //     Intent intent = getIntent();
+    //     if (intent == null) {
+    //       return false;
+    //     }
+    //     intent.putExtra(USE_VCARD_KEY, !qrCodeEncoder.isUseVCard());
+    //     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    //     startActivity(intent);
+    //     finish();
+    //     return true;
+    //   default:
+    //     return false;
+    // }
+    return true;
   }
   
   private void share() {
@@ -134,7 +148,10 @@ public final class EncodeActivity extends Activity {
       return;
     }
     File barcodeFile = new File(barcodesRoot, makeBarcodeFileName(contents) + ".png");
-    barcodeFile.delete();
+    if (!barcodeFile.delete()) {
+      Log.w(TAG, "Could not delete " + barcodeFile);
+      // continue anyway
+    }
     FileOutputStream fos = null;
     try {
       fos = new FileOutputStream(barcodeFile);
@@ -176,8 +193,10 @@ public final class EncodeActivity extends Activity {
     // This assumes the view is full screen, which is a good assumption
     WindowManager manager = (WindowManager) getSystemService(WINDOW_SERVICE);
     Display display = manager.getDefaultDisplay();
-    int width = display.getWidth();
-    int height = display.getHeight();
+    Point displaySize = new Point();
+    display.getSize(displaySize);
+    int width = displaySize.x;
+    int height = displaySize.y;
     int smallerDimension = width < height ? width : height;
     smallerDimension = smallerDimension * 7 / 8;
 
@@ -203,10 +222,10 @@ public final class EncodeActivity extends Activity {
       TextView contents = (TextView) findViewById(RHelper.getId("contents_text_view"));
       if (intent.getBooleanExtra(Intents.Encode.SHOW_CONTENTS, true)) {
         contents.setText(qrCodeEncoder.getDisplayContents());
-        setTitle(getString(RHelper.getString("app_name")) + " - " + qrCodeEncoder.getTitle());
+        setTitle(qrCodeEncoder.getTitle());
       } else {
         contents.setText("");
-        setTitle(getString(RHelper.getString("app_name")));
+        setTitle("");
       }
     } catch (WriterException e) {
       Log.w(TAG, "Could not encode barcode", e);

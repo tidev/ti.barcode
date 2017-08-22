@@ -16,7 +16,13 @@
 
 package com.google.zxing.client.android;
 
+import android.content.ActivityNotFoundException;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.graphics.BitmapFactory;
+import android.provider.Browser;
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.DecodeHintType;
 import com.google.zxing.Result;
 import com.google.zxing.client.android.camera.CameraManager;
 
@@ -30,112 +36,126 @@ import android.os.Message;
 import android.util.Log;
 
 import java.util.Collection;
-
-import ti.barcode.BarcodeModule;
+import java.util.Map;
 import ti.barcode.RHelper;
 
 /**
  * This class handles all the messaging which comprises the state machine for capture.
- * 
+ *
  * @author dswitkin@google.com (Daniel Switkin)
  */
 public final class CaptureActivityHandler extends Handler {
 
-	private static final String TAG = CaptureActivityHandler.class.getSimpleName();
+  private static final String TAG = CaptureActivityHandler.class.getSimpleName();
 
-	private final CaptureActivity activity;
-	private final DecodeThread decodeThread;
-	private State state;
-	private final CameraManager cameraManager;
+  private final CaptureActivity activity;
+  private final DecodeThread decodeThread;
+  private State state;
+  private final CameraManager cameraManager;
 
-	private enum State {
-		PREVIEW, SUCCESS, DONE
-	}
+  private enum State {
+    PREVIEW,
+    SUCCESS,
+    DONE
+  }
 
-	CaptureActivityHandler(CaptureActivity activity, Collection<BarcodeFormat> decodeFormats, String characterSet, CameraManager cameraManager) {
-		this.activity = activity;
-		decodeThread = new DecodeThread(activity, decodeFormats, characterSet, new ViewfinderResultPointCallback(activity.getViewfinderView()));
-		decodeThread.start();
-		state = State.SUCCESS;
+  CaptureActivityHandler(CaptureActivity activity,
+                         Collection<BarcodeFormat> decodeFormats,
+                         Map<DecodeHintType,?> baseHints,
+                         String characterSet,
+                         CameraManager cameraManager) {
+    this.activity = activity;
+    decodeThread = new DecodeThread(activity, decodeFormats, baseHints, characterSet,
+        new ViewfinderResultPointCallback(activity.getViewfinderView()));
+    decodeThread.start();
+    state = State.SUCCESS;
 
-		// Start ourselves capturing previews and decoding.
-		this.cameraManager = cameraManager;
-		cameraManager.startPreview();
-		restartPreviewAndDecode();
-	}
+    // Start ourselves capturing previews and decoding.
+    this.cameraManager = cameraManager;
+    cameraManager.startPreview();
+    restartPreviewAndDecode();
+  }
 
-	@Override
-	public void handleMessage(Message message) {
-		if (message.what == RHelper.getId("auto_focus")) {
-			// Log.d(TAG, "Got auto-focus message");
-			// When one auto focus pass finishes, start another. This is the closest thing to
-			// continuous AF. It does seem to hunt a bit, but I'm not sure what else to do.
-			if (state == State.PREVIEW) {
-				cameraManager.requestAutoFocus(this, RHelper.getId("auto_focus"));
-			}
-		} else if (message.what == RHelper.getId("restart_preview")) {
-			Log.d(TAG, "Got restart preview message");
-			restartPreviewAndDecode();
-		} else if (message.what == RHelper.getId("decode_succeeded")) {
-			Log.d(TAG, "Got decode succeeded message");
-			state = State.SUCCESS;
-			Bundle bundle = message.getData();
-			Bitmap barcode = bundle == null ? null : (Bitmap) bundle.getParcelable(DecodeThread.BARCODE_BITMAP);
-			activity.handleDecode((Result) message.obj, barcode);
-		} else if (message.what == RHelper.getId("decode_failed")) {
-			// We're decoding as fast as possible, so when one decode fails, start another.
-			state = State.PREVIEW;
-			cameraManager.requestPreviewFrame(decodeThread.getHandler(), RHelper.getId("decode"));
-		} else if (message.what == RHelper.getId("return_scan_result")) {
-			Log.d(TAG, "Got return scan result message");
-			Intent msgObj = (Intent) message.obj;
-			if (activity.doKeepOpen()) {
-				String scanResultFormat = msgObj.getStringExtra(Intents.Scan.RESULT_FORMAT);
-				String scanResult = msgObj.getStringExtra(Intents.Scan.RESULT);
-				BarcodeModule barcodeModule = BarcodeModule.getInstance();
-				if (barcodeModule != null) {
-					barcodeModule.processResult(scanResultFormat, scanResult, Activity.RESULT_OK);
-				} else {
-					Log.e(TAG, "Unable to find an instance of the barcode module!");
-				}
-				restartPreviewAndDecode();
-			} else {
-				activity.setResult(Activity.RESULT_OK, (Intent) message.obj);
-				activity.finish();
-			}
-		} else if (message.what == RHelper.getId("launch_product_query")) {
-			Log.d(TAG, "Got product query message");
-			String url = (String) message.obj;
-			Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-			activity.startActivity(intent);
-		}
-	}
+  @Override
+  public void handleMessage(Message message) {
+    if (message.what==RHelper.getId("restart_preview")) {
+        restartPreviewAndDecode();
+    } else if(message.what== RHelper.getId("decode_succeeded")) {
+        state = State.SUCCESS;
+        Bundle bundle = message.getData();
+        Bitmap barcode = null;
+        float scaleFactor = 1.0f;
+        if (bundle != null) {
+          byte[] compressedBitmap = bundle.getByteArray(DecodeThread.BARCODE_BITMAP);
+          if (compressedBitmap != null) {
+            barcode = BitmapFactory.decodeByteArray(compressedBitmap, 0, compressedBitmap.length, null);
+            // Mutable copy:
+            barcode = barcode.copy(Bitmap.Config.ARGB_8888, true);
+          }
+          scaleFactor = bundle.getFloat(DecodeThread.BARCODE_SCALED_FACTOR);          
+        }
+        activity.handleDecode((Result) message.obj, barcode, scaleFactor);
+        
+    } else if(message.what==RHelper.getId("decode_failed")){
+        // We're decoding as fast as possible, so when one decode fails, start another.
+        state = State.PREVIEW;
+        cameraManager.requestPreviewFrame(decodeThread.getHandler(), RHelper.getId("decode"));
+    } else if (message.what== RHelper.getId("return_scan_result")) {
+        activity.setResult(Activity.RESULT_OK, (Intent) message.obj);
+        activity.finish();
+    } else if (message.what==RHelper.getId("launch_product_query")){
+        String url = (String) message.obj;
 
-	public void quitSynchronously() {
-		state = State.DONE;
-		cameraManager.stopPreview();
-		Message quit = Message.obtain(decodeThread.getHandler(), RHelper.getId("quit"));
-		quit.sendToTarget();
-		try {
-			// Wait at most half a second; should be enough time, and onPause() will timeout quickly
-			decodeThread.join(500L);
-		} catch (InterruptedException e) {
-			// continue
-		}
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        intent.setData(Uri.parse(url));
 
-		// Be absolutely sure we don't send any queued up messages
-		removeMessages(RHelper.getId("decode_succeeded"));
-		removeMessages(RHelper.getId("decode_failed"));
-	}
+        ResolveInfo resolveInfo =
+            activity.getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        String browserPackageName = null;
+        if (resolveInfo != null && resolveInfo.activityInfo != null) {
+          browserPackageName = resolveInfo.activityInfo.packageName;
+          Log.d(TAG, "Using browser in package " + browserPackageName);
+        }
 
-	private void restartPreviewAndDecode() {
-		if (state == State.SUCCESS) {
-			state = State.PREVIEW;
-			cameraManager.requestPreviewFrame(decodeThread.getHandler(), RHelper.getId("decode"));
-			cameraManager.requestAutoFocus(this, RHelper.getId("auto_focus"));
-			activity.drawViewfinder();
-		}
-	}
+        // Needed for default Android browser / Chrome only apparently
+        if ("com.android.browser".equals(browserPackageName) || "com.android.chrome".equals(browserPackageName)) {
+          intent.setPackage(browserPackageName);
+          intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+          intent.putExtra(Browser.EXTRA_APPLICATION_ID, browserPackageName);
+        }
+
+        try {
+          activity.startActivity(intent);
+        } catch (ActivityNotFoundException ignored) {
+          Log.w(TAG, "Can't find anything to handle VIEW of URI " + url);
+        }
+    }
+  }
+
+  public void quitSynchronously() {
+    state = State.DONE;
+    cameraManager.stopPreview();
+    Message quit = Message.obtain(decodeThread.getHandler(), RHelper.getId("quit"));
+    quit.sendToTarget();
+    try {
+      // Wait at most half a second; should be enough time, and onPause() will timeout quickly
+      decodeThread.join(500L);
+    } catch (InterruptedException e) {
+      // continue
+    }
+
+    // Be absolutely sure we don't send any queued up messages
+    removeMessages(RHelper.getId("decode_succeeded"));
+    removeMessages(RHelper.getId("decode_failed"));
+  }
+
+  private void restartPreviewAndDecode() {
+    if (state == State.SUCCESS) {
+      state = State.PREVIEW;
+      cameraManager.requestPreviewFrame(decodeThread.getHandler(), RHelper.getId("decode"));
+      activity.drawViewfinder();
+    }
+  }
 
 }

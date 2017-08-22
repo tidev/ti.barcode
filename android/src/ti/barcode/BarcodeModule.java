@@ -31,12 +31,17 @@ import com.google.zxing.Result;
 import com.google.zxing.ResultPoint;
 import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.client.android.Intents;
-import com.google.zxing.client.android.PlanarYUVLuminanceSource;
+import com.google.zxing.PlanarYUVLuminanceSource;
 import com.google.zxing.client.android.PreferencesActivity;
-import com.google.zxing.client.android.camera.CameraConfigurationManager;
+import com.google.zxing.client.android.camera.CameraManager;
 import com.google.zxing.client.result.ParsedResult;
 import com.google.zxing.client.result.ResultParser;
 import com.google.zxing.common.HybridBinarizer;
+import com.google.zxing.client.android.camera.CameraConfigurationManager;
+import com.google.zxing.client.android.camera.open.OpenCamera;
+import com.google.zxing.client.android.camera.open.OpenCameraInterface;
+import com.google.zxing.client.android.camera.open.CameraFacing;
+import ti.barcode.FrontCamera;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -46,12 +51,15 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
 
-@Kroll.module(name = "Barcode", id = "ti.barcode", propertyAccessors = { "displayedMessage", "allowRotation", "allowMenu", "allowInstructions" })
+@Kroll.module(name = "Barcode", id = "ti.barcode", propertyAccessors = { "displayedMessage", "allowRotation" })
 public class BarcodeModule extends KrollModule implements TiActivityResultHandler {
 
 	// Standard Debugging variables
 	private static final String LCAT = "BarcodeModule";
 	private boolean keepOpen = false;
+	
+	public int frameWidth = 0;
+	public int frameHeight = 0;
 
 	@Kroll.constant
 	public static final int UNKNOWN = 0;
@@ -100,6 +108,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	@Kroll.constant
 	public static final int FORMAT_ITF = 9;
 
+
 	public BarcodeModule() {
 		super();
 	}
@@ -129,6 +138,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	public void setUseFrontCamera(boolean value) {
 		new CameraConfigurationManager(getActivity()).setFrontCamera(value);
 		if (CaptureActivity.getInstance() != null) {
+			CaptureActivity.getInstance().getCameraManager().setManualCameraId(FrontCamera.getFrontCamera());
 			CaptureActivity.getInstance().reset();
 		}
 	}
@@ -136,7 +146,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	@Kroll.method
 	@Kroll.getProperty
 	public boolean getUseLED() {
-		return new CameraConfigurationManager(getActivity()).getTorch();
+		return CaptureActivity.getInstance().getCameraManager().getTorch();
 	}
 
 	@Kroll.method
@@ -144,7 +154,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	public void setUseLED(boolean value) {
 		new CameraConfigurationManager(getActivity()).setTorch(null, value);
 		if (CaptureActivity.getInstance() != null) {
-			CaptureActivity.getInstance().reset();
+			CaptureActivity.getInstance().getCameraManager().setTorch(value);
 		}
 	}
 
@@ -198,9 +208,9 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 			Activity activity = TiApplication.getAppCurrentActivity();
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
 			decodeFormats = new Vector<BarcodeFormat>();
-			if (prefs.getBoolean(PreferencesActivity.KEY_DECODE_1D, true)) {
-				decodeFormats.addAll(ONE_D_FORMATS);
-			}
+			// if (prefs.getBoolean(PreferencesActivity.KEY_DECODE_1D, true)) {
+			// 	decodeFormats.addAll(ONE_D_FORMATS);
+			// }
 			if (prefs.getBoolean(PreferencesActivity.KEY_DECODE_QR, true)) {
 				decodeFormats.addAll(QR_CODE_FORMATS);
 			}
@@ -279,32 +289,27 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 					for (Object acceptedFormat : acceptedFormats) {
 						formats += FORMAT_STRINGS[TiConvert.toInt(acceptedFormat)] + ",";
 					}
-					Log.i(LCAT, formats.substring(0, formats.length() - 1));
+					Log.d(LCAT, formats.substring(0, formats.length() - 1));
 					intent.putExtra(Intents.Scan.FORMATS, formats.substring(0, formats.length() - 1));
 				}
 			}
 
 			intent.putExtra(Intents.Scan.SHOW_RECTANGLE, argsDict.optBoolean("showRectangle", true));
 			intent.putExtra(Intents.Scan.KEEP_OPEN, argsDict.optBoolean("keepOpen", false));
-
+			frameWidth = argsDict.optInt("frameWidth",0);
+			frameHeight = argsDict.optInt("frameHeight",0);
 		} else {
 			Intents.Scan.overlayProxy = null;
 			intent.putExtra(Intents.Scan.SHOW_RECTANGLE, true);
 			intent.putExtra(Intents.Scan.KEEP_OPEN, false);
 		}
-
-		if (!properties.optBoolean("allowInstructions", true)) {
-			disableInstructions();
-		}
-
-		intent.putExtra(Intents.Scan.ALLOW_MENU, properties.optBoolean("allowMenu", true));
-		intent.putExtra(Intents.Scan.ALLOW_INSTRUCTIONS, properties.optBoolean("allowInstructions", true));
 		
 		intent.putExtra(Intents.Scan.PROMPT_MESSAGE, properties.optString("displayedMessage", null));
 
+		
 		// [MOD-217] -- Must set the package in order for it to automatically select the application as the source of the scanning activity.
 		intent.setPackage(TiApplication.getInstance().getPackageName());
-		CaptureActivity.PACKAGE_NAME = TiApplication.getInstance().getPackageName();
+		// CaptureActivity.PACKAGE_NAME = TiApplication.getInstance().getPackageName();
 
 		Activity activity = TiApplication.getAppCurrentActivity();
 		TiActivitySupport activitySupport = (TiActivitySupport) activity;
@@ -312,15 +317,6 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 		activitySupport.launchActivityForResult(intent, resultCode, this);
 	}
 
-	private void disableInstructions() {
-		try {
-			PackageInfo info = getActivity().getPackageManager().getPackageInfo(TiApplication.getInstance().getPackageName(), 0);
-			PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().putInt(PreferencesActivity.KEY_HELP_VERSION_SHOWN, info.versionCode)
-					.commit();
-		} catch (NameNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
 
 	@Override
 	public void onError(Activity activity, int requestCode, Exception e) {
