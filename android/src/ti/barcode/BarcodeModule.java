@@ -296,12 +296,14 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 
 			intent.putExtra(Intents.Scan.SHOW_RECTANGLE, argsDict.optBoolean("showRectangle", true));
 			intent.putExtra(Intents.Scan.KEEP_OPEN, argsDict.optBoolean("keepOpen", false));
+			intent.putExtra(Intents.Scan.SHOW_INFOTEXT, argsDict.optBoolean("showInfotext", false));
 			frameWidth = argsDict.optInt("frameWidth",0);
 			frameHeight = argsDict.optInt("frameHeight",0);
 		} else {
 			Intents.Scan.overlayProxy = null;
 			intent.putExtra(Intents.Scan.SHOW_RECTANGLE, true);
 			intent.putExtra(Intents.Scan.KEEP_OPEN, false);
+			intent.putExtra(Intents.Scan.SHOW_INFOTEXT, false);
 		}
 		
 		intent.putExtra(Intents.Scan.PROMPT_MESSAGE, properties.optString("displayedMessage", null));

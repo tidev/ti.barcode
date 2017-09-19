@@ -112,6 +112,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private InactivityTimer inactivityTimer;
   private BeepManager beepManager;
   private AmbientLightManager ambientLightManager;
+  private boolean showInfotext = false;
   
   private static final int SHARE_ID = Menu.FIRST;
   private static final int HISTORY_ID = Menu.FIRST + 1;
@@ -197,6 +198,15 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     resultView = findViewById(RHelper.getId("result_view"));
     statusView = (TextView) findViewById(RHelper.getId("status_view"));
 
+    Intent intent = getIntent();
+    if (intent.getBooleanExtra(Intents.Scan.SHOW_INFOTEXT, false)) {
+        statusView.setVisibility(View.VISIBLE);
+        showInfotext = true;
+    } else {
+        showInfotext = false;
+        statusView.setVisibility(View.GONE);
+    }
+
     handler = null;
     lastResult = null;
 
@@ -205,7 +215,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     if (prefs.getBoolean(PreferencesActivity.KEY_DISABLE_AUTO_ORIENTATION, true)) {
       setRequestedOrientation(getCurrentOrientation());
     } else {
-      setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+      setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
     }
 
     resetStatusView();
@@ -216,7 +226,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     inactivityTimer.onResume();
 
-    Intent intent = getIntent();
 
     copyToClipboard = prefs.getBoolean(PreferencesActivity.KEY_COPY_TO_CLIPBOARD, true)
         && (intent == null || intent.getBooleanExtra(Intents.Scan.SAVE_HISTORY, true));
@@ -561,52 +570,47 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       barcodeImageView.setImageBitmap(barcode);
     }
 
-    TextView formatTextView = (TextView) findViewById(RHelper.getId("format_text_view"));
-    formatTextView.setText(rawResult.getBarcodeFormat().toString());
+    if (showInfotext) {
+        TextView formatTextView = (TextView) findViewById(RHelper.getId("format_text_view"));
+        formatTextView.setText(rawResult.getBarcodeFormat().toString());
 
-    TextView typeTextView = (TextView) findViewById(RHelper.getId("type_text_view"));
-    typeTextView.setText(resultHandler.getType().toString());
+        TextView typeTextView = (TextView) findViewById(RHelper.getId("type_text_view"));
+        typeTextView.setText(resultHandler.getType().toString());
 
-    DateFormat formatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
-    TextView timeTextView = (TextView) findViewById(RHelper.getId("time_text_view"));
-    timeTextView.setText(formatter.format(rawResult.getTimestamp()));
+        DateFormat formatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+        TextView timeTextView = (TextView) findViewById(RHelper.getId("time_text_view"));
+        timeTextView.setText(formatter.format(rawResult.getTimestamp()));
 
-
-    TextView metaTextView = (TextView) findViewById(RHelper.getId("meta_text_view"));
-    View metaTextViewLabel = findViewById(RHelper.getId("meta_text_view_label"));
-    metaTextView.setVisibility(View.GONE);
-    metaTextViewLabel.setVisibility(View.GONE);
-    Map<ResultMetadataType,Object> metadata = rawResult.getResultMetadata();
-    if (metadata != null) {
-      StringBuilder metadataText = new StringBuilder(20);
-      for (Map.Entry<ResultMetadataType,Object> entry : metadata.entrySet()) {
-        if (DISPLAYABLE_METADATA_TYPES.contains(entry.getKey())) {
-          metadataText.append(entry.getValue()).append('\n');
+        TextView metaTextView = (TextView) findViewById(RHelper.getId("meta_text_view"));
+        View metaTextViewLabel = findViewById(RHelper.getId("meta_text_view_label"));
+        metaTextView.setVisibility(View.GONE);
+        metaTextViewLabel.setVisibility(View.GONE);
+        Map<ResultMetadataType,Object> metadata = rawResult.getResultMetadata();
+        if (metadata != null) {
+          StringBuilder metadataText = new StringBuilder(20);
+          for (Map.Entry<ResultMetadataType,Object> entry : metadata.entrySet()) {
+            if (DISPLAYABLE_METADATA_TYPES.contains(entry.getKey())) {
+              metadataText.append(entry.getValue()).append('\n');
+            }
+          }
+          if (metadataText.length() > 0) {
+            metadataText.setLength(metadataText.length() - 1);
+            metaTextView.setText(metadataText);
+            metaTextView.setVisibility(View.VISIBLE);
+            metaTextViewLabel.setVisibility(View.VISIBLE);
+          }
         }
-      }
-      if (metadataText.length() > 0) {
-        metadataText.setLength(metadataText.length() - 1);
-        metaTextView.setText(metadataText);
-        metaTextView.setVisibility(View.VISIBLE);
-        metaTextViewLabel.setVisibility(View.VISIBLE);
-      }
-    }
+        CharSequence displayContents = resultHandler.getDisplayContents();
+        TextView contentsTextView = (TextView) findViewById(RHelper.getId("contents_text_view"));
+        contentsTextView.setText(displayContents);
+        int scaledSize = Math.max(22, 32 - displayContents.length() / 4);
+        contentsTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
 
-    CharSequence displayContents = resultHandler.getDisplayContents();
-    TextView contentsTextView = (TextView) findViewById(RHelper.getId("contents_text_view"));
-    contentsTextView.setText(displayContents);
-    int scaledSize = Math.max(22, 32 - displayContents.length() / 4);
-    contentsTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
-
-    TextView supplementTextView = (TextView) findViewById(RHelper.getId("contents_supplement_text_view"));
-    supplementTextView.setText("");
-    supplementTextView.setOnClickListener(null);
-    if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(
-        PreferencesActivity.KEY_SUPPLEMENTAL, true)) {
-    //   SupplementalInfoRetriever.maybeInvokeRetrieval(supplementTextView,
-    //                                                  resultHandler.getResult(),
-    //                                                  historyManager,
-    //                                                  this);
+        TextView supplementTextView = (TextView) findViewById(RHelper.getId("contents_supplement_text_view"));
+        supplementTextView.setText("");
+        supplementTextView.setOnClickListener(null);
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(
+            PreferencesActivity.KEY_SUPPLEMENTAL, true)) {}
     }
 
     int buttonCount = resultHandler.getButtonCount();
@@ -645,7 +649,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       if (rawResultString.length() > 32) {
         rawResultString = rawResultString.substring(0, 32) + " ...";
       }
-      statusView.setText(getString(resultHandler.getDisplayTitle()) + " : " + rawResultString);
+      if (showInfotext) {
+          statusView.setText(getString(resultHandler.getDisplayTitle()) + " : " + rawResultString);
+      }
     }
 
     maybeSetClipboard(resultHandler);
@@ -768,8 +774,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   private void resetStatusView() {
     resultView.setVisibility(View.GONE);
-    statusView.setText(RHelper.getString("msg_default_status"));
-    statusView.setVisibility(View.VISIBLE);
+    if (showInfotext) {
+        statusView.setText(RHelper.getString("msg_default_status"));
+        statusView.setVisibility(View.VISIBLE);
+    }
     viewfinderView.setVisibility(View.VISIBLE);
     lastResult = null;
   }

@@ -35,6 +35,7 @@ containing any of the following properties:
 * overlay[view]: The view to lay on top of the camera activity.
 * keepOpen[boolean]: Whether or not to keep the barcode scanner open after a barcode is recognized. Defaults to false. When set to true, "success" will fire once every time a barcode is recognized, up to two times per second. As such, it can fire multiple times for a single barcode!
 * acceptedFormats[int[]]: An optional array of int constants detailing which barcode formats are accepted. Defaults to all formats. Check out the "Barcode Format Constants" section below to see the available int constants. 
+* showInfotext[boolean]: Show the result at the bottom of the scan window. Defaults to false.
 
 ### parse([args])
 Parses a blob image for barcodes. Takes one required argument, a dictionary containing any of the following properties:
