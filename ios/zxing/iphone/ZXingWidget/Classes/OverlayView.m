@@ -35,28 +35,41 @@ CGFloat kPadding = 10;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 - (id) initWithFrame:(CGRect)theFrame
-       cancelEnabled:(BOOL)isCancelEnabled
-    rectangleEnabled:(BOOL)isRectangleEnabled
-            oneDMode:(BOOL)isOneDModeEnabled
-         withOverlay:(UIView*)overlay {
+        backgroundColor:(UIColor*)bgColor
+        frameWidth:(CGFloat)rectFrameWidth
+        frameHeight:(CGFloat)rectFrameHeight
+        cancelEnabled:(BOOL)isCancelEnabled
+        rectangleEnabled:(BOOL)isRectangleEnabled
+        oneDMode:(BOOL)isOneDModeEnabled
+        withOverlay:(UIView*)overlay {
     self = [super initWithFrame:theFrame];
     if( self ) {
         rectangleEnabled = isRectangleEnabled;
-        self.backgroundColor = [UIColor clearColor];
+        if(rectFrameWidth){
+            frameWidth = rectFrameWidth;
+        }
+        if(rectFrameHeight){
+            frameHeight = rectFrameHeight;
+        }
+        if(bgColor && rectangleEnabled){
+            self.backgroundColor = bgColor;
+        }else{
+            self.backgroundColor = [UIColor clearColor];
+        }
         self.oneDMode = isOneDModeEnabled;
-        
+
         if (isCancelEnabled)
         {
-            UIButton *butt = [UIButton buttonWithType:UIButtonTypeRoundedRect]; 
-            self.cancelButton = butt;
+            UIButton *bt = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+            self.cancelButton = bt;
             [cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
             [cancelButton addTarget:self action:@selector(cancel:) forControlEvents:UIControlEventTouchUpInside];
             [self addSubview:cancelButton];
             [self addSubview:imageView];
         }
-        
+
         [self updateViewsWithFrame:theFrame];
-        
+
         if (overlay != nil)
         {
             [self addSubview:overlay];
@@ -177,20 +190,27 @@ CGFloat kPadding = 10;
         self.displayedMessage = @"Place a barcode inside the viewfinder rectangle to scan it.";
     }
 	CGContextRef c = UIGraphicsGetCurrentContext();
-    
+
 	if (_points != nil) {
         //		[imageView.image drawAtPoint:cropRect.origin];
 	}
-	
+    
     int offset = rect.size.width / 2;
     if (rectangleEnabled) {
         CGFloat white[4] = {1.0f, 1.0f, 1.0f, 1.0f};
         CGContextSetStrokeColor(c, white);
         CGContextSetFillColor(c, white);
+        [[UIColor clearColor] setFill];
+        UIRectFill( cropRect );
+
+        if(frameWidth){
+            cropRect.size.width = frameWidth;
+        }
+        if(frameHeight){
+            cropRect.size.height = frameHeight;
+        }
         [self drawRect:cropRect inContext:c];
-        
-        //	CGContextSetStrokeColor(c, white);
-        //	CGContextSetStrokeColor(c, white);
+
         CGContextSaveGState(c);
         if (oneDMode) {
             char *text = "Place a red line over the bar code to be scanned.";

@@ -1,13 +1,14 @@
 # Change Log
 <pre>
+v1.10.2  Adds rectangleColor, frameWidth and frameHeight as custom settings for the rectangle
 v1.9.1  [TIMOB-18092] Fixed linker error when building with TiSDK 3.5.0+
 
 v1.9.0  [MOD-18092] Updating module to support 64-bit.
 
-v1.8.3  [MOD-1265] Building with 2.1.3.GA and open sourcing 
-	
+v1.8.3  [MOD-1265] Building with 2.1.3.GA and open sourcing
+
 v1.8.2  [MOD-1087] Updating attribution
-	
+
 v1.8.1	[MOD-603] Fixed useLED to properly report if the LED will be used. Also added a button to the example overlay for toggling it on and off.
 
 v1.8	[MOD-434][MOD-439] Fixed a crash when scanning a VEVENT code, and improved the durability of scanning to not crash the application upon parse errors.

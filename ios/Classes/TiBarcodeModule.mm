@@ -63,19 +63,19 @@ static zxing::DecodeHints decodeHints;
 	// if the ZXing library is updated with new formats we do not need to
 	// make any changes on our side.
 	decodeHints = zxing::DecodeHints::DEFAULT_HINT;
-	
+
 	// NOTE: The ZXing library supports the DataMatrixReader format but
 	// it is not defined as part of the default hints in DataHints.h. It
 	// has been commented out in the current library implementation because
 	// it has not been officially passed by QA. However, it does appear to
 	// work sufficiently in testing. We can add support for the DataMatrixReader
-	// format by adding it to the set of readers supported in the hints field. 
+	// format by adding it to the set of readers supported in the hints field.
 	//
 	// If the DataMatrixReader is enabled in a future release of ZXing then
 	// we can remove this call to add it. But, no harm is done if it is already
 	// in the list.
 	decodeHints.addFormat(zxing::BarcodeFormat_DATA_MATRIX);
-	
+
 	zxing::MultiFormatReader *reader = new zxing::MultiFormatReader();
 	return [super initWithReader:reader];
 }
@@ -87,14 +87,14 @@ static zxing::DecodeHints decodeHints;
 }
 
 - (void)setAcceptedFormats:(NSArray*)acceptedFormats {
-    
+
     zxing::DecodeHints newHints = zxing::DecodeHints();
     newHints.setTryHarder(decodeHints.getTryHarder());
-    
+
     for (id format in acceptedFormats) {
         newHints.addFormat((zxing::BarcodeFormat)[TiUtils intValue:format]);
     }
-    
+
     decodeHints = newHints;
 }
 
@@ -159,7 +159,7 @@ static zxing::DecodeHints decodeHints;
 {
     bool val = [TiUtils boolValue:arg def:NO];
     useFrontCamera = val;
-    
+
     if (controller != nil) {
         controller.useFrontCamera = useFrontCamera;
         [controller syncDeviceInput];
@@ -170,7 +170,7 @@ static zxing::DecodeHints decodeHints;
 {
     ENSURE_TYPE(arg, NSNumber);
     led = [TiUtils boolValue:arg def:NO];
-    
+
     if (controller != nil) {
         [controller setTorch:led];
     }
@@ -184,30 +184,30 @@ static zxing::DecodeHints decodeHints;
 -(id)parse:(id)args
 {
 	ENSURE_SINGLE_ARG(args,NSDictionary);
-    
+
     id blob = [args valueForKey:@"image"];
 	ENSURE_TYPE(blob, TiBlob);
     UIImage* image = [(TiBlob*)blob image];
-    
+
     bool tryHarder = [TiUtils boolValue:[self valueForUndefinedKey:@"allowRotation"] def:NO];
     id acceptedFormats = [args valueForKey:@"acceptedFormats"];
-    
+
     CustomMultiFormatReader* multiFormatReader = [[CustomMultiFormatReader alloc] init];
 	[multiFormatReader setTryHarder:tryHarder];
     if (acceptedFormats != nil) {
         ENSURE_ARRAY(acceptedFormats);
         [multiFormatReader setAcceptedFormats:acceptedFormats];
     }
-    
+
     Decoder *d = [[Decoder alloc] init];
     d.keepOpen = keepOpen;
     d.readers = [NSSet setWithObject:multiFormatReader];
     d.delegate = self;
-    
+
     bool retVal = [d decodeImage:image];
-    
+
     [d release];
-    
+
     return NUMBOOL(retVal);
 }
 
@@ -215,34 +215,35 @@ static zxing::DecodeHints decodeHints;
 {
 	ENSURE_UI_THREAD(capture,args);
 	ENSURE_SINGLE_ARG(args,NSDictionary);
-    
+
     [self rememberSelf];
-	
+
 	BOOL tryHarder = [TiUtils boolValue:[self valueForUndefinedKey:@"allowRotation"] def:NO];
     id acceptedFormats = [args valueForKey:@"acceptedFormats"];
-    
+
 	// [MOD-232] Allow caller to determine if they want to animate
 	animate = [TiUtils boolValue:[args objectForKey:@"animate"] def:YES];
-	
+
 	if (controller!=nil)
 	{
+        NSLog(@"[WARN] controller != nil!!!!!!!!!!!! ********************************************************************************");
         NSMutableDictionary *event = [NSMutableDictionary dictionary];
         [event setObject:@"device busy" forKey:@"message"];
         [self fireEvent:@"error" withObject:event];
 		return;
 	}
-	
+
     keepOpen = [TiUtils boolValue:@"keepOpen" properties:args def:NO];
-    
+
     // allow an overlay view
     TiViewProxy *overlayProxy = [args objectForKey:@"overlay"];
-    
+
     if (overlayProxy != nil) {
         ENSURE_TYPE(overlayProxy, TiViewProxy);
         ENSURE_UI_THREAD(capture, args);
-        
+
         [overlayProxy windowWillOpen];
-        
+
         CGSize size = [overlayProxy view].bounds.size;
 
 #ifndef TI_USE_AUTOLAYOUT
@@ -253,30 +254,52 @@ static zxing::DecodeHints decodeHints;
         CGFloat width = s.width;
         CGFloat height = s.height;
 #endif
-        
+
         if (width > 0 && height > 0) {
             size = CGSizeMake(width, height);
         }
-        
+
         if (CGSizeEqualToSize(size, CGSizeZero) || width==0 || height == 0) {
             size = [UIScreen mainScreen].bounds.size;
         }
-        
+
         CGRect rect = CGRectMake(0, 0, size.width, size.height);
         [TiUtils setView:[overlayProxy view] positionRect:rect];
         [overlayProxy layoutChildren:NO];
     }
-    
+
+    UIColor *rectColor = [[UIColor blackColor] colorWithAlphaComponent:0.3f];
+    if ([args objectForKey:@"rectangleColor"]) {
+        TiColor *tc = [TiUtils colorValue:[args objectForKey:@"rectangleColor"]];
+        rectColor = [tc _color];
+    }
+
+    CGFloat rectWidth = 20.0f;
+    CGFloat rectHeight = 20.0f;
+    if ([args objectForKey:@"frameWidth"]) {
+        rectWidth = [TiUtils floatValue:[args objectForKey:@"frameWidth"]];
+    }else{
+        rectWidth = nil;
+    }
+    if ([args objectForKey:@"frameHeight"]) {
+        rectHeight = [TiUtils floatValue:[args objectForKey:@"frameHeight"]];
+    }else{
+        rectHeight = nil;
+    }
+
 	controller = [[ZXingWidgetController alloc] initWithDelegate:self
 													  showCancel:[TiUtils boolValue:@"showCancel" properties:args def:YES]
                                                    showRectangle:[TiUtils boolValue:@"showRectangle" properties:args def:YES]
+                                                   rectangleColor:rectColor
+                                                   rectangleWidth:rectWidth
+                                                   rectangleHeight:rectHeight
                                                         keepOpen:keepOpen
                                                   useFrontCamera:useFrontCamera
                                                         OneDMode:NO
                                                      withOverlay:[overlayProxy view]];
-    
+
     [controller setTorch:led];
-	
+
 	// Use our custom multi-format reader so that we get all of the formats and
 	// we can control the 'TryHarder' flag for rotation support
 	CustomMultiFormatReader* multiFormatReader = [[CustomMultiFormatReader alloc] init];
@@ -285,21 +308,21 @@ static zxing::DecodeHints decodeHints;
         ENSURE_ARRAY(acceptedFormats);
         [multiFormatReader setAcceptedFormats:acceptedFormats];
     }
-    
+
 	NSString* displayedMessage = [TiUtils stringValue:[self valueForUndefinedKey:@"displayedMessage"]];
 	if (displayedMessage != nil) {
 	    controller.overlayView.displayedMessage = displayedMessage;
     }
-	
+
 	NSSet *readers = [[NSSet alloc] initWithObjects:
 					  multiFormatReader,
 					  nil];
-	
+
 	[multiFormatReader release];
-	
+
 	controller.readers = readers;
 	[readers release];
-    
+
 	id sound = [args objectForKey:@"soundURL"];
 	if (sound!=nil)
 	{
@@ -316,7 +339,7 @@ static zxing::DecodeHints decodeHints;
 -(void)cancel:(id)args
 {
 	ENSURE_UI_THREAD(cancel,args);
-	
+
 	if (controller!=nil)
 	{
 		[self performSelector:@selector(zxingControllerDidCancel:) withObject:nil];
@@ -535,7 +558,7 @@ MAKE_SYSTEM_PROP(FORMAT_ITF,zxing::BarcodeFormat_ITF);
 - (void)parseSuccessResult:(NSString *)result
 {
     NSLog(@"[DEBUG] Received barcode result = %@", result);
-	
+
 	NSMutableDictionary *event = [NSMutableDictionary dictionary];
 	[event setObject:result forKey:@"result"];
 	NSString *prefixCheck = [[result substringToIndex:MIN(20,[result length])] lowercaseString];
