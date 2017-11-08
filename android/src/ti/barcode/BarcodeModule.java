@@ -57,7 +57,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	// Standard Debugging variables
 	private static final String LCAT = "BarcodeModule";
 	private boolean keepOpen = false;
-	
+
 	public int frameWidth = 0;
 	public int frameHeight = 0;
 
@@ -264,10 +264,10 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 		_instance = this;
 
 		Intent intent = new Intent(Intents.Scan.ACTION);
-
+		Log.w(LCAT, "--> from module :: capture function triggered");
 		if (args != null) {
 			KrollDict argsDict = new KrollDict(args);
-
+			Log.w(LCAT, "--> from module :: we found args .. keepOpen: usedcode: "+argsDict.optBoolean("keepOpen", false)+" my way: "+ args.get("keepOpen"));
 			// [MOD-233] Turn off default animation if requested. It is on by default.
 			boolean animate = argsDict.optBoolean("animate", true);
 			if (!animate) {
@@ -296,17 +296,26 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 
 			intent.putExtra(Intents.Scan.SHOW_RECTANGLE, argsDict.optBoolean("showRectangle", true));
 			intent.putExtra(Intents.Scan.KEEP_OPEN, argsDict.optBoolean("keepOpen", false));
-			frameWidth = argsDict.optInt("frameWidth",0);
-			frameHeight = argsDict.optInt("frameHeight",0);
+
+			//intent.putExtra(Intents.Scan.SHOW_RECTANGLE, false);
+			//intent.putExtra(Intents.Scan.KEEP_OPEN, true);
+
+			intent.putExtra(Intents.Scan.SHOW_INFOTEXT, argsDict.optBoolean("showInfotext", false));
+			//frameWidth = argsDict.optInt("frameWidth",0);
+			//frameHeight = argsDict.optInt("frameHeight",0);
 		} else {
+			Log.w(LCAT, "--> from module :: no values .. default values triggered");
 			Intents.Scan.overlayProxy = null;
 			intent.putExtra(Intents.Scan.SHOW_RECTANGLE, true);
 			intent.putExtra(Intents.Scan.KEEP_OPEN, false);
+			intent.putExtra(Intents.Scan.SHOW_INFOTEXT, false);
 		}
-		
+
+		intent.putExtra(Intents.Scan.ALLOW_MENU, properties.optBoolean("allowMenu", true));
+		intent.putExtra(Intents.Scan.ALLOW_INSTRUCTIONS, properties.optBoolean("allowInstructions", true));
 		intent.putExtra(Intents.Scan.PROMPT_MESSAGE, properties.optString("displayedMessage", null));
 
-		
+
 		// [MOD-217] -- Must set the package in order for it to automatically select the application as the source of the scanning activity.
 		intent.setPackage(TiApplication.getInstance().getPackageName());
 		// CaptureActivity.PACKAGE_NAME = TiApplication.getInstance().getPackageName();
@@ -371,7 +380,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 			e.printStackTrace();
 			processFailed(resultCode);
 		}
-
+		Log.w(LCAT, "--> from module :: keepOpen value: " + keepOpen);
 		if (!keepOpen) {
 			_instance = null;
 		}

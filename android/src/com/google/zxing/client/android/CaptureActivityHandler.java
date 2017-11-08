@@ -38,6 +38,7 @@ import android.util.Log;
 import java.util.Collection;
 import java.util.Map;
 import ti.barcode.RHelper;
+import ti.barcode.BarcodeModule;
 
 /**
  * This class handles all the messaging which comprises the state machine for capture.
@@ -92,18 +93,32 @@ public final class CaptureActivityHandler extends Handler {
             // Mutable copy:
             barcode = barcode.copy(Bitmap.Config.ARGB_8888, true);
           }
-          scaleFactor = bundle.getFloat(DecodeThread.BARCODE_SCALED_FACTOR);          
+          scaleFactor = bundle.getFloat(DecodeThread.BARCODE_SCALED_FACTOR);
         }
         activity.handleDecode((Result) message.obj, barcode, scaleFactor);
-        
+
     } else if(message.what==RHelper.getId("decode_failed")){
         // We're decoding as fast as possible, so when one decode fails, start another.
         state = State.PREVIEW;
         cameraManager.requestPreviewFrame(decodeThread.getHandler(), RHelper.getId("decode"));
-    } else if (message.what== RHelper.getId("return_scan_result")) {
-        activity.setResult(Activity.RESULT_OK, (Intent) message.obj);
-        activity.finish();
-    } else if (message.what==RHelper.getId("launch_product_query")){
+    } else if (message.what == RHelper.getId("return_scan_result")) {
+			Log.d(TAG, "Got return scan result message");
+			Intent msgObj = (Intent) message.obj;
+			if (activity.doKeepOpen()) {
+				String scanResultFormat = msgObj.getStringExtra(Intents.Scan.RESULT_FORMAT);
+				String scanResult = msgObj.getStringExtra(Intents.Scan.RESULT);
+				BarcodeModule barcodeModule = BarcodeModule.getInstance();
+				if (barcodeModule != null) {
+					barcodeModule.processResult(scanResultFormat, scanResult, Activity.RESULT_OK);
+				} else {
+					Log.e(TAG, "Unable to find an instance of the barcode module!");
+				}
+				restartPreviewAndDecode();
+			} else {
+				activity.setResult(Activity.RESULT_OK, (Intent) message.obj);
+				activity.finish();
+			}
+		} else if (message.what==RHelper.getId("launch_product_query")){
         String url = (String) message.obj;
 
         Intent intent = new Intent(Intent.ACTION_VIEW);

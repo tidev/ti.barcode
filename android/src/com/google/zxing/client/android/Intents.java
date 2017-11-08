@@ -32,13 +32,16 @@ public final class Intents {
    * Constants related to the {@link Scan#ACTION} Intent.
    */
   public static final class Scan {
-      
+
     public static final String USE_LED = "USE_LED";
     public static final String USE_FRONT_CAMERA = "USE_FRONT_CAMERA";
     public static final String SHOW_RECTANGLE = "SHOW_RECTANGLE";
     public static final String KEEP_OPEN = "KEEP_OPEN";
+    public static final String ALLOW_MENU = "ALLOW_MENU";
+    public static final String ALLOW_INSTRUCTIONS = "ALLOW_INSTRUCTIONS";
+    public static final String SHOW_INFOTEXT = "SHOW_INFOTEXT";
     public static TiViewProxy overlayProxy = null;
-    
+
     /**
      * Send this intent to open the Barcodes app in scanning mode, find a barcode, and return
      * the results.
@@ -131,7 +134,7 @@ public final class Intents {
      * of the app which requested the scan via
      * {@link android.app.Activity#startActivityForResult(android.content.Intent, int)}
      * The barcodes contents can be retrieved with
-     * {@link android.content.Intent#getStringExtra(String)}. 
+     * {@link android.content.Intent#getStringExtra(String)}.
      * If the user presses Back, the result code will be {@link android.app.Activity#RESULT_CANCELED}.
      */
     public static final String RESULT = "SCAN_RESULT";
@@ -209,7 +212,7 @@ public final class Intents {
 
     /**
      * The data to encode. Use {@link android.content.Intent#putExtra(String, String)} or
-     * {@link android.content.Intent#putExtra(String, android.os.Bundle)}, 
+     * {@link android.content.Intent#putExtra(String, android.os.Bundle)},
      * depending on the type and format specified. Non-QR Code formats should
      * just use a String here. For QR Code, see Contents for details.
      */
