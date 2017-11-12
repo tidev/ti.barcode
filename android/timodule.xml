@@ -7,7 +7,6 @@
         <manifest>
             <application>
                 <activity android:name="com.google.zxing.client.android.CaptureActivity"
-                          android:screenOrientation="landscape"
                           android:clearTaskOnLaunch="true"
                           android:stateNotNeeded="true"
                           android:configChanges="orientation|keyboardHidden"

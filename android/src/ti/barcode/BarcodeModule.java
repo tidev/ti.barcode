@@ -264,10 +264,10 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 		_instance = this;
 
 		Intent intent = new Intent(Intents.Scan.ACTION);
-		Log.w(LCAT, "--> from module :: capture function triggered");
+		
 		if (args != null) {
 			KrollDict argsDict = new KrollDict(args);
-			Log.w(LCAT, "--> from module :: we found args .. keepOpen: usedcode: "+argsDict.optBoolean("keepOpen", false)+" my way: "+ args.get("keepOpen"));
+			
 			// [MOD-233] Turn off default animation if requested. It is on by default.
 			boolean animate = argsDict.optBoolean("animate", true);
 			if (!animate) {
@@ -297,14 +297,9 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 			intent.putExtra(Intents.Scan.SHOW_RECTANGLE, argsDict.optBoolean("showRectangle", true));
 			intent.putExtra(Intents.Scan.KEEP_OPEN, argsDict.optBoolean("keepOpen", false));
 
-			//intent.putExtra(Intents.Scan.SHOW_RECTANGLE, false);
-			//intent.putExtra(Intents.Scan.KEEP_OPEN, true);
-
 			intent.putExtra(Intents.Scan.SHOW_INFOTEXT, argsDict.optBoolean("showInfotext", false));
-			//frameWidth = argsDict.optInt("frameWidth",0);
-			//frameHeight = argsDict.optInt("frameHeight",0);
 		} else {
-			Log.w(LCAT, "--> from module :: no values .. default values triggered");
+			
 			Intents.Scan.overlayProxy = null;
 			intent.putExtra(Intents.Scan.SHOW_RECTANGLE, true);
 			intent.putExtra(Intents.Scan.KEEP_OPEN, false);
@@ -380,7 +375,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 			e.printStackTrace();
 			processFailed(resultCode);
 		}
-		Log.w(LCAT, "--> from module :: keepOpen value: " + keepOpen);
+		
 		if (!keepOpen) {
 			_instance = null;
 		}
