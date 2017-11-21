@@ -116,10 +116,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private boolean keepOpen;
   private boolean showRectangle;
 
-
-
   private AmbientLightManager ambientLightManager;
-  private boolean showInfotext = false;
+  private boolean showInfoText = false;
 
   private static final int SHARE_ID = Menu.FIRST;
   private static final int HISTORY_ID = Menu.FIRST + 1;
@@ -210,12 +208,12 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     statusView = (TextView) findViewById(RHelper.getId("status_view"));
 
     Intent intent = getIntent();
-    if (intent.getBooleanExtra(Intents.Scan.SHOW_INFOTEXT, false)) {
-        statusView.setVisibility(View.VISIBLE);
-        showInfotext = true;
+    boolean showInfoText = intent.getBooleanExtra(Intents.Scan.SHOW_INFO_TEXT, false);
+
+    if (showInfoText) {
+      statusView.setVisibility(View.VISIBLE);
     } else {
-        showInfotext = false;
-        statusView.setVisibility(View.GONE);
+      statusView.setVisibility(View.GONE);
     }
 
     handler = null;
@@ -268,13 +266,13 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
         }
 
         showRectangle = intent.getBooleanExtra(Intents.Scan.SHOW_RECTANGLE, true);
-				viewfinderView.setShowRectangle(showRectangle);
-				allowMenu = intent.getBooleanExtra(Intents.Scan.ALLOW_MENU, true);
-				if (intent.getBooleanExtra(Intents.Scan.ALLOW_INSTRUCTIONS, true)) {
-					//showHelpOnFirstLaunch();
-				}
+		viewfinderView.setShowRectangle(showRectangle);
+		allowMenu = intent.getBooleanExtra(Intents.Scan.ALLOW_MENU, true);
+		if (intent.getBooleanExtra(Intents.Scan.ALLOW_INSTRUCTIONS, true)) {
+			//showHelpOnFirstLaunch();
+		}
 
-				keepOpen = intent.getBooleanExtra(Intents.Scan.KEEP_OPEN, false);
+		keepOpen = intent.getBooleanExtra(Intents.Scan.KEEP_OPEN, false);
 
         if (intent.hasExtra(Intents.Scan.CAMERA_ID)) {
           int cameraId = intent.getIntExtra(Intents.Scan.CAMERA_ID, -1);
@@ -426,8 +424,8 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     if (!allowMenu) {
-			return false;
-		}
+    	return false;
+	}
     MenuInflater menuInflater = getMenuInflater();
     menuInflater.inflate(RHelper.getLayout("capture"), menu);
     return super.onCreateOptionsMenu(menu);
@@ -593,7 +591,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       barcodeImageView.setImageBitmap(barcode);
     }
 
-    if (showInfotext) {
+    if (showInfoText) {
         TextView formatTextView = (TextView) findViewById(RHelper.getId("format_text_view"));
         formatTextView.setText(rawResult.getBarcodeFormat().toString());
 
@@ -672,7 +670,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       if (rawResultString.length() > 32) {
         rawResultString = rawResultString.substring(0, 32) + " ...";
       }
-      if (showInfotext) {
+      if (showInfoText) {
           statusView.setText(getString(resultHandler.getDisplayTitle()) + " : " + rawResultString);
       }
     }
@@ -797,7 +795,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   private void resetStatusView() {
     resultView.setVisibility(View.GONE);
-    if (showInfotext) {
+    if (showInfoText) {
         statusView.setText(RHelper.getString("msg_default_status"));
         statusView.setVisibility(View.VISIBLE);
     }

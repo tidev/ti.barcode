@@ -57,6 +57,7 @@ public final class ViewfinderView extends View {
   private int scannerAlpha;
   private List<ResultPoint> possibleResultPoints;
   private List<ResultPoint> lastPossibleResultPoints;
+  private boolean showRectangle = true;
 
   // This constructor is used when the class is built from an XML resource.
   public ViewfinderView(Context context, AttributeSet attrs) {
@@ -196,7 +197,6 @@ public final class ViewfinderView extends View {
     }
   }
 
-  private boolean showRectangle = true;
   public void setShowRectangle(boolean showRectangle) {
     this.showRectangle = showRectangle;
   }

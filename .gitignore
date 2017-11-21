@@ -23,3 +23,5 @@ xcuserdata
 .idea/
 libs/
 /android/java-sources.txt
+
+.project

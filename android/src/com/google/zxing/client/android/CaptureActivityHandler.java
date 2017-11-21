@@ -102,23 +102,23 @@ public final class CaptureActivityHandler extends Handler {
         state = State.PREVIEW;
         cameraManager.requestPreviewFrame(decodeThread.getHandler(), RHelper.getId("decode"));
     } else if (message.what == RHelper.getId("return_scan_result")) {
-			Log.d(TAG, "Got return scan result message");
-			Intent msgObj = (Intent) message.obj;
-			if (activity.doKeepOpen()) {
-				String scanResultFormat = msgObj.getStringExtra(Intents.Scan.RESULT_FORMAT);
-				String scanResult = msgObj.getStringExtra(Intents.Scan.RESULT);
-				BarcodeModule barcodeModule = BarcodeModule.getInstance();
-				if (barcodeModule != null) {
-					barcodeModule.processResult(scanResultFormat, scanResult, Activity.RESULT_OK);
-				} else {
-					Log.e(TAG, "Unable to find an instance of the barcode module!");
-				}
-				restartPreviewAndDecode();
+		Log.d(TAG, "Got return scan result message");
+		Intent msgObj = (Intent) message.obj;
+		if (activity.doKeepOpen()) {
+			String scanResultFormat = msgObj.getStringExtra(Intents.Scan.RESULT_FORMAT);
+			String scanResult = msgObj.getStringExtra(Intents.Scan.RESULT);
+			BarcodeModule barcodeModule = BarcodeModule.getInstance();
+			if (barcodeModule != null) {
+				barcodeModule.processResult(scanResultFormat, scanResult, Activity.RESULT_OK);
 			} else {
-				activity.setResult(Activity.RESULT_OK, (Intent) message.obj);
-				activity.finish();
+				Log.e(TAG, "Unable to find an instance of the barcode module!");			
 			}
-		} else if (message.what==RHelper.getId("launch_product_query")){
+			restartPreviewAndDecode();
+		} else {
+			activity.setResult(Activity.RESULT_OK, (Intent) message.obj);
+			activity.finish();
+		}
+	} else if (message.what==RHelper.getId("launch_product_query")){
         String url = (String) message.obj;
 
         Intent intent = new Intent(Intent.ACTION_VIEW);

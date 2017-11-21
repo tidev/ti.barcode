@@ -39,7 +39,7 @@ public final class Intents {
     public static final String KEEP_OPEN = "KEEP_OPEN";
     public static final String ALLOW_MENU = "ALLOW_MENU";
     public static final String ALLOW_INSTRUCTIONS = "ALLOW_INSTRUCTIONS";
-    public static final String SHOW_INFOTEXT = "SHOW_INFOTEXT";
+    public static final String SHOW_INFO_TEXT = "SHOW_INFO_TEXT";
     public static TiViewProxy overlayProxy = null;
 
     /**
