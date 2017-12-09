@@ -2,9 +2,9 @@
 # this is your module manifest and used by Titanium
 # during compilation, packaging, distribution, etc.
 #
-version: 3.1.1
-apiversion: 3
-architectures: armeabi-v7a x86
+version: 4.0.0
+apiversion: 4
+architectures: arm64-v8a armeabi-v7a x86
 description: Lets you process 1D/2D barcodes.
 author: Stephen Tramer & Jeff English
 license: Apache License, Version 2.0
@@ -16,4 +16,4 @@ name: barcode
 moduleid: ti.barcode
 guid: fe2e658e-0eaf-44a6-b6d1-c074d6b986a3
 platform: android
-minsdk: 6.0.0.GA
+minsdk: 7.0.0.GA
