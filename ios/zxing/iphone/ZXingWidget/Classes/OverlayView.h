@@ -21,6 +21,8 @@
 @interface OverlayView : UIView {
 	UIImageView *imageView;
 	NSMutableArray *_points;
+	CGFloat frameWidth;
+	CGFloat frameHeight;
 	UIButton *cancelButton;
     UILabel *instructionsLabel;
 	id<CancelDelegate> delegate;
@@ -37,10 +39,13 @@
 @property (nonatomic, copy) NSString *displayedMessage;
 
 - (id)initWithFrame:(CGRect)theFrame
-      cancelEnabled:(BOOL)isCancelEnabled
-   rectangleEnabled:(BOOL)isRectangleEnabled
-           oneDMode:(BOOL)isOneDModeEnabled
-        withOverlay:(UIView*)overlay;
+	backgroundColor:(UIColor*)bgColor
+	frameWidth:(CGFloat)rectFrameWidth
+	frameHeight:(CGFloat)rectFrameHeight
+    cancelEnabled:(BOOL)isCancelEnabled
+   	rectangleEnabled:(BOOL)isRectangleEnabled
+    oneDMode:(BOOL)isOneDModeEnabled
+    withOverlay:(UIView*)overlay;
 
 - (void)setPoint:(CGPoint)point;
 -(void)updateViewsWithFrame:(CGRect)newFrame;

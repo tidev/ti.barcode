@@ -56,6 +56,9 @@
 - (id)initWithDelegate:(id<ZXingDelegate>)scanDelegate
             showCancel:(BOOL)shouldShowCancel
          showRectangle:(BOOL)shouldShowRectangle
+         rectangleColor:(UIColor*)rectangleColor
+         rectangleWidth:(CGFloat)rectangleWidth
+         rectangleHeight:(CGFloat)rectangleHeight
               keepOpen:(BOOL)shouldKeepOpen
         useFrontCamera:(BOOL)shouldUseFrontCamera
               OneDMode:(BOOL)shouldUseOneDMode
@@ -69,7 +72,10 @@
         beepSound = -1;
         decoding = NO;
         self.useFrontCamera = shouldUseFrontCamera;
-        OverlayView *theOverlayView = [[OverlayView alloc] initWithFrame:[UIScreen mainScreen].bounds 
+        OverlayView *theOverlayView = [[OverlayView alloc] initWithFrame:[UIScreen mainScreen].bounds
+                                                            backgroundColor:(UIColor*)rectangleColor
+                                                            frameWidth:(CGFloat)rectangleWidth
+                                                            frameHeight:(CGFloat)rectangleHeight
                                                            cancelEnabled:shouldShowCancel
                                                         rectangleEnabled:shouldShowRectangle
                                                                 oneDMode:oneDMode

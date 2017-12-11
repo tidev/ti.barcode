@@ -64,6 +64,9 @@
 - (id)initWithDelegate:(id<ZXingDelegate>)delegate
             showCancel:(BOOL)shouldShowCancel
          showRectangle:(BOOL)shouldShowRectangle
+         rectangleColor:(UIColor*)rectangleColor
+         rectangleWidth:(CGFloat)rectangleWidth
+         rectangleHeight:(CGFloat)rectangleHeight
               keepOpen:(BOOL)shouldKeepOpen
         useFrontCamera:(BOOL)shouldUseFrontCamera
               OneDMode:(BOOL)shouldUseoOneDMode

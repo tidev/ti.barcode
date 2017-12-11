@@ -34,16 +34,19 @@ containing any of the following properties:
 
 * animate[boolean]: Indicates if the device should animate between the current activity and the camera activity when the current activity is in a different orientation than the camera. Default is true.
 * showCancel[boolean]: Whether or not to include the default cancel button. Defaults to true.
+* rectangleColor[titanium color]: When showRectangle is true, sets a background color for the camera view
+* frameWidth[float]: When showRectangle is true, set its width
+* frameHeight[float]: When showRectangle is true, set its height
 * showRectangle[boolean]: Whether or not to include the default rectangle around the scanning area. Defaults to true.
 * overlay[view]: The view to lay on top of the camera activity.
 * keepOpen[boolean]: Whether or not to keep the barcode scanner open after a barcode is recognized. Defaults to false. When set to true, "success" will fire once every time a barcode is recognized, up to two times per second. As such, it can fire multiple times for a single barcode!
-* acceptedFormats[int[]]: An optional array of int constants detailing which barcode formats are accepted. Defaults to all formats. Check out the "Barcode Format Constants" section below to see the available int constants. 
+* acceptedFormats[int[]]: An optional array of int constants detailing which barcode formats are accepted. Defaults to all formats. Check out the "Barcode Format Constants" section below to see the available int constants.
 
 ### parse([args])
 Parses a blob image for barcodes. Takes one required argument, a dictionary containing any of the following properties:
 
 * image[blob]: The image blob to parse for a barcode.
-* acceptedFormats[int[]]: An optional array of int constants detailing which barcode formats are accepted. Defaults to all formats. Check out the "Barcode Format Constants" section below to see the available int constants. 
+* acceptedFormats[int[]]: An optional array of int constants detailing which barcode formats are accepted. Defaults to all formats. Check out the "Barcode Format Constants" section below to see the available int constants.
 
 ### cancel()
 Cancels and closes the currently open capture window.
@@ -54,23 +57,23 @@ Use Ti.Barcode.addEventListener() to process the following events that are sent 
 ### success
 Sent upon a successful barcode scan. The event object contains the following fields:
 
-* format[string, Android only] : The format of the barcode 
-* result[string] : The raw contents of the barcode 
-* code[string, Android only] : The activity result code from the scanning activity. Use the result constants defined in the [Ti.Android][] namespace 
+* format[string, Android only] : The format of the barcode
+* result[string] : The raw contents of the barcode
+* code[string, Android only] : The activity result code from the scanning activity. Use the result constants defined in the [Ti.Android][] namespace
 * contentType[int] : The type of barcode content. Use the constants defined in this module to determine which.
 * data[object]: The parsed fields associated with the contentType.
 
 ### error
 Sent when an error occurs. The event object contains the following fields:
 
-* message[string] : The error message 
-* code[string, Android only] : The activity result code from the scanning activity. Use the result constants defined in the [Ti.Android][] namespace 
+* message[string] : The error message
+* code[string, Android only] : The activity result code from the scanning activity. Use the result constants defined in the [Ti.Android][] namespace
 
 ### cancel
 Sent when the scanning process is canceled. The event object contains the following fields:
 
-* message[string] : The error message 
-* code[string] : The activity result code from the scanning activity. Use the result constants defined in the [Ti.Android][] namespace 
+* message[string] : The error message
+* code[string] : The activity result code from the scanning activity. Use the result constants defined in the [Ti.Android][] namespace
 
 ## Properties
 
