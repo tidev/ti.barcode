@@ -258,7 +258,7 @@ public:
     } else {
       [self performSelectorOnMainThread:@selector(failedToDecodeImage:)
                    withObject:NSLocalizedString(@"Decoder BarcodeDetectionFailure", @"No barcode detected.")
-                waitUntilDone:NO];
+                waitUntilDone:YES];
     }
   }
   
