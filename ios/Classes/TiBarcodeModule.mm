@@ -246,13 +246,14 @@ static zxing::DecodeHints decodeHints;
         CGSize size = [overlayProxy view].bounds.size;
 
 #ifndef TI_USE_AUTOLAYOUT
+      if ([TiUtils respondsToSelector:@selector
+           (applyConstraintToView:forProxy:withBounds:)]) {
+        [TiUtils applyConstraintToView:(TiUIView *)[overlayProxy view]
+                              forProxy:overlayProxy
+                            withBounds:[[UIScreen mainScreen] bounds]];
+      } else {
         CGFloat width = [overlayProxy autoWidthForSize:CGSizeMake(MAXFLOAT,MAXFLOAT)];
         CGFloat height = [overlayProxy autoHeightForSize:CGSizeMake(width,0)];
-#else
-        CGSize s = [[overlayProxy view] sizeThatFits:CGSizeMake(MAXFLOAT,MAXFLOAT)];
-        CGFloat width = s.width;
-        CGFloat height = s.height;
-#endif
         
         if (width > 0 && height > 0) {
             size = CGSizeMake(width, height);
@@ -265,6 +266,24 @@ static zxing::DecodeHints decodeHints;
         CGRect rect = CGRectMake(0, 0, size.width, size.height);
         [TiUtils setView:[overlayProxy view] positionRect:rect];
         [overlayProxy layoutChildren:NO];
+      }
+#else
+      CGSize s = [[overlayProxy view] sizeThatFits:CGSizeMake(MAXFLOAT,MAXFLOAT)];
+      CGFloat width = s.width;
+      CGFloat height = s.height;
+      
+      if (width > 0 && height > 0) {
+        size = CGSizeMake(width, height);
+      }
+        
+      if (CGSizeEqualToSize(size, CGSizeZero) || width==0 || height == 0) {
+        size = [UIScreen mainScreen].bounds.size;
+      }
+        
+      CGRect rect = CGRectMake(0, 0, size.width, size.height);
+      [TiUtils setView:[overlayProxy view] positionRect:rect];
+      [overlayProxy layoutChildren:NO];
+#endif
     }
     
 	controller = [[ZXingWidgetController alloc] initWithDelegate:self
@@ -274,7 +293,7 @@ static zxing::DecodeHints decodeHints;
                                                   useFrontCamera:useFrontCamera
                                                         OneDMode:NO
                                                      withOverlay:[overlayProxy view]];
-    
+  
     [controller setTorch:led];
 	
 	// Use our custom multi-format reader so that we get all of the formats and
