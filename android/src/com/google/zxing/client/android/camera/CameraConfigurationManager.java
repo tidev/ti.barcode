@@ -90,23 +90,10 @@ public final class CameraConfigurationManager {
 
     // Still not 100% sure about this. But acts like we need to flip this:
     if (camera.getFacing() == CameraFacing.FRONT) {
-      cwRotationFromNaturalToCamera = (360 - cwRotationFromNaturalToCamera) % 360;
-      Log.d(TAG, "Front camera overriden to: " + cwRotationFromNaturalToCamera);
+        cwRotationFromNaturalToCamera = (360 - cwRotationFromNaturalToCamera) % 360;
+        Log.d(TAG, "Front camera overriden to: " + cwRotationFromNaturalToCamera);
     }
 
-    /*
-    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-    String overrideRotationString;
-    if (camera.getFacing() == CameraFacing.FRONT) {
-      overrideRotationString = prefs.getString(PreferencesActivity.KEY_FORCE_CAMERA_ORIENTATION_FRONT, null);
-    } else {
-      overrideRotationString = prefs.getString(PreferencesActivity.KEY_FORCE_CAMERA_ORIENTATION, null);
-    }
-    if (overrideRotationString != null && !"-".equals(overrideRotationString)) {
-      Log.d(TAG, "Overriding camera manually to " + overrideRotationString);
-      cwRotationFromNaturalToCamera = Integer.parseInt(overrideRotationString);
-    }
-     */
 
     cwRotationFromDisplayToCamera =
         (360 + cwRotationFromNaturalToCamera - cwRotationFromNaturalToDisplay) % 360;
@@ -231,20 +218,22 @@ public final class CameraConfigurationManager {
   }
 
   public void setTorch(Camera camera, boolean newSetting) {
-	  if (camera != null) {
-	      Camera.Parameters parameters = camera.getParameters();
-	      doSetTorch(parameters, newSetting, false);
-	      camera.setParameters(parameters);
-	  }
-	  SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-	  boolean currentSetting = prefs.getBoolean(PreferencesActivity.KEY_FRONT_LIGHT, false);
-	  if (currentSetting != newSetting) {
-	  	SharedPreferences.Editor editor = prefs.edit();
-	  	editor.putBoolean(PreferencesActivity.KEY_FRONT_LIGHT, newSetting);
-	  	editor.commit();
-	  }
+      if (camera != null) {
+          Camera.Parameters parameters = camera.getParameters();
+          doSetTorch(parameters, newSetting, false);
+          camera.setParameters(parameters);
+      }
+      if (context != null) {
+          SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+          boolean currentSetting = prefs.getBoolean(PreferencesActivity.KEY_FRONT_LIGHT, false);
+          if (currentSetting != newSetting) {
+              SharedPreferences.Editor editor = prefs.edit();
+              editor.putBoolean(PreferencesActivity.KEY_FRONT_LIGHT, newSetting);
+              editor.commit();
+          }
+      }
   }
-  
+
   private void initializeTorch(Camera.Parameters parameters, SharedPreferences prefs, boolean safeMode) {
 	boolean currentSetting = prefs.getBoolean(PreferencesActivity.KEY_FRONT_LIGHT, false);
     doSetTorch(parameters, currentSetting, safeMode);
@@ -252,28 +241,34 @@ public final class CameraConfigurationManager {
 
   private void doSetTorch(Camera.Parameters parameters, boolean newSetting, boolean safeMode) {
     CameraConfigurationUtils.setTorch(parameters, newSetting);
-    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-    if (!safeMode && !prefs.getBoolean(PreferencesActivity.KEY_DISABLE_EXPOSURE, true)) {
-      CameraConfigurationUtils.setBestExposure(parameters, newSetting);
+    if (context != null) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (!safeMode && !prefs.getBoolean(PreferencesActivity.KEY_DISABLE_EXPOSURE, true)) {
+          CameraConfigurationUtils.setBestExposure(parameters, newSetting);
+        }
     }
   }
 
-
-
     // custom code
     public void setFrontCamera(boolean newSetting) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean currentSetting = prefs.getBoolean(PreferencesActivity.KEY_FRONT_CAMERA, false);
-        if (currentSetting != newSetting) {
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putBoolean(PreferencesActivity.KEY_FRONT_CAMERA, newSetting);
-            editor.commit();
+        if (context != null) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            boolean currentSetting = prefs.getBoolean(PreferencesActivity.KEY_FRONT_CAMERA, false);
+            if (currentSetting != newSetting) {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putBoolean(PreferencesActivity.KEY_FRONT_CAMERA, newSetting);
+                editor.commit();
+            }
         }
     }
 
     public boolean getFrontCamera() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getBoolean(PreferencesActivity.KEY_FRONT_CAMERA, false);
+        if (context != null) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            return prefs.getBoolean(PreferencesActivity.KEY_FRONT_CAMERA, false);
+        } else {
+            return false;
+        }
     }
 
 }
