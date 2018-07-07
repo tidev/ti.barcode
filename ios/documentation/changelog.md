@@ -1,10 +1,10 @@
 # Change Log
 <pre>
-v1.11.0 ([#55](https://github.com/appcelerator-modules/ti.barcode/pull/55)) Add rectangleColor, frameWidth and frameHeight as custom settings for the rectangle
+v1.11.0 (#55) Add rectangleColor, frameWidth and frameHeight as custom settings for the rectangle
 
 v1.10.2 [MOD-2404] Fix overlay from not being visible
 
-v1.10.1 ([#53](https://github.com/appcelerator-modules/ti.barcode/pull/53)) Fix barcode-rotation issue
+v1.10.1 (#53) Fix barcode-rotation issue
 
 v1.9.1  [TIMOB-18092] Fixed linker error when building with TiSDK 3.5.0+
 
