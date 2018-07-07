@@ -1,10 +1,9 @@
 /**
  * Ti.Barcode Module
- * Copyright (c) 2010-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2010-2018 by Appcelerator, Inc. All Rights Reserved.
  * Please see the LICENSE included with this distribution for details.
  */
 
-// Has to be an .mm file so that ZXing headers are found correctly
 #import "TiBarcodeModule.h"
 #import "TiBase.h"
 #import "TiHost.h"
@@ -226,7 +225,6 @@ static zxing::DecodeHints decodeHints;
 
 	if (controller!=nil)
 	{
-        NSLog(@"[WARN] controller != nil!!!!!!!!!!!! ********************************************************************************");
         NSMutableDictionary *event = [NSMutableDictionary dictionary];
         [event setObject:@"device busy" forKey:@"message"];
         [self fireEvent:@"error" withObject:event];
