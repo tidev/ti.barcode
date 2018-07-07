@@ -2,14 +2,13 @@
 # this is your module manifest and used by Titanium
 # during compilation, packaging, distribution, etc.
 #
-version: 1.10.2
+version: 1.11.0
 apiversion: 2
 architectures: armv7 i386 x86_64 arm64
 description: Lets you process 1D/2D barcodes.
 author: Stephen Tramer, Jeff English, Hans Knöchel, Vijay Singh
 license: Apache License, Version 2.0
 copyright: Copyright (c) 2010-Present by Axway Appcelerator.
-
 
 # these should not be edited
 name: barcode
