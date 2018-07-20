@@ -3,15 +3,20 @@
  * the scanned barcode.
  */
 var Barcode = require('ti.barcode');
+
 Barcode.allowRotation = true;
 Barcode.displayedMessage = ' ';
 Barcode.allowMenu = false;
 Barcode.allowInstructions = false;
 Barcode.useLED = true;
 
+var isiOS = Ti.Platform.osname === 'iphone' || Ti.Platform.osname === 'android';
+var isAndroid = Ti.Platform.osname === 'android';
+
 var window = Ti.UI.createWindow({
     backgroundColor: 'white'
 });
+
 var scrollView = Ti.UI.createScrollView({
     contentWidth: 'auto',
     contentHeight: 'auto',
@@ -25,33 +30,57 @@ var scrollView = Ti.UI.createScrollView({
  */
 var overlay = Ti.UI.createView({
     backgroundColor: 'transparent',
-    top: 0, right: 0, bottom: 0, left: 0
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0
 });
+
 var switchButton = Ti.UI.createButton({
     title: Barcode.useFrontCamera ? 'Back Camera' : 'Front Camera',
     textAlign: 'center',
-    color: '#000', backgroundColor: '#fff', style: 0,
-    font: { fontWeight: 'bold', fontSize: 16 },
-    borderColor: '#000', borderRadius: 10, borderWidth: 1,
+    color: '#000',
+    backgroundColor: '#fff',
+    style: 0,
+    font: {
+        fontWeight: 'bold',
+        fontSize: 16
+    },
+    borderColor: '#000',
+    borderRadius: 10,
+    borderWidth: 1,
     opacity: 0.5,
-    width: 220, height: 30,
+    width: 220,
+    height: 30,
     bottom: 10
 });
-switchButton.addEventListener('click', function () {
+
+switchButton.addEventListener('click', function() {
     Barcode.useFrontCamera = !Barcode.useFrontCamera;
     switchButton.title = Barcode.useFrontCamera ? 'Back Camera' : 'Front Camera';
 });
+
 overlay.add(switchButton);
+
 var cancelButton = Ti.UI.createButton({
-    title: 'Cancel', textAlign: 'center',
-    color: '#000', backgroundColor: '#fff', style: 0,
-    font: { fontWeight: 'bold', fontSize: 16 },
-    borderColor: '#000', borderRadius: 10, borderWidth: 1,
+    title: 'Cancel',
+    textAlign: 'center',
+    color: '#000',
+    backgroundColor: '#fff',
+    style: 0,
+    font: {
+        fontWeight: 'bold',
+        fontSize: 16
+    },
+    borderColor: '#000',
+    borderRadius: 10,
+    borderWidth: 1,
     opacity: 0.5,
-    width: 220, height: 30,
+    width: 220,
+    height: 30,
     top: 20
 });
-cancelButton.addEventListener('click', function () {
+cancelButton.addEventListener('click', function() {
     Barcode.cancel();
 });
 overlay.add(cancelButton);
@@ -60,53 +89,96 @@ overlay.add(cancelButton);
  * Create a button that will trigger the barcode scanner.
  */
 var scanCode = Ti.UI.createButton({
-    title: 'Scan Code',
+    title: 'Scan the Code',
     width: 150,
     height: 60,
     top: 20
 });
-scanCode.addEventListener('click', function () {
-    reset();
-    // Note: while the simulator will NOT show a camera stream in the simulator, you may still call "Barcode.capture"
-    // to test your barcode scanning overlay.
-    Barcode.capture({
-        animate: true,
-        overlay: overlay,
-        showCancel: false,
-        showRectangle: false,
-        keepOpen: true/*,
-        acceptedFormats: [
-            Barcode.FORMAT_QR_CODE
-        ]*/
+
+var cameraPermission = function(callback) {
+    if (isAndroid) {
+        if (Ti.Media.hasCameraPermissions()) {
+            if (callback) {
+                callback(true);
+            }
+        } else {
+            Ti.Media.requestCameraPermissions(function(e) {
+                if (e.success) {
+                    if (callback) {
+                        callback(true);
+                    }
+                } else {
+                    if (callback) {
+                        callback(false);
+                    }
+                    alert('No camera permission');
+                }
+            });
+        }
+    }
+
+    if (isiOS) {
+        if (callback) {
+            callback(true);
+        }
+    }
+};
+
+scanCode.addEventListener('click', function() {
+    cameraPermission(function(re) {
+        reset();
+        // Note: while the simulator will NOT show a camera stream in the simulator, you may still call "Barcode.capture"
+        // to test your barcode scanning overlay.
+        Barcode.capture({
+            animate: true,
+            overlay: overlay,
+            showCancel: false,
+            showRectangle: false,
+            keepOpen: true
+            /*,
+                    acceptedFormats: [
+                        Barcode.FORMAT_QR_CODE
+                    ]*/
+        });
     });
 });
 scrollView.add(scanCode);
+
 
 /**
  * Create a button that will show the gallery picker.
  */
 var scanImage = Ti.UI.createButton({
     title: 'Scan Image from Gallery',
-    width: 150, height: 60, top: 20
+    width: 150,
+    height: 60,
+    top: 20
 });
-scanImage.addEventListener('click', function () {
+
+scanImage.addEventListener('click', function() {
     reset();
     Ti.Media.openPhotoGallery({
-        success: function (evt) {
+        success: function(evt) {
             Barcode.parse({
-                image: evt.media/*,
-                acceptedFormats: [
-                    Barcode.FORMAT_QR_CODE
-                ]*/
+                image: evt.media
+                /*,
+                                acceptedFormats: [
+                                    Barcode.FORMAT_QR_CODE
+                                ]*/
             });
         }
     });
 });
+
 scrollView.add(scanImage);
+
 /**
  * Now listen for various events from the Barcode module. This is the module's way of communicating with us.
  */
-var scannedBarcodes = {}, scannedBarcodesCount = 0;
+
+var scannedBarcodes = {},
+    scannedBarcodesCount = 0;
+
 function reset() {
     scannedBarcodes = {};
     scannedBarcodesCount = 0;
@@ -117,16 +189,20 @@ function reset() {
     scanFormat.text = ' ';
     scanParsed.text = ' ';
 }
-Barcode.addEventListener('error', function (e) {
+
+Barcode.addEventListener('error', function(e) {
     scanContentType.text = ' ';
     scanFormat.text = ' ';
     scanParsed.text = ' ';
     scanResult.text = e.message;
+    console.log('An Error occured: ' + e);
 });
-Barcode.addEventListener('cancel', function (e) {
+
+Barcode.addEventListener('cancel', function(e) {
     Ti.API.info('Cancel received');
 });
-Barcode.addEventListener('success', function (e) {
+
+Barcode.addEventListener('success', function(e) {
     Ti.API.info('Success called with barcode: ' + e.result);
     if (!scannedBarcodes['' + e.result]) {
         scannedBarcodes[e.result] = true;
@@ -147,64 +223,88 @@ Barcode.addEventListener('success', function (e) {
 scrollView.add(Ti.UI.createLabel({
     text: 'You may need to rotate the device',
     top: 10,
-    height: Ti.UI.SIZE || 'auto', width: Ti.UI.SIZE || 'auto'
+    height: Ti.UI.SIZE || 'auto',
+    width: Ti.UI.SIZE || 'auto'
 }));
 
 scrollView.add(Ti.UI.createLabel({
-    text: 'Result: ', textAlign: 'left',
-    top: 10, left: 10,
+    text: 'Result: ',
+    textAlign: 'left',
+    top: 10,
+    left: 10,
     color: 'black',
     height: Ti.UI.SIZE || 'auto'
 }));
+
 var scanResult = Ti.UI.createLabel({
-    text: ' ', textAlign: 'left',
-    top: 10, left: 10,
+    text: ' ',
+    textAlign: 'left',
+    top: 10,
+    left: 10,
     color: 'black',
     height: Ti.UI.SIZE || 'auto'
 });
+
 scrollView.add(scanResult);
 
 scrollView.add(Ti.UI.createLabel({
     text: 'Content Type: ',
-    top: 10, left: 10,
+    top: 10,
+    left: 10,
     textAlign: 'left',
     color: 'black',
     height: Ti.UI.SIZE || 'auto'
 }));
+
 var scanContentType = Ti.UI.createLabel({
-    text: ' ', textAlign: 'left',
-    top: 10, left: 10,
+    text: ' ',
+    textAlign: 'left',
+    top: 10,
+    left: 10,
     color: 'black',
     height: Ti.UI.SIZE || 'auto'
 });
+
 scrollView.add(scanContentType);
 
 scrollView.add(Ti.UI.createLabel({
-    text: 'Format: ', textAlign: 'left',
-    top: 10, left: 10,
+    text: 'Format: ',
+    textAlign: 'left',
+    top: 10,
+    left: 10,
     color: 'black',
     height: Ti.UI.SIZE || 'auto'
 }));
+
 var scanFormat = Ti.UI.createLabel({
-    text: ' ', textAlign: 'left',
-    top: 10, left: 10,
+    text: ' ',
+    textAlign: 'left',
+    top: 10,
+    left: 10,
     color: 'black',
     height: Ti.UI.SIZE || 'auto'
 });
+
 scrollView.add(scanFormat);
 
 scrollView.add(Ti.UI.createLabel({
-    text: 'Parsed: ', textAlign: 'left',
-    top: 10, left: 10,
+    text: 'Parsed: ',
+    textAlign: 'left',
+    top: 10,
+    left: 10,
     color: 'black',
     height: Ti.UI.SIZE || 'auto'
 }));
+
 var scanParsed = Ti.UI.createLabel({
-    text: ' ', textAlign: 'left',
-    top: 10, left: 10,
+    text: ' ',
+    textAlign: 'left',
+    top: 10,
+    left: 10,
     color: 'black',
     height: Ti.UI.SIZE || 'auto'
 });
+
 scrollView.add(scanParsed);
 
 function parseContentType(contentType) {
