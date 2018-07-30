@@ -6,6 +6,7 @@
 
 #import "TiOverlayView.h"
 
+#define kTextMargin 10
 CGFloat _kPadding = 10;
 
 @implementation TiOverlayView
@@ -57,6 +58,7 @@ CGFloat _kPadding = 10;
     CGRect theRect = CGRectMake((self.frame.size.width - theSize.width) / 2, _cropRect.origin.y + _cropRect.size.height + 20, theSize.width, theSize.height);
     [_cancelButton setFrame:theRect];
   }
+  [self setNeedsDisplay];
 }
 
 - (void)cancel:(id)sender {
@@ -77,44 +79,12 @@ CGFloat _kPadding = 10;
     }
 }
 
-- (CGPoint)map:(CGPoint)point {
-    CGPoint center;
-    center.x = _cropRect.size.width/2;
-    center.y = _cropRect.size.height/2;
-    float x = point.x - center.x;
-    float y = point.y - center.y;
-    int rotation = 90;
-    switch(rotation) {
-        case 0:
-            point.x = x;
-            point.y = y;
-            break;
-        case 90:
-            point.x = -y;
-            point.y = x;
-            break;
-        case 180:
-            point.x = -x;
-            point.y = -y;
-            break;
-        case 270:
-            point.x = y;
-            point.y = -x;
-            break;
-    }
-    point.x = point.x + center.x;
-    point.y = point.y + center.y;
-    return point;
-}
-
-#define kTextMargin 10
-
 - (void)drawRect:(CGRect)rect {
-	[super drawRect:rect];
+    [super drawRect:rect];
     if (_displayMessage == nil) {
         self.displayMessage = @"Place the barcode inside the rectangle to scan it.";
     }
-	CGContextRef c = UIGraphicsGetCurrentContext();
+    CGContextRef c = UIGraphicsGetCurrentContext();
 	
     int offset = rect.size.width / 2;
     if (_showRectangle) {
@@ -124,10 +94,16 @@ CGFloat _kPadding = 10;
         [self drawRect:_cropRect inContext:c];
         CGContextSaveGState(c);
         UIFont *font = [UIFont systemFontOfSize:18];
+        NSMutableParagraphStyle *textStyle = [[NSMutableParagraphStyle alloc] init];
+        textStyle.lineBreakMode = NSLineBreakByWordWrapping;
+        textStyle.alignment = NSTextAlignmentCenter;
         CGSize constraint = CGSizeMake(rect.size.width  - 2 * kTextMargin, _cropRect.origin.y);
-        CGSize displaySize = [self.displayMessage sizeWithFont:font constrainedToSize:constraint];
+        CGSize displaySize = [self.displayMessage boundingRectWithSize:constraint options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName: font, NSParagraphStyleAttributeName: textStyle} context:nil].size;
         CGRect displayRect = CGRectMake((rect.size.width - displaySize.width) / 2 , _cropRect.origin.y - displaySize.height, displaySize.width, displaySize.height);
-        [self.displayMessage drawInRect:displayRect withFont:font lineBreakMode:UILineBreakModeWordWrap alignment:UITextAlignmentCenter];
+        [self.displayMessage drawInRect:displayRect withAttributes:@{NSFontAttributeName: font,
+                                                             NSParagraphStyleAttributeName: textStyle,
+                                                             NSForegroundColorAttributeName: UIColor.whiteColor
+                                                             }];
         CGContextRestoreGState(c);
     }
 }

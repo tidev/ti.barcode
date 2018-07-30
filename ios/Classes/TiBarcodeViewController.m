@@ -12,6 +12,12 @@
 
 @implementation TiBarcodeViewController
 
+
+- (void) dealloc
+{
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (instancetype)initWithObjectTypes:(NSArray *)objectTypes
            delegate:(id<TiOverlayViewDelegate>)delegate
             showCancel:(BOOL)shouldShowCancel
@@ -23,16 +29,21 @@
                                                           previewView:[self view]];
     _shouldAutorotate = NO;
     _overlayView = [[TiOverlayView alloc] initWithFrame:[UIScreen mainScreen].bounds
-                                                         showCancel:true
-                                                      showRectangle:true
-                                                           withOverlay:nil];
-    showRectangle = true;//shouldShowRectangle;
+                                                         showCancel:shouldShowCancel
+                                                      showRectangle:shouldShowRectangle
+                                                           withOverlay:overlay];
+    showRectangle = shouldShowRectangle;
     _overlayView.delegate = delegate;
     
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(handleDeviceRotation:)
+                                                 name:UIApplicationDidChangeStatusBarOrientationNotification
+                                               object:nil];
     if (showRectangle) {
       CGRect rect = _overlayView.cropRect;
+      __weak TiBarcodeViewController *weakSelf = self;
       [_scanner setDidStartScanningBlock:^(void) {
-        [_scanner setScanRect:rect];
+        [[weakSelf scanner] setScanRect:rect];
       }];
     }
   }
@@ -59,20 +70,22 @@
   return [[[TiApp app] controller] preferredStatusBarStyle];
 }
 
-// MOD-2190: Fix the orientation by using the parent one.
 - (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation
 {
   return [[[[TiApp app] controller] topContainerController] preferredInterfaceOrientationForPresentation];
 }
 
+- (void)handleDeviceRotation:(NSNotification *)notification
+{
+    if (showRectangle) {
+      CGRect rect = _overlayView.cropRect;
+      [_scanner setScanRect:rect];
+    }
+}
+
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id <UIViewControllerTransitionCoordinator>)coordinator {
   [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
-  CGRect frame = CGRectMake(_overlayView.frame.origin.x, _overlayView.frame.origin.y, size.width, size.height);
-  [_overlayView updateViewsWithFrame:frame];
-  if (showRectangle) {
-    CGRect rect = _overlayView.cropRect;
-    [_scanner setScanRect:rect];
-  }
+  [_overlayView updateViewsWithFrame:CGRectMake(_overlayView.frame.origin.x, _overlayView.frame.origin.y, size.width, size.height)];
 }
 
 @end
