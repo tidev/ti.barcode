@@ -1,30 +1,28 @@
 /**
- * Ti.BarcodeScanner
- * Copyright (c) 2017-present by Hans Knöchel. All Rights Reserved.
- * Licensed under the terms of the Apache Public License
+ * Ti.Barcode Module
+ * Copyright (c) 2010-2018 by Appcelerator, Inc. All Rights Reserved.
  * Please see the LICENSE included with this distribution for details.
  */
+
 #import <UIKit/UIKit.h>
-#import "OverlayView1.h"
+#import "TiOverlayView.h"
 
 @class MTBBarcodeScanner;
-@class OverlayView1;
+@class TiOverlayView;
 
 @interface TiBarcodeViewController : UIViewController {
   @private
-  OverlayView1 *_overlayView;
+  TiOverlayView *_overlayView;
   BOOL showRectangle;
 }
 
-//- (instancetype)initWithObjectTypes:(NSArray *)objectTypes;
-
-- (OverlayView1 *)overlayView;
+- (TiOverlayView *)overlayView;
 
 - (id)initWithObjectTypes:(NSArray *)objectTypes
-           cancelDelegate:(id<CancelDelegate>)delegate
+           delegate:(id<TiOverlayViewDelegate>)delegate
             showCancel:(BOOL)shouldShowCancel
          showRectangle:(BOOL)shouldShowRectangle
-           withOverlay:(UIView*)overlay;
+           withOverlay:(UIView *)overlay;
 
 @property(nonatomic, strong) MTBBarcodeScanner *scanner;
 

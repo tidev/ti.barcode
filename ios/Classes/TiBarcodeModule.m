@@ -1,7 +1,6 @@
 /**
- * Ti.BarcodeScanner
- * Copyright (c) 2017-present by Hans Knöchel. All Rights Reserved.
- * Licensed under the terms of the Apache Public License
+ * Ti.Barcode Module
+ * Copyright (c) 2010-2018 by Appcelerator, Inc. All Rights Reserved.
  * Please see the LICENSE included with this distribution for details.
  */
 
@@ -12,7 +11,7 @@
 #import "TiViewProxy.h"
 #import "TiApp.h"
 #import "LayoutConstraint.h"
-#import "OverlayView1.h"
+#import "TiOverlayView.h"
 
 @implementation TiBarcodeModule
 
@@ -75,21 +74,18 @@
       [acceptedFormats addObjectsFromArray:@[AVMetadataObjectTypeQRCode, AVMetadataObjectTypeUPCECode]];
     }
   
-    //barcodeViewController = [[TiBarcodeViewController alloc] initWithObjectTypes:acceptedFormats];
-    
     NSError *error = nil;
     NSError *cameraError = nil;
     UIView *overlayView = nil;
     if (overlayProxy != nil) {
       overlayView = [self prepareOverlayWithProxy:overlayProxy];
-        //[barcodeViewController setOverlayView:[self prepareOverlayWithProxy:overlayProxy]];
     }
-  barcodeViewController = [[TiBarcodeViewController alloc] initWithObjectTypes:acceptedFormats cancelDelegate:self showCancel:showCancel showRectangle:showRectangle withOverlay:overlayView];
+  barcodeViewController = [[TiBarcodeViewController alloc] initWithObjectTypes:acceptedFormats delegate:self showCancel:showCancel showRectangle:showRectangle withOverlay:overlayView];
     [[barcodeViewController scanner] setCamera:selectedCamera ?: MTBCameraBack error:&cameraError];
   
   displayedMessage = @"testing";
   if (displayedMessage != nil) {
-    [[barcodeViewController overlayView] setDisplayedMessage: displayedMessage];
+    [[barcodeViewController overlayView] setDisplayMessage: displayedMessage];
   }
     if (cameraError) {
         [self fireEvent:@"error" withObject:@{
@@ -310,7 +306,7 @@ MAKE_SYSTEM_PROP(FORMAT_AZTEC, AVMetadataObjectTypeAztecCode); // New!
 MAKE_SYSTEM_PROP(FORMAT_FACE, AVMetadataObjectTypeFace); // New!
 MAKE_SYSTEM_PROP(FORMAT_INTERLEAVED_2_OF_5, AVMetadataObjectTypeInterleaved2of5Code); // New!
 
-#pragma mark CancelDelegate
+#pragma mark TiOverlayViewDelegate
 
 - (void)cancelled {
   [self closeScanner];

@@ -1,46 +1,32 @@
 /**
- * Copyright 2009 Jeff Verkoeyen
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Ti.Barcode Module
+ * Copyright (c) 2010-2018 by Appcelerator, Inc. All Rights Reserved.
+ * Please see the LICENSE included with this distribution for details.
  */
 
-#import "OverlayView1.h"
+#import "TiOverlayView.h"
 
 CGFloat _kPadding = 10;
 
-@interface OverlayView1()
-@end
+@implementation TiOverlayView
 
-
-@implementation OverlayView1
-
-- (id) initWithFrame:(CGRect)theFrame
-       cancelEnabled:(BOOL)isCancelEnabled
-    rectangleEnabled:(BOOL)isRectangleEnabled
-         withOverlay:(UIView*)overlay {
-    self = [super initWithFrame:theFrame];
+- (id) initWithFrame:(CGRect)frame
+       showCancel:(BOOL)showCancel
+    showRectangle:(BOOL)showRectangle
+         withOverlay:(UIView *)overlay {
+    self = [super initWithFrame:frame];
     if( self ) {
-        rectangleEnabled = isRectangleEnabled;
+        _showRectangle = showRectangle;
         self.backgroundColor = [UIColor clearColor];        
-        if (isCancelEnabled)
+        if (showCancel)
         {
-            cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-            [cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
-            [cancelButton addTarget:self action:@selector(cancel:) forControlEvents:UIControlEventTouchUpInside];
-            [self addSubview:cancelButton];
+            _cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+            [_cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
+            [_cancelButton addTarget:self action:@selector(cancel:) forControlEvents:UIControlEventTouchUpInside];
+            [self addSubview:_cancelButton];
         }
         
-        [self updateViewsWithFrame:theFrame];
+        [self updateViewsWithFrame:frame];
         
         if (overlay != nil)
         {
@@ -65,11 +51,11 @@ CGFloat _kPadding = 10;
     }
   _cropRect = CGRectMake(_kPadding, (self.frame.size.height - rectSize2) / 2, rectSize, rectSize2);
   
-  if (cancelButton)
+  if (_cancelButton)
   {
     CGSize theSize = CGSizeMake(100, 50);
     CGRect theRect = CGRectMake((self.frame.size.width - theSize.width) / 2, _cropRect.origin.y + _cropRect.size.height + 20, theSize.width, theSize.height);
-    [cancelButton setFrame:theRect];
+    [_cancelButton setFrame:theRect];
   }
 }
 
@@ -80,7 +66,7 @@ CGFloat _kPadding = 10;
 }
 
 - (void)drawRect:(CGRect)rect inContext:(CGContextRef)context {
-    if (rectangleEnabled) {
+    if (_showRectangle) {
         CGContextBeginPath(context);
         CGContextMoveToPoint(context, rect.origin.x, rect.origin.y);
         CGContextAddLineToPoint(context, rect.origin.x + rect.size.width, rect.origin.y);
@@ -125,13 +111,13 @@ CGFloat _kPadding = 10;
 
 - (void)drawRect:(CGRect)rect {
 	[super drawRect:rect];
-    if (_displayedMessage == nil) {
-        self.displayedMessage = @"Place a barcode inside the viewfinder rectangle to scan it.";
+    if (_displayMessage == nil) {
+        self.displayMessage = @"Place the barcode inside the rectangle to scan it.";
     }
 	CGContextRef c = UIGraphicsGetCurrentContext();
 	
     int offset = rect.size.width / 2;
-    if (rectangleEnabled) {
+    if (_showRectangle) {
         CGFloat white[4] = {1.0f, 1.0f, 1.0f, 1.0f};
         CGContextSetStrokeColor(c, white);
         CGContextSetFillColor(c, white);
@@ -139,9 +125,9 @@ CGFloat _kPadding = 10;
         CGContextSaveGState(c);
         UIFont *font = [UIFont systemFontOfSize:18];
         CGSize constraint = CGSizeMake(rect.size.width  - 2 * kTextMargin, _cropRect.origin.y);
-        CGSize displaySize = [self.displayedMessage sizeWithFont:font constrainedToSize:constraint];
+        CGSize displaySize = [self.displayMessage sizeWithFont:font constrainedToSize:constraint];
         CGRect displayRect = CGRectMake((rect.size.width - displaySize.width) / 2 , _cropRect.origin.y - displaySize.height, displaySize.width, displaySize.height);
-        [self.displayedMessage drawInRect:displayRect withFont:font lineBreakMode:UILineBreakModeWordWrap alignment:UITextAlignmentCenter];
+        [self.displayMessage drawInRect:displayRect withFont:font lineBreakMode:UILineBreakModeWordWrap alignment:UITextAlignmentCenter];
         CGContextRestoreGState(c);
     }
 }

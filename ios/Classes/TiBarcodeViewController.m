@@ -1,19 +1,19 @@
 /**
- * Ti.BarcodeScanner
- * Copyright (c) 2017-present by Hans Knöchel. All Rights Reserved.
- * Licensed under the terms of the Apache Public License
+ * Ti.Barcode Module
+ * Copyright (c) 2010-2018 by Appcelerator, Inc. All Rights Reserved.
  * Please see the LICENSE included with this distribution for details.
  */
+
 
 #import "TiBarcodeViewController.h"
 #import "MTBBarcodeScanner.h"
 #import "TiApp.h"
-#import "OverlayView1.h"
+#import "TiOverlayView.h"
 
 @implementation TiBarcodeViewController
 
 - (instancetype)initWithObjectTypes:(NSArray *)objectTypes
-           cancelDelegate:(id<CancelDelegate>)delegate
+           delegate:(id<TiOverlayViewDelegate>)delegate
             showCancel:(BOOL)shouldShowCancel
          showRectangle:(BOOL)shouldShowRectangle
            withOverlay:(UIView*)overlay {
@@ -22,9 +22,9 @@
     _scanner = [[MTBBarcodeScanner alloc] initWithMetadataObjectTypes:objectTypes
                                                           previewView:[self view]];
     _shouldAutorotate = NO;
-    _overlayView = [[OverlayView1 alloc] initWithFrame:[UIScreen mainScreen].bounds
-                                                         cancelEnabled:true
-                                                      rectangleEnabled:true
+    _overlayView = [[TiOverlayView alloc] initWithFrame:[UIScreen mainScreen].bounds
+                                                         showCancel:true
+                                                      showRectangle:true
                                                            withOverlay:nil];
     showRectangle = true;//shouldShowRectangle;
     _overlayView.delegate = delegate;
@@ -38,31 +38,9 @@
   }
   return self;
 }
-/*
-- (instancetype)initWithObjectTypes:(NSArray *)objectTypes
-{
-    if (self = [super init]) {
-        _scanner = [[MTBBarcodeScanner alloc] initWithMetadataObjectTypes:objectTypes
-                                                              previewView:[self view]];
-        _shouldAutorotate = NO;
-      OverlayView1 *theOverlayView = [[OverlayView1 alloc] initWithFrame:[UIScreen mainScreen].bounds
-                                                         cancelEnabled:true
-                                                      rectangleEnabled:true
-                                                              oneDMode:false
-                                                           withOverlay:nil];
-    }
-    
-    return self;
-}
-*/
+
 - (void)viewDidAppear:(BOOL)animated
 {
-  [[self view] addSubview:_overlayView];
-}
-
-- (void)setOverlayView:(UIView *)view
-{
-  //_overlayView = view;
   [[self view] addSubview:_overlayView];
 }
 
@@ -71,7 +49,7 @@
     return _shouldAutorotate;
 }
 
-- (OverlayView1 *)overlayView
+- (TiOverlayView *)overlayView
 {
   return _overlayView;
 }
