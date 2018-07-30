@@ -5,7 +5,7 @@
  */
 
 // Has to be an .mm file so that ZXing headers are found correctly
-#import "TiBarcodeModule.h"
+#import "TiBarcodeModule1.h"
 #import "TiBase.h"
 #import "TiHost.h"
 #import "TiUtils.h"
@@ -111,7 +111,7 @@ static zxing::DecodeHints decodeHints;
 
 @end
 
-@implementation TiBarcodeModule
+@implementation TiBarcodeModule1
 
 #pragma mark Internal
 
@@ -138,7 +138,7 @@ static zxing::DecodeHints decodeHints;
 		// [MOD-232] Animation controlled by caller
 		[controller dismissViewControllerAnimated:animate completion:nil];
 	}
-	RELEASE_TO_NIL(controller);
+//	RELEASE_TO_NIL(controller);
 }
 
 -(void)_destroy
@@ -206,7 +206,7 @@ static zxing::DecodeHints decodeHints;
     
     bool retVal = [d decodeImage:image];
     
-    [d release];
+    //[d release];
     
     return NUMBOOL(retVal);
 }
@@ -248,9 +248,9 @@ static zxing::DecodeHints decodeHints;
 #ifndef TI_USE_AUTOLAYOUT
       if ([TiUtils respondsToSelector:@selector
            (applyConstraintToView:forProxy:withBounds:)]) {
-        [TiUtils applyConstraintToView:(TiUIView *)[overlayProxy view]
-                              forProxy:overlayProxy
-                            withBounds:[[UIScreen mainScreen] bounds]];
+//        [TiUtils applyConstraintToView:(TiUIView *)[overlayProxy view]
+//                              forProxy:overlayProxy
+//                            withBounds:[[UIScreen mainScreen] bounds]];
       } else {
         //Remove this else block once minimum sdk version is set to 7.2.0.
         
@@ -303,10 +303,10 @@ static zxing::DecodeHints decodeHints;
 					  multiFormatReader,
 					  nil];
 	
-	[multiFormatReader release];
+	//[multiFormatReader release];
 	
 	controller.readers = readers;
-	[readers release];
+	//[readers release];
     
 	id sound = [args objectForKey:@"soundURL"];
 	if (sound!=nil)
