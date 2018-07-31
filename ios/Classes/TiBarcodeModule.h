@@ -11,13 +11,8 @@
 
 @interface TiBarcodeModule : TiModule <TiOverlayViewDelegate> {
   TiBarcodeViewController *barcodeViewController;
-
   MTBCamera selectedCamera;
-
   MTBTorchMode selectedLEDMode;
-
-  BOOL allowRotation;
-
   NSString *displayedMessage;
 }
 

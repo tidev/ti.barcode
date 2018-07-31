@@ -26,7 +26,6 @@
   if (self) {
     _scanner = [[MTBBarcodeScanner alloc] initWithMetadataObjectTypes:objectTypes
                                                           previewView:[self view]];
-    _shouldAutorotate = NO;
     _overlayView = [[TiOverlayView alloc] initWithFrame:[UIScreen mainScreen].bounds
                                              showCancel:shouldShowCancel
                                           showRectangle:shouldShowRectangle
@@ -52,11 +51,12 @@
 - (void)viewDidAppear:(BOOL)animated
 {
   [[self view] addSubview:_overlayView];
+  [[self view] bringSubviewToFront:_overlayView];
 }
 
-- (BOOL)shouldAutorotate
+- (void)viewDidDisappear:(BOOL)animated
 {
-  return _shouldAutorotate;
+  [_overlayView removeFromSuperview];
 }
 
 - (TiOverlayView *)overlayView

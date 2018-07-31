@@ -54,7 +54,7 @@
 - (void)capture:(id)args
 {
   ENSURE_UI_THREAD(capture, args);
-  ENSURE_SINGLE_ARG(args, NSDictionary);
+  ENSURE_SINGLE_ARG_OR_NIL(args, NSDictionary);
 
   BOOL keepOpen = [TiUtils boolValue:[args objectForKey:@"keepOpen"] def:NO];
   BOOL animate = [TiUtils boolValue:[args objectForKey:@"animate"] def:YES];
@@ -93,7 +93,6 @@
          }];
   }
 
-  [barcodeViewController setShouldAutorotate:allowRotation];
   [[barcodeViewController scanner] setTorchMode:MTBTorchModeOff];
 
   [[barcodeViewController scanner] startScanningWithResultBlock:^(NSArray *codes) {
@@ -180,10 +179,7 @@
 
 - (void)setAllowRotation:(id)value
 {
-  ENSURE_TYPE(value, NSNumber);
-  [self replaceValue:value forKey:@"allowRotation" notification:NO];
-
-  allowRotation = [TiUtils boolValue:value def:NO];
+  DEPRECATED_REMOVED(@"Barcode.allowRotation", @"2.0.0", @"2.0.0");
 }
 
 - (void)setUseFrontCamera:(id)value
