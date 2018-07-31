@@ -66,9 +66,9 @@
   TiViewProxy *overlayProxy = [args objectForKey:@"overlay"];
 
   if (acceptedFormats.count != 0) {
-    if ([acceptedFormats containsObject:@-1]) {
+    if ([acceptedFormats containsObject:@"-1"]) {
       NSLog(@"[WARN] The code-format FORMAT_NONE is deprecated. Use an empty array instead or don't specify formats.");
-      [acceptedFormats removeObject:@-1];
+      [acceptedFormats removeObject:@"-1"];
     }
   } else {
     [acceptedFormats addObjectsFromArray:@[ AVMetadataObjectTypeQRCode, AVMetadataObjectTypeDataMatrixCode, AVMetadataObjectTypeUPCECode, AVMetadataObjectTypeEAN13Code, AVMetadataObjectTypeEAN8Code, AVMetadataObjectTypeCode128Code, AVMetadataObjectTypeCode39Code, AVMetadataObjectTypeCode93Code, AVMetadataObjectTypeCode39Mod43Code, AVMetadataObjectTypeITF14Code, AVMetadataObjectTypePDF417Code, AVMetadataObjectTypeAztecCode, AVMetadataObjectTypeInterleaved2of5Code ]];
@@ -536,22 +536,22 @@
 
 #pragma mark Constants
 
-MAKE_SYSTEM_PROP(FORMAT_NONE, -1); // Deprecated, don't specify types
-MAKE_SYSTEM_PROP(FORMAT_QR_CODE, AVMetadataObjectTypeQRCode);
-MAKE_SYSTEM_PROP(FORMAT_DATA_MATRIX, AVMetadataObjectTypeDataMatrixCode);
-MAKE_SYSTEM_PROP(FORMAT_UPC_E, AVMetadataObjectTypeUPCECode);
-MAKE_SYSTEM_PROP(FORMAT_UPC_A, AVMetadataObjectTypeEAN13Code); // Sub-set
-MAKE_SYSTEM_PROP(FORMAT_EAN_8, AVMetadataObjectTypeEAN8Code);
-MAKE_SYSTEM_PROP(FORMAT_EAN_13, AVMetadataObjectTypeEAN13Code);
-MAKE_SYSTEM_PROP(FORMAT_CODE_128, AVMetadataObjectTypeCode128Code);
-MAKE_SYSTEM_PROP(FORMAT_CODE_39, AVMetadataObjectTypeCode39Code);
-MAKE_SYSTEM_PROP(FORMAT_CODE_93, AVMetadataObjectTypeCode93Code); // New!
-MAKE_SYSTEM_PROP(FORMAT_CODE_39_MOD_43, AVMetadataObjectTypeCode39Mod43Code); // New!
-MAKE_SYSTEM_PROP(FORMAT_ITF, AVMetadataObjectTypeITF14Code);
-MAKE_SYSTEM_PROP(FORMAT_PDF_417, AVMetadataObjectTypePDF417Code); // New!
-MAKE_SYSTEM_PROP(FORMAT_AZTEC, AVMetadataObjectTypeAztecCode); // New!
-MAKE_SYSTEM_PROP(FORMAT_FACE, AVMetadataObjectTypeFace); // New!
-MAKE_SYSTEM_PROP(FORMAT_INTERLEAVED_2_OF_5, AVMetadataObjectTypeInterleaved2of5Code); // New!
+MAKE_SYSTEM_STR(FORMAT_NONE, @"-1"); // Deprecated, don't specify types
+MAKE_SYSTEM_STR(FORMAT_QR_CODE, AVMetadataObjectTypeQRCode);
+MAKE_SYSTEM_STR(FORMAT_DATA_MATRIX, AVMetadataObjectTypeDataMatrixCode);
+MAKE_SYSTEM_STR(FORMAT_UPC_E, AVMetadataObjectTypeUPCECode);
+MAKE_SYSTEM_STR(FORMAT_UPC_A, AVMetadataObjectTypeEAN13Code); // Sub-set
+MAKE_SYSTEM_STR(FORMAT_EAN_8, AVMetadataObjectTypeEAN8Code);
+MAKE_SYSTEM_STR(FORMAT_EAN_13, AVMetadataObjectTypeEAN13Code);
+MAKE_SYSTEM_STR(FORMAT_CODE_128, AVMetadataObjectTypeCode128Code);
+MAKE_SYSTEM_STR(FORMAT_CODE_39, AVMetadataObjectTypeCode39Code);
+MAKE_SYSTEM_STR(FORMAT_CODE_93, AVMetadataObjectTypeCode93Code); // New!
+MAKE_SYSTEM_STR(FORMAT_CODE_39_MOD_43, AVMetadataObjectTypeCode39Mod43Code); // New!
+MAKE_SYSTEM_STR(FORMAT_ITF, AVMetadataObjectTypeITF14Code);
+MAKE_SYSTEM_STR(FORMAT_PDF_417, AVMetadataObjectTypePDF417Code); // New!
+MAKE_SYSTEM_STR(FORMAT_AZTEC, AVMetadataObjectTypeAztecCode); // New!
+MAKE_SYSTEM_STR(FORMAT_FACE, AVMetadataObjectTypeFace); // New!
+MAKE_SYSTEM_STR(FORMAT_INTERLEAVED_2_OF_5, AVMetadataObjectTypeInterleaved2of5Code); // New!
 
 MAKE_SYSTEM_PROP(UNKNOWN, 0);
 MAKE_SYSTEM_PROP(URL, 1);
