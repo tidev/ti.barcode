@@ -10,6 +10,10 @@
 @class MTBBarcodeScanner;
 @class TiOverlayView;
 
+#if !TARGET_IPHONE_SIMULATOR
+#define HAS_AVFF 1
+#endif
+
 @interface TiBarcodeViewController : UIViewController {
   @private
   TiOverlayView *_overlayView;

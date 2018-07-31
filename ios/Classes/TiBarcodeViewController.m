@@ -24,8 +24,10 @@
 {
   self = [super init];
   if (self) {
+#if HAS_AVFF
     _scanner = [[MTBBarcodeScanner alloc] initWithMetadataObjectTypes:objectTypes
                                                           previewView:[self view]];
+#endif
     _overlayView = [[TiOverlayView alloc] initWithFrame:[UIScreen mainScreen].bounds
                                              showCancel:shouldShowCancel
                                           showRectangle:shouldShowRectangle
