@@ -13,7 +13,7 @@
 @interface TiBarcodeViewController : UIViewController {
   @private
   TiOverlayView *_overlayView;
-  BOOL showRectangle;
+  BOOL _showRectangle;
 }
 
 - (TiOverlayView *)overlayView;

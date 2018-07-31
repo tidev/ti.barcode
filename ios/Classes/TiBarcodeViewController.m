@@ -32,14 +32,14 @@
                                                          showCancel:shouldShowCancel
                                                       showRectangle:shouldShowRectangle
                                                            withOverlay:overlay];
-    showRectangle = shouldShowRectangle;
+    _showRectangle = shouldShowRectangle;
     _overlayView.delegate = delegate;
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(handleDeviceRotation:)
                                                  name:UIApplicationDidChangeStatusBarOrientationNotification
                                                object:nil];
-    if (showRectangle) {
+    if (_showRectangle) {
       CGRect rect = _overlayView.cropRect;
       __weak TiBarcodeViewController *weakSelf = self;
       [_scanner setDidStartScanningBlock:^(void) {
@@ -77,7 +77,7 @@
 
 - (void)handleDeviceRotation:(NSNotification *)notification
 {
-    if (showRectangle) {
+    if (_showRectangle) {
       CGRect rect = _overlayView.cropRect;
       [_scanner setScanRect:rect];
     }
