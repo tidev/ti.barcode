@@ -11,8 +11,8 @@
 @end
 
 @interface TiOverlayView : UIView {
-@private
-	UIButton *_cancelButton;
+  @private
+  UIButton *_cancelButton;
   BOOL _showRectangle;
 }
 
@@ -21,10 +21,9 @@
 @property (nonatomic, copy) NSString *displayMessage;
 
 - (id)initWithFrame:(CGRect)frame
-      showCancel:(BOOL)showCancel
-   showRectangle:(BOOL)showRectangle
-        withOverlay:(UIView*)overlay;
+         showCancel:(BOOL)showCancel
+      showRectangle:(BOOL)showRectangle
+        withOverlay:(UIView *)overlay;
 
 - (void)updateViewsWithFrame:(CGRect)newFrame;
 @end
-

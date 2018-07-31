@@ -4,22 +4,21 @@
  * Please see the LICENSE included with this distribution for details.
  */
 
-
-#import "TiModule.h"
-#import "TiBarcodeViewController.h"
 #import "MTBBarcodeScanner.h"
+#import "TiBarcodeViewController.h"
+#import "TiModule.h"
 @class TiOverlayView;
 
-@interface TiBarcodeModule : TiModule <TiOverlayViewDelegate>{
-    TiBarcodeViewController *barcodeViewController;
-    
-    MTBCamera selectedCamera;
-    
-    MTBTorchMode selectedLEDMode;
-    
-    BOOL allowRotation;
-    
-    NSString *displayedMessage;
+@interface TiBarcodeModule : TiModule <TiOverlayViewDelegate> {
+  TiBarcodeViewController *barcodeViewController;
+
+  MTBCamera selectedCamera;
+
+  MTBTorchMode selectedLEDMode;
+
+  BOOL allowRotation;
+
+  NSString *displayedMessage;
 }
 
 - (id)canShow:(id)unused;

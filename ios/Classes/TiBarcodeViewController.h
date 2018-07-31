@@ -4,8 +4,8 @@
  * Please see the LICENSE included with this distribution for details.
  */
 
-#import <UIKit/UIKit.h>
 #import "TiOverlayView.h"
+#import <UIKit/UIKit.h>
 
 @class MTBBarcodeScanner;
 @class TiOverlayView;
@@ -19,13 +19,13 @@
 - (TiOverlayView *)overlayView;
 
 - (id)initWithObjectTypes:(NSArray *)objectTypes
-           delegate:(id<TiOverlayViewDelegate>)delegate
-            showCancel:(BOOL)shouldShowCancel
-         showRectangle:(BOOL)shouldShowRectangle
-           withOverlay:(UIView *)overlay;
+                 delegate:(id<TiOverlayViewDelegate>)delegate
+               showCancel:(BOOL)shouldShowCancel
+            showRectangle:(BOOL)shouldShowRectangle
+              withOverlay:(UIView *)overlay;
 
-@property(nonatomic, strong) MTBBarcodeScanner *scanner;
+@property (nonatomic, strong) MTBBarcodeScanner *scanner;
 
-@property(nonatomic, assign) BOOL shouldAutorotate;
+@property (nonatomic, assign) BOOL shouldAutorotate;
 
 @end

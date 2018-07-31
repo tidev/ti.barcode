@@ -4,7 +4,6 @@
  * Please see the LICENSE included with this distribution for details.
  */
 
-
 #import "TiBarcodeViewController.h"
 #import "MTBBarcodeScanner.h"
 #import "TiApp.h"
@@ -12,29 +11,29 @@
 
 @implementation TiBarcodeViewController
 
-
-- (void) dealloc
+- (void)dealloc
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (instancetype)initWithObjectTypes:(NSArray *)objectTypes
-           delegate:(id<TiOverlayViewDelegate>)delegate
-            showCancel:(BOOL)shouldShowCancel
-         showRectangle:(BOOL)shouldShowRectangle
-           withOverlay:(UIView*)overlay {
+                           delegate:(id<TiOverlayViewDelegate>)delegate
+                         showCancel:(BOOL)shouldShowCancel
+                      showRectangle:(BOOL)shouldShowRectangle
+                        withOverlay:(UIView *)overlay
+{
   self = [super init];
   if (self) {
     _scanner = [[MTBBarcodeScanner alloc] initWithMetadataObjectTypes:objectTypes
                                                           previewView:[self view]];
     _shouldAutorotate = NO;
     _overlayView = [[TiOverlayView alloc] initWithFrame:[UIScreen mainScreen].bounds
-                                                         showCancel:shouldShowCancel
-                                                      showRectangle:shouldShowRectangle
-                                                           withOverlay:overlay];
+                                             showCancel:shouldShowCancel
+                                          showRectangle:shouldShowRectangle
+                                            withOverlay:overlay];
     _showRectangle = shouldShowRectangle;
     _overlayView.delegate = delegate;
-    
+
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(handleDeviceRotation:)
                                                  name:UIApplicationDidChangeStatusBarOrientationNotification
@@ -57,7 +56,7 @@
 
 - (BOOL)shouldAutorotate
 {
-    return _shouldAutorotate;
+  return _shouldAutorotate;
 }
 
 - (TiOverlayView *)overlayView
@@ -65,7 +64,7 @@
   return _overlayView;
 }
 
--(UIStatusBarStyle)preferredStatusBarStyle
+- (UIStatusBarStyle)preferredStatusBarStyle
 {
   return [[[TiApp app] controller] preferredStatusBarStyle];
 }
@@ -77,13 +76,14 @@
 
 - (void)handleDeviceRotation:(NSNotification *)notification
 {
-    if (_showRectangle) {
-      CGRect rect = _overlayView.cropRect;
-      [_scanner setScanRect:rect];
-    }
+  if (_showRectangle) {
+    CGRect rect = _overlayView.cropRect;
+    [_scanner setScanRect:rect];
+  }
 }
 
-- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id <UIViewControllerTransitionCoordinator>)coordinator {
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+{
   [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
   [_overlayView updateViewsWithFrame:CGRectMake(_overlayView.frame.origin.x, _overlayView.frame.origin.y, size.width, size.height)];
 }
