@@ -104,8 +104,7 @@
     if (!keepOpen) {
       [self closeScanner];
     }
-  }
-                                                           error:&error];
+  } error:&error];
 
   if (error) {
     [self fireEvent:@"error"
@@ -301,11 +300,11 @@
 {
   [overlayProxy windowWillOpen];
 
-  CGSize size = [overlayProxy view].bounds.size;
-
 #ifndef TI_USE_AUTOLAYOUT
   ApplyConstraintToViewWithBounds([overlayProxy layoutProperties], (TiUIView *)[overlayProxy view], [[UIScreen mainScreen] bounds]);
 #else
+  CGSize size = [overlayProxy view].bounds.size;
+
   CGSize s = [[overlayProxy view] sizeThatFits:CGSizeMake(MAXFLOAT, MAXFLOAT)];
   CGFloat width = s.width;
   CGFloat height = s.height;

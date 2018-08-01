@@ -87,7 +87,6 @@ CGFloat _kPadding = 10;
   }
   CGContextRef c = UIGraphicsGetCurrentContext();
 
-  int offset = rect.size.width / 2;
   if (_showRectangle) {
     CGFloat white[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
     CGContextSetStrokeColor(c, white);

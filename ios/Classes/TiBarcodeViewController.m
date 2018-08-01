@@ -52,12 +52,16 @@
 
 - (void)viewDidAppear:(BOOL)animated
 {
+  [super viewDidAppear:animated];
+
   [[self view] addSubview:_overlayView];
   [[self view] bringSubviewToFront:_overlayView];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
+  [super viewDidDisappear:animated];
+
   [_overlayView removeFromSuperview];
 }
 
