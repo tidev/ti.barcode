@@ -1,44 +1,42 @@
 /**
  * Ti.Barcode Module
- * Copyright (c) 2010-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2010-2018 by Appcelerator, Inc. All Rights Reserved.
  * Please see the LICENSE included with this distribution for details.
  */
 
+#import "MTBBarcodeScanner.h"
+#import "TiBarcodeViewController.h"
 #import "TiModule.h"
-#import "ZXingWidgetController.h"
-#import "DecoderDelegate.h"
-#import "TwoDDecoderResult.h"
+@class TiOverlayView;
 
-@interface TiBarcodeModule : TiModule<ZXingDelegate, DecoderDelegate> 
-{
-	ZXingWidgetController *controller;
-	BOOL animate;
-    BOOL keepOpen;
-    BOOL useFrontCamera;
-    BOOL led;
+@interface TiBarcodeModule : TiModule <TiOverlayViewDelegate> {
+  @private
+  TiBarcodeViewController *_barcodeViewController;
+  MTBCamera _selectedCamera;
+  MTBTorchMode _selectedLEDMode;
+  NSString *_displayedMessage;
 }
 
-@property(nonatomic,readonly) NSNumber *UNKNOWN;
-@property(nonatomic,readonly) NSNumber *URL;
-@property(nonatomic,readonly) NSNumber *SMS;
-@property(nonatomic,readonly) NSNumber *TELEPHONE;
-@property(nonatomic,readonly) NSNumber *TEXT;
-@property(nonatomic,readonly) NSNumber *CALENDAR;
-@property(nonatomic,readonly) NSNumber *GEOLOCATION;
-@property(nonatomic,readonly) NSNumber *EMAIL;
-@property(nonatomic,readonly) NSNumber *CONTACT;
-@property(nonatomic,readonly) NSNumber *BOOKMARK;
-@property(nonatomic,readonly) NSNumber *WIFI;
+- (NSNumber *)canShow:(id)unused;
 
-@property(nonatomic,readonly) NSNumber *FORMAT_NONE;
-@property(nonatomic,readonly) NSNumber *FORMAT_QR_CODE;
-@property(nonatomic,readonly) NSNumber *FORMAT_DATA_MATRIX;
-@property(nonatomic,readonly) NSNumber *FORMAT_UPC_E;
-@property(nonatomic,readonly) NSNumber *FORMAT_UPC_A;
-@property(nonatomic,readonly) NSNumber *FORMAT_EAN_8;
-@property(nonatomic,readonly) NSNumber *FORMAT_EAN_13;
-@property(nonatomic,readonly) NSNumber *FORMAT_CODE_128;
-@property(nonatomic,readonly) NSNumber *FORMAT_CODE_39;
-@property(nonatomic,readonly) NSNumber *FORMAT_ITF;
+- (void)capture:(id)args;
+
+- (void)freezeCapture:(id)unused;
+
+- (void)unfreezeCapture:(id)unused;
+
+- (void)captureStillImage:(id)value;
+
+- (void)cancel:(id)unused;
+
+- (void)setUseLED:(NSNumber *)value;
+
+- (NSNumber *)useLED;
+
+- (void)setAllowRotation:(NSNumber *)value;
+
+- (void)setUseFrontCamera:(NSNumber *)value;
+
+- (NSNumber *)useFrontCamera;
 
 @end

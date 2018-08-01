@@ -50,6 +50,12 @@ Parses a blob image for barcodes. Takes one required argument, a dictionary cont
 ### cancel()
 Cancels and closes the currently open capture window.
 
+### freezeCapture()
+Freeze capture keeping the last frame on camera view. This is supported in iOS only.
+
+### unfreezeCapture()
+Unfreeze a frozen capture. This is supported in iOS only.
+
 ## Events
 Use Ti.Barcode.addEventListener() to process the following events that are sent from the module:
 
@@ -139,12 +145,19 @@ Value representing wifi connection settings
 ### FORMAT_CODE_128[int]
 ### FORMAT_CODE_39[int]
 ### FORMAT_ITF[int]
+### FORMAT_CODE_93[int, iOS only]
+### FORMAT_CODE_39_MOD_43[int, iOS only ]
+### FORMAT_PDF_417[int, iOS only ]
+### FORMAT_AZTEC[int, iOS only ]
+### FORMAT_INTERLEAVED_2_OF_5[int, iOS only ]
 
 ## Usage
 See `example/app.js` for details!
 
-## Module History
+## Author
+Jeff Haynie & Jeff English & Vijay Singh
 
+## Module History
 View the [change log](changelog.html) for this module.
 
 ## Feedback and Support
