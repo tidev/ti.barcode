@@ -4,17 +4,19 @@
 Lets you process 1D/2D barcodes.
 
 ## System Requirements
-Barcode module has support for iOS 4 and later. The module does not support iOS versions prior to iOS 4.
 
-## Warning when Updating to Barcode v1.5
-With the 1.5 update to the Barcode Module, several breaking changes have been made. These changes were made to bring
-the iOS and Android modules in to full parity. When upgrading to 1.5, you will need to consider the following:
-
-- BREAKING CHANGE: iOS now uses event listeners instead of callbacks! Use Ti.Barcode.addEventListener('success', ...) instead of capture({ success: ...})!
-- BREAKING CHANGE: Android's contentType property is now an integer, instead of a string! Check out the example and documentation to find out more.
-- BREAKING CHANGE: All automatically parsed "data" keys will now be lower case. This ensures consistency across the API and ease of access. 
-- BREAKING CHANGE: Android now properly fires the "cancel" event, as documented. It was firing the "canceled" event.
-- Ensure that you assign the module object that is returned from "require('ti.barcode')" to a variable or your event listeners may not receive the barcode events
+- [x] Titanium SDK 5.5.1+
+- [x] Camera Permissions set in your tiapp.xml:
+```xml
+    <ios>
+        <plist>
+            <dict>
+                <key>NSCameraUsageDescription</key>
+                <string>We need permission to access your device camera.</string>
+            </dict>
+        </plist>
+    </ios>
+```
 
 ## Getting Started
 
@@ -150,17 +152,16 @@ Value representing wifi connection settings
 ### FORMAT_INTERLEAVED_2_OF_5[int, iOS only ]
 
 ## Usage
-See example.
+See `example/app.js` for details!
 
 ## Author
 Jeff Haynie & Jeff English & Vijay Singh
 
 ## Module History
-
 View the [change log](changelog.html) for this module.
 
 ## Feedback and Support
 Please direct all questions, feedback, and concerns to [info@appcelerator.com](mailto:info@appcelerator.com?subject=iOS%20Barcode%20Module).
 
 ## License
-Copyright(c) 2010-2013 by Appcelerator, Inc. All Rights Reserved. Please see the LICENSE file included in the distribution for further details.
+Copyright(c) 2010-2018 by Appcelerator, Inc. All Rights Reserved. Please see the LICENSE file included in the distribution for further details.
