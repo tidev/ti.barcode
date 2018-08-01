@@ -1,5 +1,12 @@
 # Change Log
 <pre>
+v2.0.0  [MOD-2354] 
+            - Replaced XZing library with AVFoundation framework.
+            - Supported new barcode types -FORMAT_CODE_93,  FORMAT_CODE_39_MOD_43,  FORMAT_PDF_417, FORMAT_AZTEC, FORMAT_INTERLEAVED_2_OF_5
+            - Supported new methods -  freezeCapture() and unfreezeCapture()
+            - Property 'allowRotation' is removed. By default  it will analyze portrait and landscape image.
+
+
 v1.9.1  [TIMOB-18092] Fixed linker error when building with TiSDK 3.5.0+
 
 v1.9.0  [MOD-18092] Updating module to support 64-bit.

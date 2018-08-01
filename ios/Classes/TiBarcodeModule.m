@@ -62,7 +62,7 @@
   BOOL showRectangle = [TiUtils boolValue:@"showRectangle" properties:args def:YES];
   NSString *displayedMessage = [TiUtils stringValue:[self valueForUndefinedKey:@"displayedMessage"]];
 
-  NSMutableArray *acceptedFormats = [NSMutableArray arrayWithArray:[args objectForKey:@"acceptedFormats"]];
+  NSMutableArray *acceptedFormats = [self metaDataObjectListFromFormtArray:[args objectForKey:@"acceptedFormats"]];
   TiViewProxy *overlayProxy = [args objectForKey:@"overlay"];
 
   if (acceptedFormats.count != 0) {
@@ -234,6 +234,68 @@
 }
 
 #pragma mark Internal
+
+
+- (NSMutableArray *)metaDataObjectListFromFormtArray:(NSArray *)formatArray
+{
+  // For backward compatibility and parity
+  NSMutableArray *convertedArray = [NSMutableArray arrayWithCapacity:[formatArray count]];
+  for (NSNumber *number in formatArray) {
+    NSString *object = @"-1";
+    switch ([number integerValue]) {
+      case TiMetadataObjectTypeNone:
+        object = @"-1";
+        break;
+      case TiMetadataObjectTypeQRCode:
+        object = AVMetadataObjectTypeQRCode;
+        break;
+      case TiMetadataObjectTypeDataMatrixCode:
+        object = AVMetadataObjectTypeDataMatrixCode;
+        break;
+      case TiMetadataObjectTypeUPCECode:
+        object = AVMetadataObjectTypeUPCECode;
+        break;
+      case TiMetadataObjectTypeUPCACode:
+        object = AVMetadataObjectTypeEAN13Code;
+        break;
+      case TiMetadataObjectTypeEAN8Code:
+        object = AVMetadataObjectTypeEAN8Code;
+        break;
+      case TiMetadataObjectTypeEAN13Code:
+        object = AVMetadataObjectTypeEAN13Code;
+        break;
+      case TiMetadataObjectTypeCode128Code:
+        object = AVMetadataObjectTypeCode128Code;
+        break;
+      case TiMetadataObjectTypeCode39Code:
+        object = AVMetadataObjectTypeCode39Code;
+        break;
+      case TiMetadataObjectTypeCode93Code:
+        object = AVMetadataObjectTypeCode93Code;
+        break;
+      case TiMetadataObjectTypeCode39Mod43Code:
+        object = AVMetadataObjectTypeCode39Mod43Code;
+        break;
+      case TiMetadataObjectTypeITF14Code:
+        object = AVMetadataObjectTypeITF14Code;
+        break;
+      case TiMetadataObjectTypePDF417Code:
+        object = AVMetadataObjectTypePDF417Code;
+        break;
+      case TiMetadataObjectTypeAztecCode:
+        object = AVMetadataObjectTypeAztecCode;
+        break;
+      case TiMetadataObjectTypeFace:
+        object = AVMetadataObjectTypeFace;
+        break;
+      case TiMetadataObjectTypeInterleaved2of5Code:
+        object = AVMetadataObjectTypeInterleaved2of5Code;
+        break;
+    }
+    [convertedArray addObject:object];
+  }
+  return convertedArray;
+}
 
 - (UIView *)prepareOverlayWithProxy:(TiViewProxy *)overlayProxy
 {
@@ -529,22 +591,22 @@
 
 #pragma mark Constants
 
-MAKE_SYSTEM_STR(FORMAT_NONE, @"-1"); // Deprecated, don't specify types
-MAKE_SYSTEM_STR(FORMAT_QR_CODE, AVMetadataObjectTypeQRCode);
-MAKE_SYSTEM_STR(FORMAT_DATA_MATRIX, AVMetadataObjectTypeDataMatrixCode);
-MAKE_SYSTEM_STR(FORMAT_UPC_E, AVMetadataObjectTypeUPCECode);
-MAKE_SYSTEM_STR(FORMAT_UPC_A, AVMetadataObjectTypeEAN13Code); // Sub-set
-MAKE_SYSTEM_STR(FORMAT_EAN_8, AVMetadataObjectTypeEAN8Code);
-MAKE_SYSTEM_STR(FORMAT_EAN_13, AVMetadataObjectTypeEAN13Code);
-MAKE_SYSTEM_STR(FORMAT_CODE_128, AVMetadataObjectTypeCode128Code);
-MAKE_SYSTEM_STR(FORMAT_CODE_39, AVMetadataObjectTypeCode39Code);
-MAKE_SYSTEM_STR(FORMAT_CODE_93, AVMetadataObjectTypeCode93Code); // New!
-MAKE_SYSTEM_STR(FORMAT_CODE_39_MOD_43, AVMetadataObjectTypeCode39Mod43Code); // New!
-MAKE_SYSTEM_STR(FORMAT_ITF, AVMetadataObjectTypeITF14Code);
-MAKE_SYSTEM_STR(FORMAT_PDF_417, AVMetadataObjectTypePDF417Code); // New!
-MAKE_SYSTEM_STR(FORMAT_AZTEC, AVMetadataObjectTypeAztecCode); // New!
-MAKE_SYSTEM_STR(FORMAT_FACE, AVMetadataObjectTypeFace); // New!
-MAKE_SYSTEM_STR(FORMAT_INTERLEAVED_2_OF_5, AVMetadataObjectTypeInterleaved2of5Code); // New!
+MAKE_SYSTEM_PROP(FORMAT_NONE, TiMetadataObjectTypeNone); // Deprecated, don't specify types
+MAKE_SYSTEM_PROP(FORMAT_QR_CODE, TiMetadataObjectTypeQRCode);
+MAKE_SYSTEM_PROP(FORMAT_DATA_MATRIX, TiMetadataObjectTypeDataMatrixCode);
+MAKE_SYSTEM_PROP(FORMAT_UPC_E, TiMetadataObjectTypeUPCECode);
+MAKE_SYSTEM_PROP(FORMAT_UPC_A, TiMetadataObjectTypeEAN13Code); // Sub-set
+MAKE_SYSTEM_PROP(FORMAT_EAN_8, TiMetadataObjectTypeEAN8Code);
+MAKE_SYSTEM_PROP(FORMAT_EAN_13, TiMetadataObjectTypeEAN13Code);
+MAKE_SYSTEM_PROP(FORMAT_CODE_128, TiMetadataObjectTypeCode128Code);
+MAKE_SYSTEM_PROP(FORMAT_CODE_39, TiMetadataObjectTypeCode39Code);
+MAKE_SYSTEM_PROP(FORMAT_CODE_93, TiMetadataObjectTypeCode93Code); // New!
+MAKE_SYSTEM_PROP(FORMAT_CODE_39_MOD_43, TiMetadataObjectTypeCode39Mod43Code); // New!
+MAKE_SYSTEM_PROP(FORMAT_ITF, TiMetadataObjectTypeITF14Code);
+MAKE_SYSTEM_PROP(FORMAT_PDF_417, TiMetadataObjectTypePDF417Code); // New!
+MAKE_SYSTEM_PROP(FORMAT_AZTEC, TiMetadataObjectTypeAztecCode); // New!
+//MAKE_SYSTEM_PROP(FORMAT_FACE, TiMetadataObjectTypeFace); // New! Not Supported
+MAKE_SYSTEM_PROP(FORMAT_INTERLEAVED_2_OF_5, TiMetadataObjectTypeInterleaved2of5Code); // New!
 
 MAKE_SYSTEM_PROP(UNKNOWN, 0);
 MAKE_SYSTEM_PROP(URL, 1);
@@ -557,5 +619,25 @@ MAKE_SYSTEM_PROP(EMAIL, 7);
 MAKE_SYSTEM_PROP(CONTACT, 8);
 MAKE_SYSTEM_PROP(BOOKMARK, 9);
 MAKE_SYSTEM_PROP(WIFI, 10);
+
+
+typedef NS_ENUM(NSInteger, TiMetaDataObjectType) {
+  TiMetadataObjectTypeNone = -1,
+  TiMetadataObjectTypeQRCode,
+  TiMetadataObjectTypeDataMatrixCode,
+  TiMetadataObjectTypeUPCECode,
+  TiMetadataObjectTypeUPCACode,
+  TiMetadataObjectTypeEAN8Code,
+  TiMetadataObjectTypeEAN13Code,
+  TiMetadataObjectTypeCode128Code,
+  TiMetadataObjectTypeCode39Code,
+  TiMetadataObjectTypeCode93Code,
+  TiMetadataObjectTypeCode39Mod43Code,
+  TiMetadataObjectTypeITF14Code,
+  TiMetadataObjectTypePDF417Code,
+  TiMetadataObjectTypeAztecCode,
+  TiMetadataObjectTypeFace,
+  TiMetadataObjectTypeInterleaved2of5Code
+};
 
 @end
