@@ -32,23 +32,23 @@
 - (void)startup
 {
   [super startup];
-
-  NSLog(@"[DEBUG] %@ loaded", self);
-
-  [self initialize];
 }
 
-- (void)initialize
+- (id)_initWithPageContext:(id<TiEvaluator>)context
 {
-  selectedCamera = MTBCameraBack;
-  selectedLEDMode = MTBTorchModeOff;
+  if (self = [super _initWithPageContext:context]) {
+    _selectedCamera = MTBCameraBack;
+    _selectedLEDMode = MTBTorchModeOff;
+  }
+
+  return self;
 }
 
 #pragma mark Public API's
 
-- (id)canShow:(id)unused
+- (NSNumber *)canShow:(id)unused
 {
-  return NUMBOOL([MTBBarcodeScanner cameraIsPresent] && ![MTBBarcodeScanner scanningIsProhibited]);
+  return @([MTBBarcodeScanner cameraIsPresent] && ![MTBBarcodeScanner scanningIsProhibited]);
 }
 
 - (void)capture:(id)args
@@ -80,11 +80,11 @@
   if (overlayProxy != nil) {
     overlayView = [self prepareOverlayWithProxy:overlayProxy];
   }
-  barcodeViewController = [[TiBarcodeViewController alloc] initWithObjectTypes:acceptedFormats delegate:self showCancel:showCancel showRectangle:showRectangle withOverlay:overlayView];
-  [[barcodeViewController scanner] setCamera:selectedCamera ?: MTBCameraBack error:&cameraError];
+  _barcodeViewController = [[TiBarcodeViewController alloc] initWithObjectTypes:acceptedFormats delegate:self showCancel:showCancel showRectangle:showRectangle withOverlay:overlayView];
+  [[_barcodeViewController scanner] setCamera:_selectedCamera ?: MTBCameraBack error:&cameraError];
 
   if (displayedMessage != nil) {
-    [[barcodeViewController overlayView] setDisplayMessage:displayedMessage];
+    [[_barcodeViewController overlayView] setDisplayMessage:_displayedMessage];
   }
   if (cameraError) {
     [self fireEvent:@"error"
@@ -93,9 +93,9 @@
          }];
   }
 
-  [[barcodeViewController scanner] setTorchMode:MTBTorchModeOff];
+  [[_barcodeViewController scanner] setTorchMode:MTBTorchModeOff];
 
-  [[barcodeViewController scanner] startScanningWithResultBlock:^(NSArray *codes) {
+  [[_barcodeViewController scanner] startScanningWithResultBlock:^(NSArray *codes) {
     if (!codes || [codes count] == 0) {
       return;
     }
@@ -105,7 +105,7 @@
       [self closeScanner];
     }
   }
-                                                          error:&error];
+                                                           error:&error];
 
   if (error) {
     [self fireEvent:@"error"
@@ -118,23 +118,23 @@
     }
   }
 
-  [[[[TiApp app] controller] topPresentedController] presentViewController:barcodeViewController
+  [[[[TiApp app] controller] topPresentedController] presentViewController:_barcodeViewController
                                                                   animated:animate
                                                                 completion:^{
-                                                                  [[barcodeViewController scanner] setTorchMode:selectedLEDMode ?: MTBTorchModeOff];
+                                                                  [[_barcodeViewController scanner] setTorchMode:_selectedLEDMode ?: MTBTorchModeOff];
                                                                 }];
 }
 
 - (void)freezeCapture:(id)unused
 {
   ENSURE_UI_THREAD(freezeCapture, unused);
-  [[barcodeViewController scanner] freezeCapture];
+  [[_barcodeViewController scanner] freezeCapture];
 }
 
 - (void)unfreezeCapture:(id)unused
 {
   ENSURE_UI_THREAD(unfreezeCapture, unused);
-  [[barcodeViewController scanner] unfreezeCapture];
+  [[_barcodeViewController scanner] unfreezeCapture];
 }
 
 - (void)captureStillImage:(id)value
@@ -142,7 +142,7 @@
   ENSURE_UI_THREAD(captureStillImage, value);
   ENSURE_SINGLE_ARG(value, KrollCallback);
 
-  [[barcodeViewController scanner] captureStillImage:^(UIImage *image, NSError *error) {
+  [[_barcodeViewController scanner] captureStillImage:^(UIImage *image, NSError *error) {
     TiBlob *blob = [[TiBlob alloc] _initWithPageContext:[self pageContext]];
     [blob setImage:image];
     [blob setMimeType:@"image/png" type:TiBlobTypeImage];
@@ -160,38 +160,38 @@
   [self fireEvent:@"cancel" withObject:nil];
 }
 
-- (void)setUseLED:(id)value
+- (void)setUseLED:(NSNumber *)value
 {
   ENSURE_TYPE(value, NSNumber);
   [self replaceValue:value forKey:@"useLED" notification:NO];
 
-  selectedLEDMode = [TiUtils boolValue:value def:YES] ? MTBTorchModeOn : MTBTorchModeOff;
+  _selectedLEDMode = [TiUtils boolValue:value def:YES] ? MTBTorchModeOn : MTBTorchModeOff;
 
-  if (barcodeViewController) {
-    [[barcodeViewController scanner] setTorchMode:selectedLEDMode];
+  if (_barcodeViewController != nil) {
+    [[_barcodeViewController scanner] setTorchMode:_selectedLEDMode];
   }
 }
 
-- (id)useLED
+- (NSNumber *)useLED
 {
-  return NUMBOOL(selectedLEDMode == MTBTorchModeOn);
+  return @(_selectedLEDMode == MTBTorchModeOn);
 }
 
-- (void)setAllowRotation:(id)value
+- (void)setAllowRotation:(NSNumber *)value
 {
   DEPRECATED_REMOVED(@"Barcode.allowRotation", @"2.0.0", @"2.0.0");
 }
 
-- (void)setUseFrontCamera:(id)value
+- (void)setUseFrontCamera:(NSNumber *)value
 {
   ENSURE_TYPE(value, NSNumber);
   [self replaceValue:value forKey:@"useFrontCamera" notification:NO];
 
-  selectedCamera = [TiUtils boolValue:value def:YES] ? MTBCameraFront : MTBCameraBack;
-  NSError *cameraError;
+  _selectedCamera = [TiUtils boolValue:value def:YES] ? MTBCameraFront : MTBCameraBack;
+  NSError *cameraError = nil;
 
-  if (barcodeViewController) {
-    [[barcodeViewController scanner] setCamera:selectedCamera error:&cameraError];
+  if (_barcodeViewController != nil) {
+    [[_barcodeViewController scanner] setCamera:_selectedCamera error:&cameraError];
 
     if (cameraError) {
       [self fireEvent:@"error"
@@ -202,19 +202,19 @@
   }
 }
 
-- (id)useFrontCamera
+- (NSNumber *)useFrontCamera
 {
-  return NUMBOOL(selectedCamera == MTBCameraFront);
+  return @(_selectedCamera == MTBCameraFront);
 }
 
-- (id)parse:(id)args
+- (NSNumber *)parse:(id)args
 {
   ENSURE_SINGLE_ARG(args, NSDictionary);
 
-  id blob = [args valueForKey:@"image"];
+  TiBlob *blob = [args valueForKey:@"image"];
   ENSURE_TYPE(blob, TiBlob);
 
-  UIImage *image = [(TiBlob *)blob image];
+  UIImage *image = [blob image];
   CIImage *ciImage = [[CIImage alloc] initWithImage:image];
   CIDetector *detector = [CIDetector detectorOfType:CIDetectorTypeQRCode context:nil options:@{ CIDetectorAccuracy : CIDetectorAccuracyLow }];
   NSArray<CIFeature *> *features = [detector featuresInImage:ciImage];
@@ -227,13 +227,10 @@
   if ([result length] > 0) {
     [self handleSuccessResult:result];
   } else {
-    [self fireEvent:@"error"
-         withObject:@{
-           @"message" : @"Unknown error occurred."
-         }];
+    [self fireEvent:@"error" withObject:@{ @"message" : @"Unknown error occurred." }];
+    return @(NO);
   }
-
-  return NUMBOOL(true);
+  return @(YES);
 }
 
 #pragma mark Internal
@@ -269,17 +266,17 @@
 
 - (void)closeScanner
 {
-  if (!barcodeViewController) {
+  if (_barcodeViewController == nil) {
     NSLog(@"[ERROR] Trying to dismiss a scanner that hasn't been created, yet. Try again, Marty!");
     return;
   }
-  if ([[barcodeViewController scanner] isScanning]) {
-    [[barcodeViewController scanner] stopScanning];
+  if ([[_barcodeViewController scanner] isScanning]) {
+    [[_barcodeViewController scanner] stopScanning];
   }
 
-  [barcodeViewController setScanner:nil];
-  [[[[barcodeViewController view] subviews] objectAtIndex:0] removeFromSuperview];
-  [barcodeViewController dismissViewControllerAnimated:YES completion:nil];
+  [_barcodeViewController setScanner:nil];
+  [[[[_barcodeViewController view] subviews] objectAtIndex:0] removeFromSuperview];
+  [_barcodeViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark Parsing Utility Methods
@@ -451,7 +448,7 @@
     if (range.location == NSNotFound)
       continue;
     NSString *key = [token substringToIndex:range.location];
-    id value = [token substringFromIndex:range.location + 1];
+    NSString *value = [token substringFromIndex:range.location + 1];
     if ([key isEqualToString:@"N"]) {
       key = @"NAME";
     }

@@ -10,13 +10,14 @@
 @class TiOverlayView;
 
 @interface TiBarcodeModule : TiModule <TiOverlayViewDelegate> {
-  TiBarcodeViewController *barcodeViewController;
-  MTBCamera selectedCamera;
-  MTBTorchMode selectedLEDMode;
-  NSString *displayedMessage;
+  @private
+  TiBarcodeViewController *_barcodeViewController;
+  MTBCamera _selectedCamera;
+  MTBTorchMode _selectedLEDMode;
+  NSString *_displayedMessage;
 }
 
-- (id)canShow:(id)unused;
+- (NSNumber *)canShow:(id)unused;
 
 - (void)capture:(id)args;
 
@@ -28,14 +29,14 @@
 
 - (void)cancel:(id)unused;
 
-- (void)setUseLED:(id)value;
+- (void)setUseLED:(NSNumber *)value;
 
-- (id)useLED;
+- (NSNumber *)useLED;
 
-- (void)setAllowRotation:(id)value;
+- (void)setAllowRotation:(NSNumber *)value;
 
-- (void)setUseFrontCamera:(id)value;
+- (void)setUseFrontCamera:(NSNumber *)value;
 
-- (id)useFrontCamera;
+- (NSNumber *)useFrontCamera;
 
 @end
