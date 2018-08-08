@@ -63,7 +63,7 @@
   NSString *displayedMessage = [TiUtils stringValue:[self valueForUndefinedKey:@"displayedMessage"]];
 
   NSMutableArray *acceptedFormats = [self metaDataObjectListFromFormtArray:[args objectForKey:@"acceptedFormats"]];
-  TiViewProxy *overlayProxy = [args objectForKey:@"overlay"];
+  _overlayViewProxy = [args objectForKey:@"overlay"];
 
   if (acceptedFormats.count != 0) {
     if ([acceptedFormats containsObject:@"-1"]) {
@@ -77,8 +77,9 @@
   NSError *error = nil;
   NSError *cameraError = nil;
   UIView *overlayView = nil;
-  if (overlayProxy != nil) {
-    overlayView = [self prepareOverlayWithProxy:overlayProxy];
+  if (_overlayViewProxy != nil) {
+    [self rememberProxy:_overlayViewProxy];
+    overlayView = [self prepareOverlayWithProxy:_overlayViewProxy];
   }
   _barcodeViewController = [[TiBarcodeViewController alloc] initWithObjectTypes:acceptedFormats delegate:self showCancel:showCancel showRectangle:showRectangle withOverlay:overlayView];
   [[_barcodeViewController scanner] setCamera:_selectedCamera ?: MTBCameraBack error:&cameraError];
@@ -104,7 +105,8 @@
     if (!keepOpen) {
       [self closeScanner];
     }
-  } error:&error];
+  }
+                                                           error:&error];
 
   if (error) {
     [self fireEvent:@"error"
@@ -234,7 +236,6 @@
 
 #pragma mark Internal
 
-
 - (NSMutableArray *)metaDataObjectListFromFormtArray:(NSArray *)formatArray
 {
   // For backward compatibility and parity
@@ -242,54 +243,54 @@
   for (NSNumber *number in formatArray) {
     NSString *object = @"-1";
     switch ([number integerValue]) {
-      case TiMetadataObjectTypeNone:
-        object = @"-1";
-        break;
-      case TiMetadataObjectTypeQRCode:
-        object = AVMetadataObjectTypeQRCode;
-        break;
-      case TiMetadataObjectTypeDataMatrixCode:
-        object = AVMetadataObjectTypeDataMatrixCode;
-        break;
-      case TiMetadataObjectTypeUPCECode:
-        object = AVMetadataObjectTypeUPCECode;
-        break;
-      case TiMetadataObjectTypeUPCACode:
-        object = AVMetadataObjectTypeEAN13Code;
-        break;
-      case TiMetadataObjectTypeEAN8Code:
-        object = AVMetadataObjectTypeEAN8Code;
-        break;
-      case TiMetadataObjectTypeEAN13Code:
-        object = AVMetadataObjectTypeEAN13Code;
-        break;
-      case TiMetadataObjectTypeCode128Code:
-        object = AVMetadataObjectTypeCode128Code;
-        break;
-      case TiMetadataObjectTypeCode39Code:
-        object = AVMetadataObjectTypeCode39Code;
-        break;
-      case TiMetadataObjectTypeCode93Code:
-        object = AVMetadataObjectTypeCode93Code;
-        break;
-      case TiMetadataObjectTypeCode39Mod43Code:
-        object = AVMetadataObjectTypeCode39Mod43Code;
-        break;
-      case TiMetadataObjectTypeITF14Code:
-        object = AVMetadataObjectTypeITF14Code;
-        break;
-      case TiMetadataObjectTypePDF417Code:
-        object = AVMetadataObjectTypePDF417Code;
-        break;
-      case TiMetadataObjectTypeAztecCode:
-        object = AVMetadataObjectTypeAztecCode;
-        break;
-      case TiMetadataObjectTypeFace:
-        object = AVMetadataObjectTypeFace;
-        break;
-      case TiMetadataObjectTypeInterleaved2of5Code:
-        object = AVMetadataObjectTypeInterleaved2of5Code;
-        break;
+    case TiMetadataObjectTypeNone:
+      object = @"-1";
+      break;
+    case TiMetadataObjectTypeQRCode:
+      object = AVMetadataObjectTypeQRCode;
+      break;
+    case TiMetadataObjectTypeDataMatrixCode:
+      object = AVMetadataObjectTypeDataMatrixCode;
+      break;
+    case TiMetadataObjectTypeUPCECode:
+      object = AVMetadataObjectTypeUPCECode;
+      break;
+    case TiMetadataObjectTypeUPCACode:
+      object = AVMetadataObjectTypeEAN13Code;
+      break;
+    case TiMetadataObjectTypeEAN8Code:
+      object = AVMetadataObjectTypeEAN8Code;
+      break;
+    case TiMetadataObjectTypeEAN13Code:
+      object = AVMetadataObjectTypeEAN13Code;
+      break;
+    case TiMetadataObjectTypeCode128Code:
+      object = AVMetadataObjectTypeCode128Code;
+      break;
+    case TiMetadataObjectTypeCode39Code:
+      object = AVMetadataObjectTypeCode39Code;
+      break;
+    case TiMetadataObjectTypeCode93Code:
+      object = AVMetadataObjectTypeCode93Code;
+      break;
+    case TiMetadataObjectTypeCode39Mod43Code:
+      object = AVMetadataObjectTypeCode39Mod43Code;
+      break;
+    case TiMetadataObjectTypeITF14Code:
+      object = AVMetadataObjectTypeITF14Code;
+      break;
+    case TiMetadataObjectTypePDF417Code:
+      object = AVMetadataObjectTypePDF417Code;
+      break;
+    case TiMetadataObjectTypeAztecCode:
+      object = AVMetadataObjectTypeAztecCode;
+      break;
+    case TiMetadataObjectTypeFace:
+      object = AVMetadataObjectTypeFace;
+      break;
+    case TiMetadataObjectTypeInterleaved2of5Code:
+      object = AVMetadataObjectTypeInterleaved2of5Code;
+      break;
     }
     [convertedArray addObject:object];
   }
@@ -335,6 +336,7 @@
     [[_barcodeViewController scanner] stopScanning];
   }
 
+  [self forgetProxy:_overlayViewProxy];
   [_barcodeViewController setScanner:nil];
   [[[[_barcodeViewController view] subviews] objectAtIndex:0] removeFromSuperview];
   [_barcodeViewController dismissViewControllerAnimated:YES completion:nil];
@@ -618,7 +620,6 @@ MAKE_SYSTEM_PROP(EMAIL, 7);
 MAKE_SYSTEM_PROP(CONTACT, 8);
 MAKE_SYSTEM_PROP(BOOKMARK, 9);
 MAKE_SYSTEM_PROP(WIFI, 10);
-
 
 typedef NS_ENUM(NSInteger, TiMetaDataObjectType) {
   TiMetadataObjectTypeNone = -1,
