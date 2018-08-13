@@ -50,17 +50,17 @@
   return self;
 }
 
-- (void)viewDidAppear:(BOOL)animated
+- (void)viewWillAppear:(BOOL)animated
 {
-  [super viewDidAppear:animated];
+  [super viewWillAppear:animated];
 
   [[self view] addSubview:_overlayView];
   [[self view] bringSubviewToFront:_overlayView];
 }
 
-- (void)viewDidDisappear:(BOOL)animated
+- (void)viewWillDisappear:(BOOL)animated
 {
-  [super viewDidDisappear:animated];
+  [super viewWillDisappear:animated];
 
   [_overlayView removeFromSuperview];
 }

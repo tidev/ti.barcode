@@ -30,7 +30,7 @@ CGFloat _kPadding = 10;
     [self updateViewsWithFrame:frame];
 
     if (overlay != nil) {
-      [self addSubview:overlay];
+      [self.layer addSublayer:overlay.layer];
     }
   }
   return self;

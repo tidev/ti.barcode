@@ -8,6 +8,7 @@
 #import "TiBarcodeViewController.h"
 #import "TiModule.h"
 @class TiOverlayView;
+@class TiViewProxy;
 
 @interface TiBarcodeModule : TiModule <TiOverlayViewDelegate> {
   @private
@@ -15,6 +16,7 @@
   MTBCamera _selectedCamera;
   MTBTorchMode _selectedLEDMode;
   NSString *_displayedMessage;
+  TiViewProxy *_overlayViewProxy;
 }
 
 - (NSNumber *)canShow:(id)unused;
