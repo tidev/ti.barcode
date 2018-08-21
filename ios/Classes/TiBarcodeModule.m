@@ -60,7 +60,6 @@
   BOOL animate = [TiUtils boolValue:[args objectForKey:@"animate"] def:YES];
   BOOL showCancel = [TiUtils boolValue:@"showCancel" properties:args def:YES];
   BOOL showRectangle = [TiUtils boolValue:@"showRectangle" properties:args def:YES];
-  NSString *displayedMessage = [TiUtils stringValue:[self valueForUndefinedKey:@"displayedMessage"]];
 
   NSMutableArray *acceptedFormats = [self metaDataObjectListFromFormtArray:[args objectForKey:@"acceptedFormats"]];
   _overlayViewProxy = [args objectForKey:@"overlay"];
@@ -84,7 +83,7 @@
   _barcodeViewController = [[TiBarcodeViewController alloc] initWithObjectTypes:acceptedFormats delegate:self showCancel:showCancel showRectangle:showRectangle withOverlay:overlayView];
   [[_barcodeViewController scanner] setCamera:_selectedCamera ?: MTBCameraBack error:&cameraError];
 
-  if (displayedMessage != nil) {
+  if (_displayedMessage != nil) {
     [[_barcodeViewController overlayView] setDisplayMessage:_displayedMessage];
   }
   if (cameraError) {
@@ -93,8 +92,6 @@
            @"message" : [cameraError localizedDescription] ?: @"Unknown error occurred."
          }];
   }
-
-  [[_barcodeViewController scanner] setTorchMode:MTBTorchModeOff];
 
   [[_barcodeViewController scanner] startScanningWithResultBlock:^(NSArray *codes) {
     if (!codes || [codes count] == 0) {
@@ -122,7 +119,7 @@
   [[[[TiApp app] controller] topPresentedController] presentViewController:_barcodeViewController
                                                                   animated:animate
                                                                 completion:^{
-                                                                  [[_barcodeViewController scanner] setTorchMode:_selectedLEDMode ?: MTBTorchModeOff];
+                                                                  [[_barcodeViewController scanner] setTorchMode:_selectedLEDMode];
                                                                 }];
 }
 
@@ -166,7 +163,7 @@
   ENSURE_TYPE(value, NSNumber);
   [self replaceValue:value forKey:@"useLED" notification:NO];
 
-  _selectedLEDMode = [TiUtils boolValue:value def:YES] ? MTBTorchModeOn : MTBTorchModeOff;
+  _selectedLEDMode = [TiUtils boolValue:value def:NO] ? MTBTorchModeOn : MTBTorchModeOff;
 
   if (_barcodeViewController != nil) {
     [[_barcodeViewController scanner] setTorchMode:_selectedLEDMode];
@@ -176,6 +173,11 @@
 - (NSNumber *)useLED
 {
   return @(_selectedLEDMode == MTBTorchModeOn);
+}
+
+- (void)setDisplayedMessage:(NSString *)message
+{
+  _displayedMessage = message;
 }
 
 - (void)setAllowRotation:(NSNumber *)value
