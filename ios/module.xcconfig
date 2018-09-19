@@ -25,4 +25,4 @@
 //
 // IMPORTANT NOTE: always use $(inherited) in your overrides
 // 
-OTHER_LDFLAGS=$(inherited) -lstdc++.6.0.9 -liconv
+OTHER_LDFLAGS=$(inherited) -stdlib=libc++ -liconv

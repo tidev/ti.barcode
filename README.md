@@ -1,7 +1,7 @@
-Titanium Barcode Module [![Build Status](https://travis-ci.org/appcelerator-modules/ti.barcode.svg)](https://travis-ci.org/appcelerator-modules/ti.barcode)
-=======
+# Titanium Barcode Module
 
-This is the Barcode Module for Titanium built on top of the ZXing library.
+This is the Barcode Module for Titanium built on top of the ZXing library (Android)
+and AVFoundation (iOS).
 
 ## Contributors
 
@@ -9,5 +9,5 @@ Interested in contributing? Read the [contributors/committer's](https://wiki.app
 
 ## Legal
 
-This module is Copyright (c) 2010-2016 by Appcelerator, Inc. All Rights Reserved. Usage of this module is subject to 
+This module is Copyright (c) 2010-present by Appcelerator, Inc. All Rights Reserved. Usage of this module is subject to 
 the Terms of Service agreement with Appcelerator, Inc.

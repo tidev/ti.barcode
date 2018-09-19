@@ -295,7 +295,10 @@
 					"-DDEBUG",
 					"-DTI_POST_1_2",
 				);
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-stdlib=libc++",
+				);
 				PRODUCT_NAME = TiBarcode;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
@@ -341,7 +344,10 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				"IPHONEOS_DEPLOYMENT_TARGET[sdk=iphoneos*]" = 8.0;
 				OTHER_CFLAGS = "-DTI_POST_1_2";
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-stdlib=libc++",
+				);
 				PRODUCT_NAME = TiBarcode;
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = iphoneos;
