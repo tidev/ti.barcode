@@ -54,8 +54,12 @@
 {
   [super viewWillAppear:animated];
 
+  [_overlayView updateViewsWithFrame:[UIScreen mainScreen].bounds];
   [[self view] addSubview:_overlayView];
   [[self view] bringSubviewToFront:_overlayView];
+#if HAS_AVFF
+  _scanner.previewLayer.frame = _overlayView.frame;
+#endif
 }
 
 - (void)viewWillDisappear:(BOOL)animated
