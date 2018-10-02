@@ -10,8 +10,8 @@ Barcode.allowMenu = false;
 Barcode.allowInstructions = false;
 Barcode.useLED = true;
 
-var isiOS = Ti.Platform.osname === 'iphone' || Ti.Platform.osname === 'android';
 var isAndroid = Ti.Platform.osname === 'android';
+var isiOS = !isAndroid;
 
 var window = Ti.UI.createWindow({
     backgroundColor: 'white'
