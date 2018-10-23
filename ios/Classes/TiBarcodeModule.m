@@ -60,6 +60,7 @@
   BOOL animate = [TiUtils boolValue:[args objectForKey:@"animate"] def:YES];
   BOOL showCancel = [TiUtils boolValue:@"showCancel" properties:args def:YES];
   BOOL showRectangle = [TiUtils boolValue:@"showRectangle" properties:args def:YES];
+  BOOL preventRotation = [TiUtils boolValue:@"preventRotation" properties:args def: NO];
 
   NSMutableArray *acceptedFormats = [self metaDataObjectListFromFormtArray:[args objectForKey:@"acceptedFormats"]];
   _overlayViewProxy = [args objectForKey:@"overlay"];
@@ -80,7 +81,7 @@
     [self rememberProxy:_overlayViewProxy];
     overlayView = [self prepareOverlayWithProxy:_overlayViewProxy];
   }
-  _barcodeViewController = [[TiBarcodeViewController alloc] initWithObjectTypes:acceptedFormats delegate:self showCancel:showCancel showRectangle:showRectangle withOverlay:overlayView];
+  _barcodeViewController = [[TiBarcodeViewController alloc] initWithObjectTypes:acceptedFormats delegate:self showCancel:showCancel showRectangle:showRectangle withOverlay:overlayView preventRotation:preventRotation];
   [[_barcodeViewController scanner] setCamera:_selectedCamera ?: MTBCameraBack error:&cameraError];
 
   if (_displayedMessage != nil) {
