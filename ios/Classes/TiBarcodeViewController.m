@@ -21,6 +21,7 @@
                          showCancel:(BOOL)shouldShowCancel
                       showRectangle:(BOOL)shouldShowRectangle
                         withOverlay:(UIView *)overlay
+                    preventRotation:(BOOL)preventRotation
 {
   self = [super init];
   if (self) {
@@ -34,6 +35,7 @@
                                             withOverlay:overlay];
     _showRectangle = shouldShowRectangle;
     _overlayView.delegate = delegate;
+    _preventRotation = preventRotation;
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(handleDeviceRotation:)
@@ -82,6 +84,17 @@
 - (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation
 {
   return [[[[TiApp app] controller] topContainerController] preferredInterfaceOrientationForPresentation];
+}
+
+- (BOOL)shouldAutorotate
+{
+  [super shouldAutorotate];
+    
+  if (_preventRotation) {
+    return NO;
+  }
+    
+  return YES;
 }
 
 - (void)handleDeviceRotation:(NSNotification *)notification

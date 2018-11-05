@@ -18,6 +18,7 @@
   @private
   TiOverlayView *_overlayView;
   BOOL _showRectangle;
+  BOOL _preventRotation;
 }
 
 - (TiOverlayView *)overlayView;
@@ -26,7 +27,8 @@
                  delegate:(id<TiOverlayViewDelegate>)delegate
                showCancel:(BOOL)shouldShowCancel
             showRectangle:(BOOL)shouldShowRectangle
-              withOverlay:(UIView *)overlay;
+              withOverlay:(UIView *)overlay
+          preventRotation:(BOOL)preventRotation;
 
 @property (nonatomic, strong) MTBBarcodeScanner *scanner;
 
