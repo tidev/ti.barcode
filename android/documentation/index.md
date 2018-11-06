@@ -14,7 +14,7 @@ the iOS and Android modules in to full parity. When upgrading to 1.5, you will n
 
 - BREAKING CHANGE: iOS now uses event listeners instead of callbacks! Use Ti.Barcode.addEventListener('success', ...) instead of capture({ success: ...})!
 - BREAKING CHANGE: Android's contentType property is now an integer, instead of a string! Check out the example and documentation to find out more.
-- BREAKING CHANGE: All automatically parsed "data" keys will now be lower case. This ensures consistency across the API and ease of access. 
+- BREAKING CHANGE: All automatically parsed "data" keys will now be lower case. This ensures consistency across the API and ease of access.
 - BREAKING CHANGE: Android now properly fires the "cancel" event, as documented. It was firing the "canceled" event.
 - Ensure that you assign the module object that is returned from "require('ti.barcode')" to a variable or your event listeners may not receive the barcode events
 
@@ -34,13 +34,16 @@ containing any of the following properties:
 * showRectangle[boolean]: Whether or not to include the default rectangle around the scanning area. Defaults to true.
 * overlay[view]: The view to lay on top of the camera activity.
 * keepOpen[boolean]: Whether or not to keep the barcode scanner open after a barcode is recognized. Defaults to false. When set to true, "success" will fire once every time a barcode is recognized, up to two times per second. As such, it can fire multiple times for a single barcode!
-* acceptedFormats[int[]]: An optional array of int constants detailing which barcode formats are accepted. Defaults to all formats. Check out the "Barcode Format Constants" section below to see the available int constants. 
+* acceptedFormats[int[]]: An optional array of int constants detailing which barcode formats are accepted. Defaults to all formats. Check out the "Barcode Format Constants" section below to see the available int constants.
+* preventRotation[boolean]: Prevent the scanner from auto-rotating when the device is rotated. Default: true
+* frameWidth[int]: Width of the rectangle that is shown in the scanner
+* frameHeight[int]: Height of the rectangle that is shown in the scanner
 
 ### parse([args])
 Parses a blob image for barcodes. Takes one required argument, a dictionary containing any of the following properties:
 
 * image[blob]: The image blob to parse for a barcode.
-* acceptedFormats[int[]]: An optional array of int constants detailing which barcode formats are accepted. Defaults to all formats. Check out the "Barcode Format Constants" section below to see the available int constants. 
+* acceptedFormats[int[]]: An optional array of int constants detailing which barcode formats are accepted. Defaults to all formats. Check out the "Barcode Format Constants" section below to see the available int constants.
 
 ### cancel()
 Cancels and closes the currently open capture window.
@@ -51,23 +54,23 @@ Use Ti.Barcode.addEventListener() to process the following events that are sent 
 ### success
 Sent upon a successful barcode scan. The event object contains the following fields:
 
-* format[string, Android only] : The format of the barcode 
-* result[string] : The raw contents of the barcode 
-* code[string, Android only] : The activity result code from the scanning activity. Use the result constants defined in the [Ti.Android][] namespace 
+* format[string, Android only] : The format of the barcode
+* result[string] : The raw contents of the barcode
+* code[string, Android only] : The activity result code from the scanning activity. Use the result constants defined in the [Ti.Android][] namespace
 * contentType[int] : The type of barcode content. Use the constants defined in this module to determine which.
 * data[object]: The parsed fields associated with the contentType.
 
 ### error
 Sent when an error occurs. The event object contains the following fields:
 
-* message[string] : The error message 
-* code[string] : The activity result code from the scanning activity. Use the result constants defined in the [Ti.Android][] namespace 
+* message[string] : The error message
+* code[string] : The activity result code from the scanning activity. Use the result constants defined in the [Ti.Android][] namespace
 
 ### cancel
 Sent when the scanning process is canceled. The event object contains the following fields:
 
-* message[string] : The error message 
-* code[string] : The activity result code from the scanning activity. Use the result constants defined in the [Ti.Android][] namespace 
+* message[string] : The error message
+* code[string] : The activity result code from the scanning activity. Use the result constants defined in the [Ti.Android][] namespace
 
 ## Properties
 
@@ -87,7 +90,7 @@ Whether or not to display helpful instructions or a changelog when the app is up
 
 ### displayedMessage[string]
 Controls the message that is displayed to the end user when they are capturing a barcode.
-                                                                                         
+
 ### useFrontCamera[boolean, defaults to false]
 Controls whether or not the front camera on the device will be used to capture barcodes. On Android, this requires API
 level 9 (Android OS 2.3) or higher. If no front camera is available, this will gracefully fall back to utilize whatever
