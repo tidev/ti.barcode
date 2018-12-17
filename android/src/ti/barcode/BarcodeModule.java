@@ -264,10 +264,10 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 		_instance = this;
 
 		Intent intent = new Intent(Intents.Scan.ACTION);
-		
+
 		if (args != null) {
 			KrollDict argsDict = new KrollDict(args);
-			
+
 			// [MOD-233] Turn off default animation if requested. It is on by default.
 			boolean animate = argsDict.optBoolean("animate", true);
 			if (!animate) {
@@ -296,10 +296,11 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 
 			intent.putExtra(Intents.Scan.SHOW_RECTANGLE, argsDict.optBoolean("showRectangle", true));
 			intent.putExtra(Intents.Scan.KEEP_OPEN, argsDict.optBoolean("keepOpen", false));
-
+			frameWidth = argsDict.optInt("frameWidth", 0);
+			frameHeight = argsDict.optInt("frameHeight",0);
 			intent.putExtra(Intents.Scan.SHOW_INFO_TEXT, argsDict.optBoolean("showInfoText", false));
+			intent.putExtra(Intents.Scan.PREVENT_ROTATION, argsDict.optBoolean("preventRotation", true));
 		} else {
-			
 			Intents.Scan.overlayProxy = null;
 			intent.putExtra(Intents.Scan.SHOW_RECTANGLE, true);
 			intent.putExtra(Intents.Scan.KEEP_OPEN, false);
@@ -375,7 +376,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 			e.printStackTrace();
 			processFailed(resultCode);
 		}
-		
+
 		if (!keepOpen) {
 			_instance = null;
 		}
