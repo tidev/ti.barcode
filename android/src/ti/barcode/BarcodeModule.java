@@ -535,4 +535,9 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 			retVal.put(pair[0].toLowerCase(), pair[1]);
 		}
 	}
+
+	public String getApiName()
+	{
+		return "Ti.Barcode";
+	}
 }
