@@ -25,3 +25,7 @@ libs/
 /android/java-sources.txt
 
 .project
+
+TESTS-*.xml
+
+node_modules/

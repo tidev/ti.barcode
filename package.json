@@ -1,0 +1,46 @@
+{
+  "name": "ti.barcode",
+  "version": "4.0.2",
+  "description": "Lets you process 1D/2D barcodes",
+  "private": true,
+  "scripts": {
+    "test": "karma start test/unit/karma.unit.config.js",
+    "test:android": "npm test -- --browsers android",
+    "test:ios": "npm test -- --browsers ios"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/appcelerator-modules/ti.barcode.git"
+  },
+  "bugs": {
+    "url": "https://github.com/appcelerator-modules/ti.barcode/issues"
+  },
+  "homepage": "https://github.com/appcelerator-modules/ti.barcode#readme",
+  "titanium": {
+    "type": "native-module",
+    "platform": [
+      "ios",
+      "android"
+    ]
+  },
+  "devDependencies": {
+    "@seadub/danger-plugin-dependencies": "^0.1.0",
+    "@seadub/danger-plugin-junit": "^0.1.1",
+    "danger": "^7.1.0",
+    "eslint": "^5.10.0",
+    "eslint-config-axway": "^4.1.1",
+    "eslint-plugin-jasmine": "^2.10.1",
+    "jasmine-core": "^3.3.0",
+    "karma": "^4.0.0",
+    "karma-jasmine": "^2.0.1",
+    "karma-junit-reporter": "^1.2.0",
+    "karma-mocha": "^1.3.0",
+    "karma-mocha-reporter": "^2.2.5",
+    "karma-titanium-launcher": "^0.5.3",
+    "karma-webpack": "^4.0.0-rc.6",
+    "mocha": "^5.2.0",
+    "socket.io": "^2.2.0",
+    "webpack": "^4.29.0"
+  },
+  "dependencies": {}
+}
