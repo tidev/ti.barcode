@@ -27,6 +27,11 @@
   return @"ti.barcode";
 }
 
+- (NSString *)apiName
+{
+  return @"Ti.Barcode";
+}
+
 #pragma mark Lifecycle
 
 - (void)startup
