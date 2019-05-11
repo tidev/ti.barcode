@@ -219,6 +219,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 			}
 		}
 		hints.put(DecodeHintType.POSSIBLE_FORMATS, decodeFormats);
+		hints.put(DecodeHintType.ASSUME_GS1, null);
 		return hints;
 	}
 
