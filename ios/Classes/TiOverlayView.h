@@ -14,6 +14,7 @@
   @private
   UIButton *_cancelButton;
   BOOL _showRectangle;
+  UIView *_overlay;
 }
 
 @property (nonatomic, assign) id<TiOverlayViewDelegate> delegate;

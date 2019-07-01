@@ -18,6 +18,7 @@ CGFloat _kPadding = 10;
 {
   self = [super initWithFrame:frame];
   if (self) {
+    _overlay = overlay;
     _showRectangle = showRectangle;
     self.backgroundColor = [UIColor clearColor];
     if (showCancel) {
@@ -39,6 +40,8 @@ CGFloat _kPadding = 10;
 - (void)updateViewsWithFrame:(CGRect)newFrame
 {
   self.frame = newFrame;
+  _overlay.frame = CGRectMake(_overlay.frame.origin.x, _overlay.frame.origin.y, _overlay.frame.size.height, _overlay.frame.size.width);
+
   if (self.frame.size.width > self.frame.size.height) {
     _kPadding = 70;
   } else {
