@@ -1,5 +1,5 @@
 library 'pipeline-library'
 
 buildModule {
-	sdkVersion = '7.5.2.GA'
+	sdkVersion = '8.2.0.GA'
 }
