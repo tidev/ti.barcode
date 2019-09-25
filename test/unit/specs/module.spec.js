@@ -15,7 +15,6 @@ describe('ti.barcode', function () {
 	});
 
 	describe('constants', () => {
-
 		describe('FORMAT_*', () => {
 			it('FORMAT_NONE', () => {
 				expect(Barcode.FORMAT_NONE).toEqual(jasmine.any(Number));
@@ -103,6 +102,86 @@ describe('ti.barcode', function () {
 			});
 			it('WIFI', () => {
 				expect(Barcode.WIFI).toEqual(10);
+			});
+		});
+	});
+
+	describe('properties', () => {
+		if (IOS) {
+			describe('.allowRotation', () => {
+				it('is a Boolean', () => {
+					expect(Barcode.allowRotation).toEqual(jasmine.any(Boolean));
+				});
+			});
+		}
+
+		if (ANDROID) {
+			describe('.allowMenu', () => {
+				it('is a Boolean', () => {
+					expect(Barcode.allowMenu).toEqual(jasmine.any(Boolean));
+				});
+			});
+
+			describe('.allowInstructions', () => {
+				it('is a Boolean', () => {
+					expect(Barcode.allowInstructions).toEqual(jasmine.any(Boolean));
+				});
+			});
+		}
+
+		describe('.displayedMessage', () => {
+			it('is a String', () => {
+				expect(Barcode.displayedMessage).toEqual(jasmine.any(String));
+			});
+		});
+
+		describe('.useFrontCamera', () => {
+			it('is a Boolean', () => {
+				expect(Barcode.useFrontCamera).toEqual(jasmine.any(Boolean));
+			});
+		});
+
+		describe('.useLED', () => {
+			it('is a Boolean', () => {
+				expect(Barcode.useLED).toEqual(jasmine.any(Boolean));
+			});
+		});
+	});
+
+	describe('methods', () => {
+		describe('.cancel()', () => {
+			it('is a Function', () => {
+				expect(Barcode.cancel).toEqual(jasmine.any(Function));
+			});
+		});
+
+		describe('.capture()', () => {
+			it('is a Function', () => {
+				expect(Barcode.capture).toEqual(jasmine.any(Function));
+			});
+			// TODO: Can we test capturing? I assume it needs permissions...
+		});
+
+		describe('.parse()', () => {
+			it('is a Function', () => {
+				expect(Barcode.parse).toEqual(jasmine.any(Function));
+			});
+
+			it('finds a barcode in a blob image', finish => {
+				// FIXME: Include some image files with barcodes in the test app!
+				const imageBlob = Ti.Filesystem.getFile().read();
+				Barcode.addEventListener('error', err => {
+					finish(err);
+				});
+				Barcode.addEventListener('success', obj => {
+					// dict.put("format", format);
+					// dict.put("result", contents);
+					// dict.put("code", resultCode);
+					// dict.put("contentType", contentType);
+					// dict.put("data", parseData(contentType, contents));
+					finish();
+				});
+				Barcode.parse({ image: imageBlob });
 			});
 		});
 	});
