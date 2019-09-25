@@ -3,17 +3,29 @@
 // requires
 const junit = require('@seadub/danger-plugin-junit').default;
 const dependencies = require('@seadub/danger-plugin-dependencies').default;
+const fs = require('fs');
+const path = require('path');
 const ENV = process.env;
 
 // Add links to artifacts we've stuffed into the ENV.ARTIFACTS variable
 async function linkToArtifacts() {
-	if (ENV.BUILD_STATUS === 'SUCCESS' || ENV.BUILD_STATUS === 'UNSTABLE') {
+	if (ENV.ARTIFACTS && (ENV.BUILD_STATUS === 'SUCCESS' || ENV.BUILD_STATUS === 'UNSTABLE')) {
 		const artifacts = ENV.ARTIFACTS.split(';');
 		if (artifacts.length !== 0) {
 			const artifactsListing = '- ' + artifacts.map(a => danger.utils.href(`${ENV.BUILD_URL}artifact/${a}`, a)).join('\n- ');
 			message(`:floppy_disk: Here are the artifacts produced:\n${artifactsListing}`);
 		}
 	}
+}
+
+async function checkLintLog() {
+	const lintLog = path.join(__dirname, 'lint.log');
+	if (!fs.existsSync(lintLog)) {
+		return;
+	}
+	const contents = fs.readFileSync(lintLog, 'utf8');
+	fail('`npm run lint` failed, please check messages below for output.');
+	message(`:bomb: Here's the output of \`npm run lint\`:\n\`\`\`${contents}\`\`\``);
 }
 
 async function main() {
@@ -23,6 +35,7 @@ async function main() {
 		junit({ pathToReport: './TESTS-*.xml' }),
 		dependencies({ type: 'npm' }),
 		linkToArtifacts(),
+		checkLintLog(),
 	]);
 }
 main()
