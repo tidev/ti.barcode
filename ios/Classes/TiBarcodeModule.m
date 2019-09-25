@@ -54,7 +54,7 @@
 
 - (NSNumber *)canShow:(id)unused
 {
-  return @([MTBBarcodeScanner cameraIsPresent] && ![MTBBarcodeScanner scanningIsProhibited]);
+  return NUMBOOL([MTBBarcodeScanner cameraIsPresent] && ![MTBBarcodeScanner scanningIsProhibited]);
 }
 
 - (void)capture:(id)args
@@ -179,7 +179,7 @@
 
 - (NSNumber *)useLED
 {
-  return @(_selectedLEDMode == MTBTorchModeOn);
+  return NUMBOOL(_selectedLEDMode == MTBTorchModeOn);
 }
 
 - (void)setDisplayedMessage:(NSString *)message
@@ -214,7 +214,7 @@
 
 - (NSNumber *)useFrontCamera
 {
-  return @(_selectedCamera == MTBCameraFront);
+  return NUMBOOL(_selectedCamera == MTBCameraFront);
 }
 
 - (NSNumber *)parse:(id)args
