@@ -37,7 +37,7 @@
     "karma-jasmine": "^2.0.1",
     "karma-junit-reporter": "^1.2.0",
     "karma-mocha-reporter": "^2.2.5",
-    "karma-titanium-launcher": "^0.5.6",
+    "karma-titanium-launcher": "^0.7.5",
     "socket.io": "^2.2.0",
     "titanium-docgen": "^0.2.0"
   },
