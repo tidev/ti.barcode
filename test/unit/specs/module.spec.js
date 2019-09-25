@@ -107,43 +107,35 @@ describe('ti.barcode', function () {
 	});
 
 	describe('properties', () => {
-		if (IOS) {
-			describe('.allowRotation', () => {
-				it('is a Boolean', () => {
-					expect(Barcode.allowRotation).toEqual(jasmine.any(Boolean));
-				});
-			});
-		}
-
 		if (ANDROID) {
 			describe('.allowMenu', () => {
-				it('is a Boolean', () => {
-					expect(Barcode.allowMenu).toEqual(jasmine.any(Boolean));
+				it('defaults to true', () => {
+					expect(Barcode.allowMenu).toEqual(true);
 				});
 			});
 
 			describe('.allowInstructions', () => {
-				it('is a Boolean', () => {
-					expect(Barcode.allowInstructions).toEqual(jasmine.any(Boolean));
+				it('defaults to true', () => {
+					expect(Barcode.allowInstructions).toEqual(true);
 				});
 			});
 		}
 
 		describe('.displayedMessage', () => {
-			it('is a String', () => {
-				expect(Barcode.displayedMessage).toEqual(jasmine.any(String));
+			it('defaults to undefined', () => {
+				expect(Barcode.displayedMessage).not.toBeDefined();
 			});
 		});
 
 		describe('.useFrontCamera', () => {
-			it('is a Boolean', () => {
-				expect(Barcode.useFrontCamera).toEqual(jasmine.any(Boolean));
+			it('defaults to false', () => {
+				expect(Barcode.useFrontCamera).toEqual(false);
 			});
 		});
 
 		describe('.useLED', () => {
-			it('is a Boolean', () => {
-				expect(Barcode.useLED).toEqual(jasmine.any(Boolean));
+			it('defaults to false', () => {
+				expect(Barcode.useLED).toEqual(false);
 			});
 		});
 	});
@@ -154,6 +146,18 @@ describe('ti.barcode', function () {
 				expect(Barcode.cancel).toEqual(jasmine.any(Function));
 			});
 		});
+
+		if (IOS) {
+			describe('.canShow()', () => {
+				it('is a Function', () => {
+					expect(Barcode.canShow).toEqual(jasmine.any(Function));
+				});
+
+				it('returns Boolean', () => {
+					expect(Barcode.canShow()).toEqual(jasmine.any(Boolean));
+				});
+			});
+		}
 
 		describe('.capture()', () => {
 			it('is a Function', () => {
@@ -167,22 +171,119 @@ describe('ti.barcode', function () {
 				expect(Barcode.parse).toEqual(jasmine.any(Function));
 			});
 
-			it('finds a barcode in a blob image', finish => {
-				// FIXME: Include some image files with barcodes in the test app!
-				const imageBlob = Ti.Filesystem.getFile().read();
-				Barcode.addEventListener('error', err => {
-					finish(err);
+			function testBarcodeViaURL(url, format, data, finish) {
+				// FIXME: Include some image files with barcodes in the test app rather than downloading them
+				// const imageBlob = Ti.Filesystem.getFile().read();
+				const client = Ti.Network.createHTTPClient({
+					onload: function(e) {
+						function error(err) {
+							Barcode.removeEventListener('error', error);
+							finish(err);
+						}
+
+						function success(obj) {
+							Barcode.removeEventListener('success', success);
+							console.log(obj);
+							try {
+								expect(obj.format).toEqual(format);
+								// dict.put("result", contents);
+								// dict.put("code", resultCode);
+								expect(obj.contentType).toEqual(Barcode.TEXT);
+								// dict.put("data", parseData(contentType, contents));
+								finish();
+							} catch (err) {
+								finish.fail(err);
+							}
+						}
+						Barcode.addEventListener('error', error);
+						Barcode.addEventListener('success', success);
+						Barcode.parse({ image: this.responseData });
+					},
+					onerror: e => finish.fail(e),
+					timeout: 5000
 				});
-				Barcode.addEventListener('success', obj => {
-					// dict.put("format", format);
-					// dict.put("result", contents);
-					// dict.put("code", resultCode);
-					// dict.put("contentType", contentType);
-					// dict.put("data", parseData(contentType, contents));
-					finish();
-				});
-				Barcode.parse({ image: imageBlob });
+				client.open('GET', url);
+				client.send();
+			}
+
+			it('finds a Code 39 barcode in a blob image', finish => {
+				testBarcodeViaURL(
+					'https://www.barcoderesource.com/images/Code39Barcode.jpg',
+					Barcode.FORMAT_CODE_39, // FIXME: Android reports format as 'CODE_39' rather than constant
+					'12345F',
+					finish);
 			});
+
+			it('finds a Code 128 barcode in a blob image', finish => {
+				testBarcodeViaURL(
+					'https://www.barcoderesource.com/images/Code128Barcode.jpg',
+					Barcode.FORMAT_CODE_128, // FIXME: Android reports format as 'CODE_128' rather than constant
+					'12345678',
+					finish);
+			});
+
+			it('finds an EAN 13 barcode in a blob image', finish => {
+				testBarcodeViaURL(
+					'https://www.barcoderesource.com/images/EAN13Barcode.jpg',
+					Barcode.FORMAT_EAN_13, // FIXME: This appears to be the same as EAN8 on Android?
+					'12345670', // FIXME: Should be '1234567890128'
+					finish);
+			});
+
+			it('finds an EAN 8 barcode in a blob image', finish => {
+				testBarcodeViaURL(
+					'https://www.barcoderesource.com/images/EAN8Barcode.jpg',
+					Barcode.FORMAT_EAN_8,// FIXME: Android reports format as 'EAN_8' rather than constant
+					'12345670',
+					finish);
+			});
+
+			it('finds a UPC A barcode in a blob image', finish => {
+				testBarcodeViaURL(
+					'https://www.barcoderesource.com/images/UPCABarcode.jpg',
+					Barcode.FORMAT_UPC_A, // FIXME: This appears to be the same as 'ITF' on Android?
+					'00012345678905',
+					finish);
+			});
+
+			it('finds a UPC E barcode in a blob image', finish => {
+				testBarcodeViaURL(
+					'https://www.barcoderesource.com/images/UPCEBarcode.jpg',
+					Barcode.FORMAT_UPC_E, // FIXME: This appears to be the same as 'ITF' on Android?
+					'00012345678905', // FIXME: should be '01234565'
+					finish);
+			});
+
+			it('finds an ITF 14 barcode in a blob image', finish => {
+				testBarcodeViaURL(
+					'https://www.barcoderesource.com/images/itf14_barcode.jpg',
+					Barcode.FORMAT_ITF,
+					'00012345678905',
+					finish);
+			});
+
+			it('finds an Interleaved 2 of 5 barcode in a blob image', finish => {
+				testBarcodeViaURL(
+					'https://www.barcoderesource.com/images/I2of5Barcode.jpg',
+					Barcode.FORMAT_INTERLEAVED_2_OF_5,// FIXME: Android reports format as 'ITF' rather than constant
+					'161718',
+					finish);
+			});
+
+			it('finds an Aztec barcode in a blob image', finish => {
+				testBarcodeViaURL(
+					'https://upload.wikimedia.org/wikipedia/commons/e/ec/Code-aztec.png',
+					Barcode.FORMAT_AZTEC,// FIXME: Android reports format as 'AZTEC' rather than constant, constant is undefined
+					'ZXing:http://code.google.com/p/zxing & http;//tinyurl.com/gcode-site/p/zxing = PHP:http://www.php.net = Google Code:http://code.google.com & http://tinyurl.com/gcode-site TinyURL:http://tinyurl.com = Mozilla:http://www.mozilla.org',
+					finish);
+			});
+
+			// TODO: QR Code
+			// TODO: Data Matrix
+			// TODO: FORMAT_CODE_93
+			// TODO: FORMAT_CODE_39_MOD_43
+			// TODO: FORMAT_PDF_417
+
 		});
 	});
 });
