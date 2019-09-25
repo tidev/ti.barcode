@@ -12,6 +12,7 @@
 #import "TiOverlayView.h"
 #import "TiUtils.h"
 #import "TiViewProxy.h"
+#import "TiBlob.h"
 
 @implementation TiBarcodeModule
 
