@@ -1,12 +1,14 @@
 {
-  "name": "ti.barcode",
+  "name": "@titanium/ti.barcode",
   "version": "4.0.2",
   "description": "Lets you process 1D/2D barcodes",
-  "private": true,
   "scripts": {
-    "test": "karma start test/unit/karma.unit.config.js",
-    "test:android": "npm test -- --browsers android",
-    "test:ios": "npm test -- --browsers ios"
+    "lint": "npm run lint:docs",
+    "lint:docs": "tdoc-validate -w Titanium.Module,Titanium.UI.View,Titanium.Blob apidoc",
+    "test": "npm run lint && npm test",
+    "test:unit": "karma start test/unit/karma.unit.config.js",
+    "test:android": "npm run test:unit -- --browsers android",
+    "test:ios": "npm run test:unit -- --browsers ios"
   },
   "repository": {
     "type": "git",
@@ -36,7 +38,8 @@
     "karma-junit-reporter": "^1.2.0",
     "karma-mocha-reporter": "^2.2.5",
     "karma-titanium-launcher": "^0.5.6",
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.2.0",
+    "titanium-docgen": "^0.2.0"
   },
   "dependencies": {}
 }
