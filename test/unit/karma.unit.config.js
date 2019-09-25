@@ -12,7 +12,7 @@ module.exports = config => {
 			'karma-*'
 		],
 		titanium: {
-			sdkVersion: config.sdkVersion || '7.5.2.GA'
+			sdkVersion: config.sdkVersion || '8.2.0.GA'
 		},
 		customLaunchers: {
 			android: {
