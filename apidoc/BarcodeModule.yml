@@ -272,8 +272,10 @@ properties:
         * false [default]: Captured images will be analyzed using only the current device orientation.
     type: Boolean
     default: false
-    since: "3.1.0"
     platforms: [iphone, ipad]
+    deprecated:
+        since: "2.0.0"
+        removed: "2.0.0"
 
   - name: allowMenu
     summary: Whether or not to allow the built-in ZXing menu to display.
@@ -319,6 +321,12 @@ methods:
     summary: Cancels and closes the currently open capture window.
     since: "3.1.0"
     platforms: [android, iphone, ipad]
+
+  - name: canShow
+    summary: Whether the barcode scanner camera is allowed.
+    platforms: [iphone, ipad]
+    returns:
+      type: Boolean
 
   - name: capture
     summary: |
@@ -415,6 +423,7 @@ properties:
     type: Boolean
     optional: true
     default: true
+    platforms: [android, iphone, ipad]
 
   - name: showCancel
     summary: |
@@ -422,6 +431,7 @@ properties:
     type: Boolean
     optional: true
     default: true
+    platforms: [iphone, ipad]
 
   - name: showRectangle
     summary: |
@@ -429,12 +439,14 @@ properties:
     type: Boolean
     optional: true
     default: true
+    platforms: [android, iphone, ipad]
 
   - name: overlay
     summary: |
         The view to lay on top of the camera activity.
     type: Titanium.UI.View
     optional: true
+    platforms: [android, iphone, ipad]
 
   - name: keepOpen
     summary: |
@@ -444,6 +456,7 @@ properties:
     type: Boolean
     optional: true
     default: false
+    platforms: [android, iphone, ipad]
 
   - name: acceptedFormats
     summary: |
@@ -451,6 +464,7 @@ properties:
         Check out the "Barcode Format Constants" section below to see the available int constants.
     type: Array<Number>
     optional: true
+    platforms: [android, iphone, ipad]
 
   - name: preventRotation
     summary: |
@@ -458,18 +472,28 @@ properties:
     type: Boolean
     optional: true
     default: true
+    platforms: [android, iphone, ipad]
 
   - name: frameWidth
     summary: |
         Width of the rectangle that is shown in the scanner
-    type: Boolean
+    type: Number
     optional: true
+    platforms: [android]
 
   - name: frameHeight
     summary: |
         Height of the rectangle that is shown in the scanner
+    type: Number
+    optional: true
+    platforms: [android]
+
+  - name: showInfoText
+    summary: |
+        Whether to show informational text
     type: Boolean
     optional: true
+    platforms: [android]
 
 ---
 name: BarcodeParseDict
