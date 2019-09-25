@@ -111,6 +111,12 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 
 	public BarcodeModule() {
 		super();
+
+		defaultValues.put("allowRotation", false);
+		defaultValues.put("allowMenu", true);
+		defaultValues.put("allowInstructions", true);
+		defaultValues.put("useFrontCamera", false);
+		defaultValues.put("useLED", false);
 	}
 
 	private static BarcodeModule _instance;
@@ -137,24 +143,30 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	@Kroll.setProperty
 	public void setUseFrontCamera(boolean value) {
 		new CameraConfigurationManager(getActivity()).setFrontCamera(value);
-		if (CaptureActivity.getInstance() != null) {
-			CaptureActivity.getInstance().getCameraManager().setManualCameraId(FrontCamera.getFrontCamera());
-			CaptureActivity.getInstance().reset();
+		CaptureActivity activity = CaptureActivity.getInstance();
+		if (activity != null) {
+			activity.getCameraManager().setManualCameraId(FrontCamera.getFrontCamera());
+			activity.reset();
 		}
 	}
 
 	@Kroll.method
 	@Kroll.getProperty
 	public boolean getUseLED() {
-		return CaptureActivity.getInstance().getCameraManager().getTorch();
+		CaptureActivity activity = CaptureActivity.getInstance();
+		if (activity != null) {
+			return activity.getCameraManager().getTorch();
+		}
+		return false;
 	}
 
 	@Kroll.method
 	@Kroll.setProperty
 	public void setUseLED(boolean value) {
 		new CameraConfigurationManager(getActivity()).setTorch(null, value);
-		if (CaptureActivity.getInstance() != null) {
-			CaptureActivity.getInstance().getCameraManager().setTorch(value);
+		CaptureActivity activity = CaptureActivity.getInstance();
+		if (activity != null) {
+			activity.getCameraManager().setTorch(value);
 		}
 	}
 
