@@ -1,12 +1,14 @@
 /**
  * Ti.Barcode Module
- * Copyright (c) 2010-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2010-2019 by Appcelerator, Inc. All Rights Reserved.
  * Please see the LICENSE included with this distribution for details.
  */
 
 package ti.barcode;
 
+import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Vector;
 import java.util.HashMap;
 
@@ -25,22 +27,23 @@ import org.appcelerator.titanium.view.TiDrawableReference;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.DecodeHintType;
+import com.google.zxing.LuminanceSource;
 import com.google.zxing.MultiFormatReader;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.Result;
 import com.google.zxing.ResultPoint;
+import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.client.android.Intents;
-import com.google.zxing.PlanarYUVLuminanceSource;
 import com.google.zxing.client.android.PreferencesActivity;
 import com.google.zxing.client.android.camera.CameraManager;
 import com.google.zxing.client.result.ParsedResult;
 import com.google.zxing.client.result.ResultParser;
-import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.client.android.camera.CameraConfigurationManager;
 import com.google.zxing.client.android.camera.open.OpenCamera;
 import com.google.zxing.client.android.camera.open.OpenCameraInterface;
 import com.google.zxing.client.android.camera.open.CameraFacing;
+import com.google.zxing.common.HybridBinarizer;
 import ti.barcode.FrontCamera;
 
 import android.app.Activity;
@@ -84,9 +87,6 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	@Kroll.constant
 	public static final int WIFI = 10;
 
-	private static final String[] FORMAT_STRINGS = new String[] { "NONE", "QR_CODE", "DATA_MATRIX", "UPC_E", "UPC_A", "EAN_8", "EAN_13", "CODE_128",
-			"CODE_39", "ITF" };
-
 	@Kroll.constant
 	public static final int FORMAT_NONE = 0;
 	@Kroll.constant
@@ -106,8 +106,29 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	@Kroll.constant
 	public static final int FORMAT_CODE_39 = 8;
 	@Kroll.constant
-	public static final int FORMAT_ITF = 9;
+	public static final int FORMAT_CODE_93 = 9;
+	@Kroll.constant
+	public static final int FORMAT_CODE_39_MOD_43 = 10;
+	@Kroll.constant
+	public static final int FORMAT_ITF = 11;
+	@Kroll.constant
+	public static final int FORMAT_PDF_417 = 12;
+	@Kroll.constant
+	public static final int FORMAT_AZTEC = 13;
+	// FORMAT_FACE = 14;
+	@Kroll.constant
+	public static final int FORMAT_INTERLEAVED_2_OF_5 = 15; // FIXME: Remove?
+	@Kroll.constant
+	public static final int FORMAT_RSS_14 = 16;
+	@Kroll.constant
+	public static final int FORMAT_MAXICODE = 17;
+	@Kroll.constant
+	public static final int FORMAT_CODABAR = 18;
 
+	private static final List<String> FORMAT_STRINGS = Arrays.asList(
+		"NONE", "QR_CODE", "DATA_MATRIX", "UPC_E", "UPC_A", "EAN_8", "EAN_13", "CODE_128",
+		"CODE_39", "CODE_93", "CODE_39_MOD_43", "ITF", "PDF_417", "AZTEC", "FACE",
+		"INTERLEAVED_2_OF_5", "RSS_14", "MAXICODE", "CODABAR" );
 
 	public BarcodeModule() {
 		super();
@@ -193,44 +214,23 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 		DATA_MATRIX_FORMATS.add(BarcodeFormat.DATA_MATRIX);
 	}
 
-	// Inspired in large part by:
-	// http://ketai.googlecode.com/svn/trunk/ketai/src/edu/uic/ketai/inputService/KetaiCamera.java
-	private void populateYUVLuminanceFromRGB(int[] rgb, byte[] yuv420sp, int width, int height) {
-		for (int i = 0; i < width * height; i++) {
-			float red = (rgb[i] >> 16) & 0xff;
-			float green = (rgb[i] >> 8) & 0xff;
-			float blue = (rgb[i]) & 0xff;
-			int luminance = (int) ((0.257f * red) + (0.504f * green) + (0.098f * blue) + 16);
-			yuv420sp[i] = (byte) (0xff & luminance);
-		}
-	}
-
 	@SuppressWarnings("rawtypes")
 	private Hashtable<DecodeHintType, Object> populateHints(HashMap args) {
-		Vector<BarcodeFormat> decodeFormats = new Vector<BarcodeFormat>();
 		Hashtable<DecodeHintType, Object> hints = new Hashtable<DecodeHintType, Object>();
 		if (args.containsKey("acceptedFormats")) {
 			Object[] acceptedFormats = (Object[]) args.get("acceptedFormats");
 			if (acceptedFormats.length > 0) {
+				Vector<BarcodeFormat> decodeFormats = new Vector<BarcodeFormat>();
 				for (Object acceptedFormat : acceptedFormats) {
-					decodeFormats.add(BarcodeFormat.valueOf(FORMAT_STRINGS[TiConvert.toInt(acceptedFormat)]));
+					decodeFormats.add(BarcodeFormat.valueOf(FORMAT_STRINGS.get(TiConvert.toInt(acceptedFormat))));
 				}
-			}
-		} else {
-			Activity activity = TiApplication.getAppCurrentActivity();
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-			decodeFormats = new Vector<BarcodeFormat>();
-			// if (prefs.getBoolean(PreferencesActivity.KEY_DECODE_1D, true)) {
-			// 	decodeFormats.addAll(ONE_D_FORMATS);
-			// }
-			if (prefs.getBoolean(PreferencesActivity.KEY_DECODE_QR, true)) {
-				decodeFormats.addAll(QR_CODE_FORMATS);
-			}
-			if (prefs.getBoolean(PreferencesActivity.KEY_DECODE_DATA_MATRIX, true)) {
-				decodeFormats.addAll(DATA_MATRIX_FORMATS);
+				hints.put(DecodeHintType.POSSIBLE_FORMATS, decodeFormats);
 			}
 		}
-		hints.put(DecodeHintType.POSSIBLE_FORMATS, decodeFormats);
+		// Allow setting "tryHarder"
+		if (args.containsKey("tryHarder") && TiConvert.toBoolean(args.get("tryHarder"))) {
+			hints.put(DecodeHintType.TRY_HARDER, true);
+		}
 		return hints;
 	}
 
@@ -247,12 +247,9 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 
 			int w = image.getWidth(), h = image.getHeight();
 			int[] rgb = new int[w * h];
-			byte[] yuv = new byte[w * h];
-
 			image.getPixels(rgb, 0, w, 0, 0, w, h);
-			populateYUVLuminanceFromRGB(rgb, yuv, w, h);
 
-			PlanarYUVLuminanceSource source = new PlanarYUVLuminanceSource(yuv, w, h, 0, 0, w, h, false);
+			LuminanceSource source = new RGBLuminanceSource(w, h, rgb);
 			BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
 			MultiFormatReader reader = new MultiFormatReader();
 			reader.setHints(populateHints(args));
@@ -299,7 +296,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 				if (acceptedFormats.length > 0) {
 					String formats = "";
 					for (Object acceptedFormat : acceptedFormats) {
-						formats += FORMAT_STRINGS[TiConvert.toInt(acceptedFormat)] + ",";
+						formats += FORMAT_STRINGS.get(TiConvert.toInt(acceptedFormat)) + ",";
 					}
 					Log.d(LCAT, formats.substring(0, formats.length() - 1));
 					intent.putExtra(Intents.Scan.FORMATS, formats.substring(0, formats.length() - 1));
@@ -363,7 +360,13 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	public void processResult(String format, String contents, int resultCode) {
 		int contentType = getContentType(format, contents);
 		HashMap<String, Object> dict = new HashMap<String, Object>();
-		dict.put("format", format);
+		int formatIndex = FORMAT_STRINGS.indexOf(format);
+		if (formatIndex != -1) {
+			dict.put("format", formatIndex);
+		} else {
+			// format not in our FORMAT_STRINGS array!
+			dict.put("format", format);
+		}
 		dict.put("result", contents);
 		dict.put("code", resultCode);
 		dict.put("contentType", contentType);
