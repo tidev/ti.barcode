@@ -163,6 +163,33 @@ properties:
     since: "3.1.0"
     platforms: [iphone, ipad]
 
+  - name: FORMAT_RSS_14
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: FORMAT_MAXICODE
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: FORMAT_CODABAR
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
   - name: UNKNOWN
     summary: |
         Used in the [success](Modules.Barcode.success) event
