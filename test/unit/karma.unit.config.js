@@ -1,15 +1,37 @@
 'use strict';
+const fs = require('fs-extra');
+const path = require('path');
+
+function projectManagerHook(projectManager) {
+	projectManager.once('prepared', function () {
+		// Copy our test resources into the project!
+		const src = path.join(__dirname, 'Resources/images');
+		const dest = path.join(this.karmaRunnerProjectPath, 'Resources/images');
+		console.log(`Copying ${src} to ${dest}`);
+		fs.copySync(src, dest);
+
+		// Trun off app thinning so images don't get shoved in asset catalog
+		const tiapp = path.join(this.karmaRunnerProjectPath, 'tiapp.xml');
+		const contents = fs.readFileSync(tiapp, 'utf8');
+		fs.writeFileSync(tiapp, contents.replace('</ios>', `<use-app-thinning>false</use-app-thinning>
+</ios>`), 'utf8');
+	});
+}
+projectManagerHook.$inject = [ 'projectManager' ];
 
 module.exports = config => {
 	config.set({
 		basePath: '../..',
-		frameworks: [ 'jasmine' ],
+		frameworks: [ 'jasmine', 'projectManagerHook' ],
 		files: [
 			'test/unit/specs/**/*spec.js'
 		],
 		reporters: [ 'mocha', 'junit' ],
 		plugins: [
-			'karma-*'
+			'karma-*',
+			{
+			   'framework:projectManagerHook': ['factory', projectManagerHook]
+			}
 		],
 		titanium: {
 			sdkVersion: config.sdkVersion || '8.2.0.GA'
