@@ -116,7 +116,7 @@ properties:
     type: Number
     permission: read-only
     since: "3.1.0"
-    platforms: [iphone, ipad]
+    platforms: [android, iphone, ipad]
 
   - name: FORMAT_CODE_39_MOD_43
     summary: |
@@ -143,7 +143,7 @@ properties:
     type: Number
     permission: read-only
     since: "3.1.0"
-    platforms: [iphone, ipad]
+    platforms: [android, iphone, ipad]
 
   - name: FORMAT_AZTEC
     summary: |
@@ -152,7 +152,7 @@ properties:
     type: Number
     permission: read-only
     since: "3.1.0"
-    platforms: [iphone, ipad]
+    platforms: [android, iphone, ipad]
 
   - name: FORMAT_INTERLEAVED_2_OF_5
     summary: |
@@ -170,7 +170,7 @@ properties:
     type: Number
     permission: read-only
     since: "3.1.0"
-    platforms: [android, iphone, ipad]
+    platforms: [android]
 
   - name: FORMAT_MAXICODE
     summary: |
@@ -179,7 +179,7 @@ properties:
     type: Number
     permission: read-only
     since: "3.1.0"
-    platforms: [android, iphone, ipad]
+    platforms: [android]
 
   - name: FORMAT_CODABAR
     summary: |
@@ -188,7 +188,7 @@ properties:
     type: Number
     permission: read-only
     since: "3.1.0"
-    platforms: [android, iphone, ipad]
+    platforms: [android]
 
   - name: UNKNOWN
     summary: |
