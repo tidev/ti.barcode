@@ -55,18 +55,22 @@ describe('ti.barcode', function () {
 			it('FORMAT_ITF', () => {
 				expect(Barcode.FORMAT_ITF).toEqual(jasmine.any(Number));
 			});
-			// FIXME: Support PDF_417, AZTEC, and INTERLEAVED_2_OF_5 on Android!
+			// FIXME: Support PDF_417 and INTERLEAVED_2_OF_5 on Android!
 			if (IOS) {
 				it('FORMAT_PDF_417', () => {
 					expect(Barcode.FORMAT_PDF_417).toEqual(jasmine.any(Number));
-				});
-				it('FORMAT_AZTEC', () => {
-					expect(Barcode.FORMAT_AZTEC).toEqual(jasmine.any(Number));
 				});
 				it('FORMAT_INTERLEAVED_2_OF_5', () => {
 					expect(Barcode.FORMAT_INTERLEAVED_2_OF_5).toEqual(jasmine.any(Number));
 				});
 			}
+			it('FORMAT_AZTEC', () => {
+				expect(Barcode.FORMAT_AZTEC).toEqual(jasmine.any(Number));
+			});
+
+			it('FORMAT_RSS_14', () => {
+				expect(Barcode.FORMAT_RSS_14).toEqual(jasmine.any(Number));
+			});
 		});
 
 		describe('contentType values', () => {
@@ -166,124 +170,219 @@ describe('ti.barcode', function () {
 			// TODO: Can we test capturing? I assume it needs permissions...
 		});
 
+		// TODO: ios has: freezeCapture(), unfreezeCapture(), captureStillImage()
+		// FIXME: iOS has  ahuge feature parity issue between the capture and parse methods.
+		// They use totally different APIs, and parse() can really only pick up QR codes.
+		// While capture uses AVFoundation and can pick up a much wider array of codes.
+		// Android meanwhile uses zxing, and seems to handle even a wider array of code types
 		describe('.parse()', () => {
+			// Try out a number of samples from: https://commons.wikimedia.org/wiki/Barcode
 			it('is a Function', () => {
 				expect(Barcode.parse).toEqual(jasmine.any(Function));
 			});
 
-			function testBarcodeViaURL(url, format, data, finish) {
-				// FIXME: Include some image files with barcodes in the test app rather than downloading them
-				// const imageBlob = Ti.Filesystem.getFile().read();
-				const client = Ti.Network.createHTTPClient({
-					onload: function(e) {
-						function error(err) {
-							Barcode.removeEventListener('error', error);
-							finish(err);
-						}
+			function testBarcode(filename, format, result, contentType, finish) {
+				// FIXME: Use getAsset on ios so we don't need to turn off app thinning?
+				const image = Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory, `images/${filename}`).read();
+				function error(err) {
+					Barcode.removeEventListener('success', success);
+					Barcode.removeEventListener('error', error);
+					finish.fail(err);
+				}
 
-						function success(obj) {
-							Barcode.removeEventListener('success', success);
-							console.log(obj);
-							try {
-								expect(obj.format).toEqual(format);
-								// dict.put("result", contents);
-								// dict.put("code", resultCode);
-								expect(obj.contentType).toEqual(Barcode.TEXT);
-								// dict.put("data", parseData(contentType, contents));
-								finish();
-							} catch (err) {
-								finish.fail(err);
-							}
-						}
-						Barcode.addEventListener('error', error);
-						Barcode.addEventListener('success', success);
-						Barcode.parse({ image: this.responseData });
-					},
-					onerror: e => finish.fail(e),
-					timeout: 5000
-				});
-				client.open('GET', url);
-				client.send();
+				function success(obj) {
+					Barcode.removeEventListener('success', success);
+					Barcode.removeEventListener('error', error);
+					console.log(`${filename}, ${format}:`);
+					console.log(obj);
+					try {
+						expect(obj).toEqual(jasmine.objectContaining({
+							format,
+							result,
+							contentType
+							// TODO: Check code? data?
+						}));
+						finish();
+					} catch (err) {
+						finish.fail(err);
+					}
+				}
+				Barcode.addEventListener('error', error);
+				Barcode.addEventListener('success', success);
+				Barcode.parse({ image, acceptedFormats: [ format ] });
 			}
 
+			// TODO: Generate some barcodes encoding multiple content types:
+			// https://zxing.appspot.com/generator
+
 			it('finds a Code 39 barcode in a blob image', finish => {
-				testBarcodeViaURL(
-					'https://www.barcoderesource.com/images/Code39Barcode.jpg',
-					Barcode.FORMAT_CODE_39, // FIXME: Android reports format as 'CODE_39' rather than constant
+				testBarcode(
+					'Code39Barcode.jpg',
+					Barcode.FORMAT_CODE_39,
 					'12345F',
+					Barcode.TEXT,
+					finish);
+			});
+
+			it('finds a Code 93 barcode in a blob image', finish => {
+				testBarcode(
+					'Code_93.png',
+					Barcode.FORMAT_CODE_93,
+					'WIKIPEDIA',
+					Barcode.TEXT,
 					finish);
 			});
 
 			it('finds a Code 128 barcode in a blob image', finish => {
-				testBarcodeViaURL(
-					'https://www.barcoderesource.com/images/Code128Barcode.jpg',
-					Barcode.FORMAT_CODE_128, // FIXME: Android reports format as 'CODE_128' rather than constant
+				testBarcode(
+					'Code128Barcode.jpg',
+					Barcode.FORMAT_CODE_128,
 					'12345678',
+					Barcode.TEXT,
 					finish);
 			});
 
-			it('finds an EAN 13 barcode in a blob image', finish => {
-				testBarcodeViaURL(
-					'https://www.barcoderesource.com/images/EAN13Barcode.jpg',
-					Barcode.FORMAT_EAN_13, // FIXME: This appears to be the same as EAN8 on Android?
-					'12345670', // FIXME: Should be '1234567890128'
+			it('finds an EAN 13 barcode with rest indicator in a blob image', finish => {
+				testBarcode(
+					'EAN-13-5901234123457.png',
+					Barcode.FORMAT_EAN_13,
+					'5901234123457',
+					Barcode.TEXT,
 					finish);
 			});
 
 			it('finds an EAN 8 barcode in a blob image', finish => {
-				testBarcodeViaURL(
-					'https://www.barcoderesource.com/images/EAN8Barcode.jpg',
-					Barcode.FORMAT_EAN_8,// FIXME: Android reports format as 'EAN_8' rather than constant
+				testBarcode(
+					'EAN8Barcode.jpg',
+					Barcode.FORMAT_EAN_8,
 					'12345670',
+					Barcode.TEXT,
 					finish);
 			});
 
 			it('finds a UPC A barcode in a blob image', finish => {
-				testBarcodeViaURL(
-					'https://www.barcoderesource.com/images/UPCABarcode.jpg',
-					Barcode.FORMAT_UPC_A, // FIXME: This appears to be the same as 'ITF' on Android?
-					'00012345678905',
+				testBarcode(
+					'UPC-A-036000291452.png',
+					Barcode.FORMAT_UPC_A,
+					'036000291452',
+					Barcode.TEXT,
 					finish);
 			});
 
 			it('finds a UPC E barcode in a blob image', finish => {
-				testBarcodeViaURL(
-					'https://www.barcoderesource.com/images/UPCEBarcode.jpg',
-					Barcode.FORMAT_UPC_E, // FIXME: This appears to be the same as 'ITF' on Android?
-					'00012345678905', // FIXME: should be '01234565'
+				testBarcode(
+					'upc-e.jpg',
+					Barcode.FORMAT_UPC_E,
+					'04252614',
+					Barcode.TEXT,
 					finish);
 			});
 
 			it('finds an ITF 14 barcode in a blob image', finish => {
-				testBarcodeViaURL(
-					'https://www.barcoderesource.com/images/itf14_barcode.jpg',
+				testBarcode(
+					'itf14_barcode.jpg',
 					Barcode.FORMAT_ITF,
 					'00012345678905',
+					Barcode.TEXT,
 					finish);
 			});
 
 			it('finds an Interleaved 2 of 5 barcode in a blob image', finish => {
-				testBarcodeViaURL(
-					'https://www.barcoderesource.com/images/I2of5Barcode.jpg',
-					Barcode.FORMAT_INTERLEAVED_2_OF_5,// FIXME: Android reports format as 'ITF' rather than constant
+				testBarcode(
+					'I2of5Barcode.jpg',
+					// FIXME: We have this defined as a separate constant, but ITF stands for "Interleaved Two of Five"
+					// So ITF should be correct!
+					// Barcode.FORMAT_INTERLEAVED_2_OF_5,
+					Barcode.FORMAT_ITF,
 					'161718',
+					Barcode.TEXT,
 					finish);
 			});
 
 			it('finds an Aztec barcode in a blob image', finish => {
-				testBarcodeViaURL(
-					'https://upload.wikimedia.org/wikipedia/commons/e/ec/Code-aztec.png',
-					Barcode.FORMAT_AZTEC,// FIXME: Android reports format as 'AZTEC' rather than constant, constant is undefined
+				testBarcode(
+					'Code-aztec.png',
+					Barcode.FORMAT_AZTEC,
 					'ZXing:http://code.google.com/p/zxing & http;//tinyurl.com/gcode-site/p/zxing = PHP:http://www.php.net = Google Code:http://code.google.com & http://tinyurl.com/gcode-site TinyURL:http://tinyurl.com = Mozilla:http://www.mozilla.org',
+					Barcode.TEXT,
 					finish);
 			});
 
-			// TODO: QR Code
-			// TODO: Data Matrix
-			// TODO: FORMAT_CODE_93
-			// TODO: FORMAT_CODE_39_MOD_43
-			// TODO: FORMAT_PDF_417
+			it('finds a PDF-417 barcode in a blob image', finish => {
+				testBarcode(
+					'Better_Sample_PDF417.png',
+					Barcode.FORMAT_PDF_417,
+					'PDF417 is a stacked linear barcode symbol format used in a variety of applications, primarily transport, identification cards, and inventory management.',
+					Barcode.TEXT,
+					finish);
+			});
 
+			it('finds a QR Code barcode in a Wikipedia blob image', finish => {
+				testBarcode(
+					'Wikipedia_QR-Code.png',
+					Barcode.FORMAT_QR_CODE,
+					'http://wikipedia.org/',
+					Barcode.URL,
+					finish);
+			});
+
+			it('finds a QR Code barcode in a blob image', finish => {
+				testBarcode(
+					'QRCode.png',
+					Barcode.FORMAT_QR_CODE,
+					'QR Code',
+					Barcode.TEXT,
+					finish);
+			});
+
+			it('finds a Codabar barcode in a blob image', finish => {
+				testBarcode(
+					'Rationalized-codabar.png',
+					Barcode.FORMAT_CODABAR,
+					'137255',
+					Barcode.TEXT,
+					finish);
+			});
+
+			it('finds a Maxicode barcode in a blob image', finish => {
+				testBarcode(
+					'1024px-MaxiCode.png', // FIXME: Does not scan on Android, scans online at https://zxing.org/w/decode.jspx
+					Barcode.FORMAT_MAXICODE,
+					'Wikipedia, the free encyclopedia',
+					Barcode.TEXT,
+					finish);
+			});
+
+			// TODO: Try: https://www.barcodefaq.com/wp-content/uploads/2018/08/maxicode-ups-example.gif
+			// 
+
+			it('finds a Data Matrix barcode in a blob image', finish => {
+				testBarcode(
+					'Datamatrix.png',
+					Barcode.FORMAT_DATA_MATRIX,
+					'Wikipedia, the free encyclopedia',
+					Barcode.TEXT,
+					finish);
+			});
+
+			xit('finds a Data Matrix barcode in a blob USPS Pitney Bowes image', finish => {
+				testBarcode(
+					'DataMatrix_US_franking_mark12.jpg',
+					Barcode.FORMAT_DATA_MATRIX,
+					 // FIXME: text is garbled/invalid (which busts things when we try to print it!)
+					'��$ÂÐ�021Aùâ)�3åm�N���B2���������������Í¹2�0000Z­A�Å[�Ý�¿oÉ�ý¼à�s)0ëKÓ��$¿öý)y�ÞÕ',
+					Barcode.TEXT,
+					finish);
+			});
+
+			it('finds an RSS-14 barcode in a blob image', finish => {
+				testBarcode(
+					'RSS_14-Databar_14_00075678164125.png',
+					Barcode.FORMAT_RSS_14,
+					'00075678164125',
+					Barcode.TEXT,
+					finish);
+			});
 		});
 	});
 });
