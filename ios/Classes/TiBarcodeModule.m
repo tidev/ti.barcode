@@ -104,7 +104,8 @@
     if (!codes || [codes count] == 0) {
       return;
     }
-    [self handleSuccessResult:[(AVMetadataMachineReadableCodeObject *)[codes firstObject] stringValue]];
+    AVMetadataMachineReadableCodeObject *code = (AVMetadataMachineReadableCodeObject *)[codes firstObject];
+    [self handleSuccessResult:[code stringValue] withFormat:[self convertCodeToFormat:code]];
 
     if (!keepOpen) {
       [self closeScanner];
@@ -235,7 +236,9 @@
     }
   }
   if ([result length] > 0) {
-    [self handleSuccessResult:result];
+    // FIXME: This implennetation is limited to QR codes, while capture can handle many more types. Can we unify the APIs?
+    // This code *only* supports QR codes, so I guess we could hard-code that here...
+    [self handleSuccessResult:result withFormat:TiMetadataObjectTypeQRCode];
   } else {
     [self fireEvent:@"error" withObject:@{ @"message" : @"Unknown error occurred." }];
     return @(NO);
@@ -244,6 +247,51 @@
 }
 
 #pragma mark Internal
+
+- (NSInteger)convertCodeToFormat:(AVMetadataMachineReadableCodeObject *)code
+{
+  AVMetadataObjectType type = [code type];
+  if (type == AVMetadataObjectTypeQRCode) {
+      return TiMetadataObjectTypeQRCode;
+  }
+  if (type == AVMetadataObjectTypeDataMatrixCode) {
+      return TiMetadataObjectTypeDataMatrixCode;
+  }
+  if (type == AVMetadataObjectTypeUPCECode) {
+      return TiMetadataObjectTypeUPCECode;
+  }
+  if (type == AVMetadataObjectTypeEAN8Code) {
+      return TiMetadataObjectTypeEAN8Code;
+  }
+  if (type == AVMetadataObjectTypeEAN13Code) {
+      return TiMetadataObjectTypeEAN13Code;
+  }
+  if (type == AVMetadataObjectTypeCode128Code) {
+      return TiMetadataObjectTypeCode128Code;
+  }
+  if (type == AVMetadataObjectTypeCode39Code) {
+      return TiMetadataObjectTypeCode39Code;
+  }
+  if (type == AVMetadataObjectTypeCode93Code) {
+      return TiMetadataObjectTypeCode93Code;
+  }
+  if (type == AVMetadataObjectTypeCode39Mod43Code) {
+      return TiMetadataObjectTypeCode39Mod43Code;
+  }
+  if (type == AVMetadataObjectTypeITF14Code) {
+      return TiMetadataObjectTypeITF14Code;
+  }
+  if (type == AVMetadataObjectTypePDF417Code) {
+      return TiMetadataObjectTypePDF417Code;
+  }
+  if (type == AVMetadataObjectTypeAztecCode) {
+      return TiMetadataObjectTypeAztecCode;
+  }
+  if (type == AVMetadataObjectTypeInterleaved2of5Code) {
+      return TiMetadataObjectTypeInterleaved2of5Code;
+  }
+  return TiMetadataObjectTypeNone;
+}
 
 - (NSMutableArray *)metaDataObjectListFromFormtArray:(NSArray *)formatArray
 {
@@ -265,7 +313,7 @@
       object = AVMetadataObjectTypeUPCECode;
       break;
     case TiMetadataObjectTypeUPCACode:
-      object = AVMetadataObjectTypeEAN13Code;
+      object = AVMetadataObjectTypeEAN13Code; // FIXME: This isn't a match!
       break;
     case TiMetadataObjectTypeEAN8Code:
       object = AVMetadataObjectTypeEAN8Code;
@@ -533,7 +581,7 @@
   [event setObject:data forKey:@"data"];
 }
 
-- (void)parseSuccessResult:(NSString *)result
+- (void)parseSuccessResult:(NSString *)result withFormat:(NSInteger)format
 {
   NSLog(@"[DEBUG] Received barcode result = %@", result);
 
@@ -579,13 +627,14 @@
     // anything else is assumed to be text
     [event setObject:[self TEXT] forKey:@"contentType"];
   }
+  [event setObject:[NSNumber numberWithInteger:format] forKey:@"format"];
   [self fireEvent:@"success" withObject:event];
 }
 
-- (void)handleSuccessResult:(NSString *)result
+- (void)handleSuccessResult:(NSString *)result withFormat:(NSInteger)format
 {
   @try {
-    [self parseSuccessResult:result];
+    [self parseSuccessResult:result withFormat:format];
   }
   @catch (NSException *e) {
     [self fireEvent:@"error" withObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:[e reason], @"message", nil]];
@@ -616,6 +665,7 @@ MAKE_SYSTEM_PROP(FORMAT_ITF, TiMetadataObjectTypeITF14Code);
 MAKE_SYSTEM_PROP(FORMAT_PDF_417, TiMetadataObjectTypePDF417Code); // New!
 MAKE_SYSTEM_PROP(FORMAT_AZTEC, TiMetadataObjectTypeAztecCode); // New!
 //MAKE_SYSTEM_PROP(FORMAT_FACE, TiMetadataObjectTypeFace); // New! Not Supported
+// FIXME: Remove this last one! ITF should be ITF-14 and INTERLEVAED_2_of_5
 MAKE_SYSTEM_PROP(FORMAT_INTERLEAVED_2_OF_5, TiMetadataObjectTypeInterleaved2of5Code); // New!
 
 MAKE_SYSTEM_PROP(UNKNOWN, 0);
@@ -631,7 +681,7 @@ MAKE_SYSTEM_PROP(BOOKMARK, 9);
 MAKE_SYSTEM_PROP(WIFI, 10);
 
 typedef NS_ENUM(NSInteger, TiMetaDataObjectType) {
-  TiMetadataObjectTypeNone = -1,
+  TiMetadataObjectTypeNone = 0,
   TiMetadataObjectTypeQRCode,
   TiMetadataObjectTypeDataMatrixCode,
   TiMetadataObjectTypeUPCECode,
