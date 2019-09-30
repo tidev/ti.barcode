@@ -9,10 +9,11 @@
 #import "TiApp.h"
 #import "TiBase.h"
 #import "TiHost.h"
+#import "TiBlob.h"
 #import "TiOverlayView.h"
 #import "TiUtils.h"
 #import "TiViewProxy.h"
-#import "TiBlob.h"
+#import "ZXCapture.h"
 
 @implementation TiBarcodeModule
 
@@ -43,8 +44,8 @@
 - (id)_initWithPageContext:(id<TiEvaluator>)context
 {
   if (self = [super _initWithPageContext:context]) {
-    _selectedCamera = MTBCameraBack;
-    _selectedLEDMode = MTBTorchModeOff;
+    _useFrontCamera = NO;
+    _useLED = NO;
   }
 
   return self;
@@ -54,7 +55,8 @@
 
 - (NSNumber *)canShow:(id)unused
 {
-  return NUMBOOL([MTBBarcodeScanner cameraIsPresent] && ![MTBBarcodeScanner scanningIsProhibited]);
+  //TO DO: Remove
+  return NUMBOOL(YES);
 }
 
 - (void)capture:(id)args
@@ -62,13 +64,14 @@
   ENSURE_UI_THREAD(capture, args);
   ENSURE_SINGLE_ARG_OR_NIL(args, NSDictionary);
 
-  BOOL keepOpen = [TiUtils boolValue:[args objectForKey:@"keepOpen"] def:NO];
+  keepOpen = [TiUtils boolValue:[args objectForKey:@"keepOpen"] def:NO];
   BOOL animate = [TiUtils boolValue:[args objectForKey:@"animate"] def:YES];
   BOOL showCancel = [TiUtils boolValue:@"showCancel" properties:args def:YES];
   BOOL showRectangle = [TiUtils boolValue:@"showRectangle" properties:args def:YES];
-  BOOL preventRotation = [TiUtils boolValue:@"preventRotation" properties:args def: NO];
+  BOOL preventRotation = [TiUtils boolValue:@"preventRotation" properties:args def:NO];
 
-  NSMutableArray *acceptedFormats = [self metaDataObjectListFromFormtArray:[args objectForKey:@"acceptedFormats"]];
+  NSMutableArray *acceptedFormats = [args objectForKey:@"acceptedFormats"];
+
   _overlayViewProxy = [args objectForKey:@"overlay"];
 
   if (acceptedFormats.count != 0) {
@@ -76,8 +79,6 @@
       NSLog(@"[WARN] The code-format FORMAT_NONE is deprecated. Use an empty array instead or don't specify formats.");
       [acceptedFormats removeObject:@"-1"];
     }
-  } else {
-    [acceptedFormats addObjectsFromArray:@[ AVMetadataObjectTypeQRCode, AVMetadataObjectTypeDataMatrixCode, AVMetadataObjectTypeUPCECode, AVMetadataObjectTypeEAN13Code, AVMetadataObjectTypeEAN8Code, AVMetadataObjectTypeCode128Code, AVMetadataObjectTypeCode39Code, AVMetadataObjectTypeCode93Code, AVMetadataObjectTypeCode39Mod43Code, AVMetadataObjectTypeITF14Code, AVMetadataObjectTypePDF417Code, AVMetadataObjectTypeAztecCode, AVMetadataObjectTypeInterleaved2of5Code ]];
   }
 
   NSError *error = nil;
@@ -87,8 +88,11 @@
     [self rememberProxy:_overlayViewProxy];
     overlayView = [self prepareOverlayWithProxy:_overlayViewProxy];
   }
-  _barcodeViewController = [[TiBarcodeViewController alloc] initWithObjectTypes:acceptedFormats delegate:self showCancel:showCancel showRectangle:showRectangle withOverlay:overlayView preventRotation:preventRotation];
-  [[_barcodeViewController scanner] setCamera:_selectedCamera ?: MTBCameraBack error:&cameraError];
+  _barcodeViewController = [[TiBarcodeViewController alloc] initWithDelegate:self showCancel:showCancel showRectangle:showRectangle withOverlay:overlayView preventRotation:preventRotation];
+
+  _barcodeViewController.capture.camera = _useFrontCamera ? _barcodeViewController.capture.front : _barcodeViewController.capture.back;
+  _barcodeViewController.capture.delegate = self;
+  [self addBarcodeFormats:acceptedFormats];
 
   if (_displayedMessage != nil) {
     [[_barcodeViewController overlayView] setDisplayMessage:_displayedMessage];
@@ -99,19 +103,6 @@
            @"message" : [cameraError localizedDescription] ?: @"Unknown error occurred."
          }];
   }
-
-  [[_barcodeViewController scanner] startScanningWithResultBlock:^(NSArray *codes) {
-    if (!codes || [codes count] == 0) {
-      return;
-    }
-    AVMetadataMachineReadableCodeObject *code = (AVMetadataMachineReadableCodeObject *)[codes firstObject];
-    [self handleSuccessResult:[code stringValue] withFormat:[self convertCodeToFormat:code]];
-
-    if (!keepOpen) {
-      [self closeScanner];
-    }
-  }
-                                                           error:&error];
 
   if (error) {
     [self fireEvent:@"error"
@@ -127,35 +118,8 @@
   [[[[TiApp app] controller] topPresentedController] presentViewController:_barcodeViewController
                                                                   animated:animate
                                                                 completion:^{
-                                                                  [[_barcodeViewController scanner] setTorchMode:_selectedLEDMode];
+                                                                  _barcodeViewController.capture.torch = _useLED;
                                                                 }];
-}
-
-- (void)freezeCapture:(id)unused
-{
-  ENSURE_UI_THREAD(freezeCapture, unused);
-  [[_barcodeViewController scanner] freezeCapture];
-}
-
-- (void)unfreezeCapture:(id)unused
-{
-  ENSURE_UI_THREAD(unfreezeCapture, unused);
-  [[_barcodeViewController scanner] unfreezeCapture];
-}
-
-- (void)captureStillImage:(id)value
-{
-  ENSURE_UI_THREAD(captureStillImage, value);
-  ENSURE_SINGLE_ARG(value, KrollCallback);
-
-  [[_barcodeViewController scanner] captureStillImage:^(UIImage *image, NSError *error) {
-    TiBlob *blob = [[TiBlob alloc] _initWithPageContext:[self pageContext]];
-    [blob setImage:image];
-    [blob setMimeType:@"image/png" type:TiBlobTypeImage];
-
-    NSDictionary *event = [NSDictionary dictionaryWithObject:blob forKey:@"image"];
-    [self _fireEventToListener:@"blob" withObject:event listener:(KrollCallback *)value thisObject:nil];
-  }];
 }
 
 - (void)cancel:(id)unused
@@ -171,16 +135,15 @@
   ENSURE_TYPE(value, NSNumber);
   [self replaceValue:value forKey:@"useLED" notification:NO];
 
-  _selectedLEDMode = [TiUtils boolValue:value def:NO] ? MTBTorchModeOn : MTBTorchModeOff;
-
+  _useLED = [TiUtils boolValue:value def:NO];
   if (_barcodeViewController != nil) {
-    [[_barcodeViewController scanner] setTorchMode:_selectedLEDMode];
+    _barcodeViewController.capture.torch = _useLED;
   }
 }
 
 - (NSNumber *)useLED
 {
-  return NUMBOOL(_selectedLEDMode == MTBTorchModeOn);
+  return NUMBOOL(_barcodeViewController.capture.torch);
 }
 
 - (void)setDisplayedMessage:(NSString *)message
@@ -188,34 +151,21 @@
   _displayedMessage = message;
 }
 
-- (void)setAllowRotation:(NSNumber *)value
-{
-  DEPRECATED_REMOVED(@"Barcode.allowRotation", @"2.0.0", @"2.0.0");
-}
-
 - (void)setUseFrontCamera:(NSNumber *)value
 {
   ENSURE_TYPE(value, NSNumber);
   [self replaceValue:value forKey:@"useFrontCamera" notification:NO];
 
-  _selectedCamera = [TiUtils boolValue:value def:YES] ? MTBCameraFront : MTBCameraBack;
-  NSError *cameraError = nil;
+  _useFrontCamera = [TiUtils boolValue:value def:YES];
 
   if (_barcodeViewController != nil) {
-    [[_barcodeViewController scanner] setCamera:_selectedCamera error:&cameraError];
-
-    if (cameraError) {
-      [self fireEvent:@"error"
-           withObject:@{
-             @"message" : [cameraError localizedDescription] ?: @"Unknown error occurred."
-           }];
-    }
+    _barcodeViewController.capture.camera = _useFrontCamera ? _barcodeViewController.capture.front : _barcodeViewController.capture.back;
   }
 }
 
 - (NSNumber *)useFrontCamera
 {
-  return NUMBOOL(_selectedCamera == MTBCameraFront);
+  return NUMBOOL(_useFrontCamera);
 }
 
 - (NSNumber *)parse:(id)args
@@ -226,133 +176,27 @@
   ENSURE_TYPE(blob, TiBlob);
 
   UIImage *image = [blob image];
-  CIImage *ciImage = [[CIImage alloc] initWithImage:image];
-  CIDetector *detector = [CIDetector detectorOfType:CIDetectorTypeQRCode context:nil options:@{ CIDetectorAccuracy : CIDetectorAccuracyLow }];
-  NSArray<CIFeature *> *features = [detector featuresInImage:ciImage];
-  NSMutableString *result = [[NSMutableString alloc] init];
-  for (CIFeature *feature in features) {
-    if ([feature.type isEqualToString:CIFeatureTypeQRCode]) {
-      [result appendString:[(CIQRCodeFeature *)feature messageString]];
-    }
-  }
-  if ([result length] > 0) {
-    // FIXME: This implennetation is limited to QR codes, while capture can handle many more types. Can we unify the APIs?
-    // This code *only* supports QR codes, so I guess we could hard-code that here...
-    [self handleSuccessResult:result withFormat:TiMetadataObjectTypeQRCode];
+  CGImageRef imageRef = [image CGImage];
+
+  ZXLuminanceSource *source = [[ZXCGImageLuminanceSource alloc] initWithCGImage:imageRef];
+  ZXHybridBinarizer *binarizer = [ZXHybridBinarizer binarizerWithSource:source];
+  ZXBinaryBitmap *bitmap = [ZXBinaryBitmap binaryBitmapWithBinarizer:binarizer];
+  ZXDecodeHints *hints = [ZXDecodeHints hints];
+  ZXMultiFormatReader *reader = [ZXMultiFormatReader reader];
+
+  NSError *error;
+
+  ZXResult *result = [reader decode:bitmap hints:hints error:&error];
+  if (!error && result) {
+    [self handleSuccessResult:result.text withFormat:result.barcodeFormat];
   } else {
     [self fireEvent:@"error" withObject:@{ @"message" : @"Unknown error occurred." }];
-    return @(NO);
+    return NUMBOOL(NO);
   }
-  return @(YES);
+  return NUMBOOL(YES);
 }
 
 #pragma mark Internal
-
-- (NSInteger)convertCodeToFormat:(AVMetadataMachineReadableCodeObject *)code
-{
-  AVMetadataObjectType type = [code type];
-  if (type == AVMetadataObjectTypeQRCode) {
-      return TiMetadataObjectTypeQRCode;
-  }
-  if (type == AVMetadataObjectTypeDataMatrixCode) {
-      return TiMetadataObjectTypeDataMatrixCode;
-  }
-  if (type == AVMetadataObjectTypeUPCECode) {
-      return TiMetadataObjectTypeUPCECode;
-  }
-  if (type == AVMetadataObjectTypeEAN8Code) {
-      return TiMetadataObjectTypeEAN8Code;
-  }
-  if (type == AVMetadataObjectTypeEAN13Code) {
-      return TiMetadataObjectTypeEAN13Code;
-  }
-  if (type == AVMetadataObjectTypeCode128Code) {
-      return TiMetadataObjectTypeCode128Code;
-  }
-  if (type == AVMetadataObjectTypeCode39Code) {
-      return TiMetadataObjectTypeCode39Code;
-  }
-  if (type == AVMetadataObjectTypeCode93Code) {
-      return TiMetadataObjectTypeCode93Code;
-  }
-  if (type == AVMetadataObjectTypeCode39Mod43Code) {
-      return TiMetadataObjectTypeCode39Mod43Code;
-  }
-  if (type == AVMetadataObjectTypeITF14Code) {
-      return TiMetadataObjectTypeITF14Code;
-  }
-  if (type == AVMetadataObjectTypePDF417Code) {
-      return TiMetadataObjectTypePDF417Code;
-  }
-  if (type == AVMetadataObjectTypeAztecCode) {
-      return TiMetadataObjectTypeAztecCode;
-  }
-  if (type == AVMetadataObjectTypeInterleaved2of5Code) {
-      return TiMetadataObjectTypeInterleaved2of5Code;
-  }
-  return TiMetadataObjectTypeNone;
-}
-
-- (NSMutableArray *)metaDataObjectListFromFormtArray:(NSArray *)formatArray
-{
-  // For backward compatibility and parity
-  NSMutableArray *convertedArray = [NSMutableArray arrayWithCapacity:[formatArray count]];
-  for (NSNumber *number in formatArray) {
-    NSString *object = @"-1";
-    switch ([number integerValue]) {
-    case TiMetadataObjectTypeNone:
-      object = @"-1";
-      break;
-    case TiMetadataObjectTypeQRCode:
-      object = AVMetadataObjectTypeQRCode;
-      break;
-    case TiMetadataObjectTypeDataMatrixCode:
-      object = AVMetadataObjectTypeDataMatrixCode;
-      break;
-    case TiMetadataObjectTypeUPCECode:
-      object = AVMetadataObjectTypeUPCECode;
-      break;
-    case TiMetadataObjectTypeUPCACode:
-      object = AVMetadataObjectTypeEAN13Code; // FIXME: This isn't a match!
-      break;
-    case TiMetadataObjectTypeEAN8Code:
-      object = AVMetadataObjectTypeEAN8Code;
-      break;
-    case TiMetadataObjectTypeEAN13Code:
-      object = AVMetadataObjectTypeEAN13Code;
-      break;
-    case TiMetadataObjectTypeCode128Code:
-      object = AVMetadataObjectTypeCode128Code;
-      break;
-    case TiMetadataObjectTypeCode39Code:
-      object = AVMetadataObjectTypeCode39Code;
-      break;
-    case TiMetadataObjectTypeCode93Code:
-      object = AVMetadataObjectTypeCode93Code;
-      break;
-    case TiMetadataObjectTypeCode39Mod43Code:
-      object = AVMetadataObjectTypeCode39Mod43Code;
-      break;
-    case TiMetadataObjectTypeITF14Code:
-      object = AVMetadataObjectTypeITF14Code;
-      break;
-    case TiMetadataObjectTypePDF417Code:
-      object = AVMetadataObjectTypePDF417Code;
-      break;
-    case TiMetadataObjectTypeAztecCode:
-      object = AVMetadataObjectTypeAztecCode;
-      break;
-    case TiMetadataObjectTypeFace:
-      object = AVMetadataObjectTypeFace;
-      break;
-    case TiMetadataObjectTypeInterleaved2of5Code:
-      object = AVMetadataObjectTypeInterleaved2of5Code;
-      break;
-    }
-    [convertedArray addObject:object];
-  }
-  return convertedArray;
-}
 
 - (UIView *)prepareOverlayWithProxy:(TiViewProxy *)overlayProxy
 {
@@ -389,14 +233,15 @@
     NSLog(@"[ERROR] Trying to dismiss a scanner that hasn't been created, yet. Try again, Marty!");
     return;
   }
-  if ([[_barcodeViewController scanner] isScanning]) {
-    [[_barcodeViewController scanner] stopScanning];
-  }
+  _barcodeViewController.capture.delegate = nil;
+
+  [_barcodeViewController.capture stop];
 
   [self forgetProxy:_overlayViewProxy];
-  [_barcodeViewController setScanner:nil];
-  [[[[_barcodeViewController view] subviews] objectAtIndex:0] removeFromSuperview];
-  [_barcodeViewController dismissViewControllerAnimated:YES completion:nil];
+
+  [_barcodeViewController dismissViewControllerAnimated:YES
+                                             completion:^{
+                                             }];
 }
 
 #pragma mark Parsing Utility Methods
@@ -581,7 +426,7 @@
   [event setObject:data forKey:@"data"];
 }
 
-- (void)parseSuccessResult:(NSString *)result withFormat:(NSInteger)format
+- (void)parseSuccessResult:(NSString *)result withFormat:(ZXBarcodeFormat)format
 {
   NSLog(@"[DEBUG] Received barcode result = %@", result);
 
@@ -628,10 +473,11 @@
     [event setObject:[self TEXT] forKey:@"contentType"];
   }
   [event setObject:[NSNumber numberWithInteger:format] forKey:@"format"];
+
   [self fireEvent:@"success" withObject:event];
 }
 
-- (void)handleSuccessResult:(NSString *)result withFormat:(NSInteger)format
+- (void)handleSuccessResult:(NSString *)result withFormat:(ZXBarcodeFormat)format
 {
   @try {
     [self parseSuccessResult:result withFormat:format];
@@ -639,6 +485,17 @@
   @catch (NSException *e) {
     [self fireEvent:@"error" withObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:[e reason], @"message", nil]];
   }
+}
+
+- (void)addBarcodeFormats:(NSArray *)formats
+{
+  ZXDecodeHints *hints = [ZXDecodeHints hints];
+  for (id format in formats) {
+    [hints addPossibleFormat:format];
+  }
+  hints.assumeGS1 = YES;
+  //hints.tryHarder = YES;
+  _barcodeViewController.capture.hints = hints;
 }
 
 #pragma mark TiOverlayViewDelegate
@@ -650,23 +507,24 @@
 
 #pragma mark Constants
 
-MAKE_SYSTEM_PROP(FORMAT_NONE, TiMetadataObjectTypeNone); // Deprecated, don't specify types
-MAKE_SYSTEM_PROP(FORMAT_QR_CODE, TiMetadataObjectTypeQRCode);
-MAKE_SYSTEM_PROP(FORMAT_DATA_MATRIX, TiMetadataObjectTypeDataMatrixCode);
-MAKE_SYSTEM_PROP(FORMAT_UPC_E, TiMetadataObjectTypeUPCECode);
-MAKE_SYSTEM_PROP(FORMAT_UPC_A, TiMetadataObjectTypeEAN13Code); // Sub-set
-MAKE_SYSTEM_PROP(FORMAT_EAN_8, TiMetadataObjectTypeEAN8Code);
-MAKE_SYSTEM_PROP(FORMAT_EAN_13, TiMetadataObjectTypeEAN13Code);
-MAKE_SYSTEM_PROP(FORMAT_CODE_128, TiMetadataObjectTypeCode128Code);
-MAKE_SYSTEM_PROP(FORMAT_CODE_39, TiMetadataObjectTypeCode39Code);
-MAKE_SYSTEM_PROP(FORMAT_CODE_93, TiMetadataObjectTypeCode93Code); // New!
-MAKE_SYSTEM_PROP(FORMAT_CODE_39_MOD_43, TiMetadataObjectTypeCode39Mod43Code); // New!
-MAKE_SYSTEM_PROP(FORMAT_ITF, TiMetadataObjectTypeITF14Code);
-MAKE_SYSTEM_PROP(FORMAT_PDF_417, TiMetadataObjectTypePDF417Code); // New!
-MAKE_SYSTEM_PROP(FORMAT_AZTEC, TiMetadataObjectTypeAztecCode); // New!
-//MAKE_SYSTEM_PROP(FORMAT_FACE, TiMetadataObjectTypeFace); // New! Not Supported
-// FIXME: Remove this last one! ITF should be ITF-14 and INTERLEVAED_2_of_5
-MAKE_SYSTEM_PROP(FORMAT_INTERLEAVED_2_OF_5, TiMetadataObjectTypeInterleaved2of5Code); // New!
+MAKE_SYSTEM_PROP(FORMAT_NONE, -1); // Deprecated, don't specify types
+MAKE_SYSTEM_PROP(FORMAT_AZTEC, kBarcodeFormatAztec);
+MAKE_SYSTEM_PROP(FORMAT_CODABAR, kBarcodeFormatCodabar);
+MAKE_SYSTEM_PROP(FORMAT_CODE_39, kBarcodeFormatCode39);
+MAKE_SYSTEM_PROP(FORMAT_CODE_93, kBarcodeFormatCode93);
+MAKE_SYSTEM_PROP(FORMAT_CODE_128, kBarcodeFormatCode128);
+MAKE_SYSTEM_PROP(FORMAT_DATA_MATRIX, kBarcodeFormatDataMatrix);
+MAKE_SYSTEM_PROP(FORMAT_EAN_8, kBarcodeFormatEan8);
+MAKE_SYSTEM_PROP(FORMAT_EAN_13, kBarcodeFormatEan13);
+MAKE_SYSTEM_PROP(FORMAT_ITF, kBarcodeFormatITF);
+MAKE_SYSTEM_PROP(FORMAT_MAXICODE, kBarcodeFormatMaxiCode);
+MAKE_SYSTEM_PROP(FORMAT_PDF_417, kBarcodeFormatPDF417);
+MAKE_SYSTEM_PROP(FORMAT_QR_CODE, kBarcodeFormatQRCode);
+MAKE_SYSTEM_PROP(FORMAT_RSS_14, kBarcodeFormatRSS14);
+MAKE_SYSTEM_PROP(FORMAT_RSS_EXPANDED, kBarcodeFormatRSSExpanded);
+MAKE_SYSTEM_PROP(FORMAT_UPC_A, kBarcodeFormatUPCA);
+MAKE_SYSTEM_PROP(FORMAT_UPC_E, kBarcodeFormatUPCE);
+//MAKE_SYSTEM_PROP(FORMAT_UPCEAN_EXTENSION, kBarcodeFormatUPCEANExtension); // extension, not a stand-alone
 
 MAKE_SYSTEM_PROP(UNKNOWN, 0);
 MAKE_SYSTEM_PROP(URL, 1);
@@ -680,23 +538,18 @@ MAKE_SYSTEM_PROP(CONTACT, 8);
 MAKE_SYSTEM_PROP(BOOKMARK, 9);
 MAKE_SYSTEM_PROP(WIFI, 10);
 
-typedef NS_ENUM(NSInteger, TiMetaDataObjectType) {
-  TiMetadataObjectTypeNone = 0,
-  TiMetadataObjectTypeQRCode,
-  TiMetadataObjectTypeDataMatrixCode,
-  TiMetadataObjectTypeUPCECode,
-  TiMetadataObjectTypeUPCACode,
-  TiMetadataObjectTypeEAN8Code,
-  TiMetadataObjectTypeEAN13Code,
-  TiMetadataObjectTypeCode128Code,
-  TiMetadataObjectTypeCode39Code,
-  TiMetadataObjectTypeCode93Code,
-  TiMetadataObjectTypeCode39Mod43Code,
-  TiMetadataObjectTypeITF14Code,
-  TiMetadataObjectTypePDF417Code,
-  TiMetadataObjectTypeAztecCode,
-  TiMetadataObjectTypeFace,
-  TiMetadataObjectTypeInterleaved2of5Code
-};
+- (void)captureResult:(ZXCapture *)capture result:(ZXResult *)result
+{
+  if (!result)
+    return;
+
+  NSLog(result.text);
+
+  [self handleSuccessResult:result.text withFormat:result.barcodeFormat];
+
+  if (!keepOpen) {
+    [self closeScanner];
+  }
+}
 
 @end

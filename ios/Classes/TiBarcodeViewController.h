@@ -6,8 +6,8 @@
 
 #import "TiOverlayView.h"
 #import <UIKit/UIKit.h>
+#import <ZXingObjC/ZXingObjC.h>
 
-@class MTBBarcodeScanner;
 @class TiOverlayView;
 
 #if !TARGET_IPHONE_SIMULATOR
@@ -19,17 +19,17 @@
   TiOverlayView *_overlayView;
   BOOL _showRectangle;
   BOOL _preventRotation;
+  CGAffineTransform _captureSizeTransform;
 }
 
 - (TiOverlayView *)overlayView;
 
-- (id)initWithObjectTypes:(NSArray *)objectTypes
-                 delegate:(id<TiOverlayViewDelegate>)delegate
-               showCancel:(BOOL)shouldShowCancel
-            showRectangle:(BOOL)shouldShowRectangle
-              withOverlay:(UIView *)overlay
-          preventRotation:(BOOL)preventRotation;
+- (id)initWithDelegate:(id<TiOverlayViewDelegate>)delegate
+            showCancel:(BOOL)shouldShowCancel
+         showRectangle:(BOOL)shouldShowRectangle
+           withOverlay:(UIView *)overlay
+       preventRotation:(BOOL)preventRotation;
 
-@property (nonatomic, strong) MTBBarcodeScanner *scanner;
+@property (nonatomic, strong) ZXCapture *capture;
 
 @end
