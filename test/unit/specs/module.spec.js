@@ -67,7 +67,7 @@ describe('ti.barcode', function () {
 
 			// This is deprecated and equivalent to ITF now!
 			it('INTERLEAVED_2_OF_5', () => {
-				expect(Barcode.INTERLEAVED_2_OF_5).toEqual(jasmine.any(Number));
+				expect(Barcode.FORMAT_INTERLEAVED_2_OF_5).toEqual(jasmine.any(Number));
 			});
 
 			it('FORMAT_PDF_417', () => {
