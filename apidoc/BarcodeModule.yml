@@ -124,8 +124,10 @@ properties:
         and the [success](Modules.Barcode.success) event to specify accepted formats.
     type: Number
     permission: read-only
-    since: "3.1.0"
     platforms: [iphone, ipad]
+    deprecated:
+        since: "2.0.0"
+        removed: "2.0.0"
 
   - name: FORMAT_ITF
     summary: |
@@ -160,8 +162,9 @@ properties:
         and the [success](Modules.Barcode.success) event to specify accepted formats.
     type: Number
     permission: read-only
-    since: "3.1.0"
-    platforms: [iphone, ipad]
+    platforms: [android, iphone, ipad]
+    deprecated:
+        since: "2.0.0"
 
   - name: FORMAT_RSS_14
     summary: |
@@ -170,7 +173,16 @@ properties:
     type: Number
     permission: read-only
     since: "3.1.0"
-    platforms: [android]
+    platforms: [android, iphone, ipad]
+
+  - name: FORMAT_RSS_EXPANDED
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
 
   - name: FORMAT_MAXICODE
     summary: |
@@ -179,7 +191,7 @@ properties:
     type: Number
     permission: read-only
     since: "3.1.0"
-    platforms: [android]
+    platforms: [android, iphone, ipad]
 
   - name: FORMAT_CODABAR
     summary: |
@@ -188,7 +200,7 @@ properties:
     type: Number
     permission: read-only
     since: "3.1.0"
-    platforms: [android]
+    platforms: [android, iphone, ipad]
 
   - name: UNKNOWN
     summary: |
@@ -354,6 +366,8 @@ methods:
     platforms: [iphone, ipad]
     returns:
       type: Boolean
+    deprecated:
+      since: "2.0.0"
 
   - name: capture
     summary: |
