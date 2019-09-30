@@ -112,23 +112,24 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 	@Kroll.constant
 	public static final int FORMAT_ITF = 11;
 	@Kroll.constant
+	public static final int FORMAT_INTERLEAVED_2_OF_5 = 11; // TODO: Remove, same as ITF
+	@Kroll.constant
 	public static final int FORMAT_PDF_417 = 12;
 	@Kroll.constant
 	public static final int FORMAT_AZTEC = 13;
-	// FORMAT_FACE = 14;
 	@Kroll.constant
-	public static final int FORMAT_INTERLEAVED_2_OF_5 = 15; // FIXME: Remove?
+	public static final int FORMAT_RSS_14 = 14;
 	@Kroll.constant
-	public static final int FORMAT_RSS_14 = 16;
+	public static final int FORMAT_MAXICODE = 15;
 	@Kroll.constant
-	public static final int FORMAT_MAXICODE = 17;
+	public static final int FORMAT_CODABAR = 16;
 	@Kroll.constant
-	public static final int FORMAT_CODABAR = 18;
+	public static final int FORMAT_RSS_EXPANDED = 17;
 
 	private static final List<String> FORMAT_STRINGS = Arrays.asList(
 		"NONE", "QR_CODE", "DATA_MATRIX", "UPC_E", "UPC_A", "EAN_8", "EAN_13", "CODE_128",
-		"CODE_39", "CODE_93", "CODE_39_MOD_43", "ITF", "PDF_417", "AZTEC", "FACE",
-		"INTERLEAVED_2_OF_5", "RSS_14", "MAXICODE", "CODABAR" );
+		"CODE_39", "CODE_93", "CODE_39_MOD_43", "ITF", "PDF_417", "AZTEC", "RSS_14",
+		"MAXICODE", "CODABAR", "RSS_EXPANDED" );
 
 	public BarcodeModule() {
 		super();
