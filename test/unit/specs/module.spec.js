@@ -171,7 +171,7 @@ describe('ti.barcode', function () {
 		});
 
 		// TODO: ios has: freezeCapture(), unfreezeCapture(), captureStillImage()
-		// FIXME: iOS has  ahuge feature parity issue between the capture and parse methods.
+		// FIXME: iOS has a huge feature parity issue between the capture and parse methods.
 		// They use totally different APIs, and parse() can really only pick up QR codes.
 		// While capture uses AVFoundation and can pick up a much wider array of codes.
 		// Android meanwhile uses zxing, and seems to handle even a wider array of code types
@@ -193,8 +193,8 @@ describe('ti.barcode', function () {
 				function success(obj) {
 					Barcode.removeEventListener('success', success);
 					Barcode.removeEventListener('error', error);
-					console.log(`${filename}, ${format}:`);
-					console.log(obj);
+					// console.log(`${filename}, ${format}:`);
+					// console.log(obj);
 					try {
 						expect(obj).toEqual(jasmine.objectContaining({
 							format,
@@ -212,8 +212,88 @@ describe('ti.barcode', function () {
 				Barcode.parse({ image, acceptedFormats: [ format ] });
 			}
 
-			// TODO: Generate some barcodes encoding multiple content types:
-			// https://zxing.appspot.com/generator
+			describe('finds structured contentTypes in QR codes', () => {
+				it('CALENDAR', finish => {
+					// TODO: Test parsed data too!
+					// FIXME: Why does this have windows newlines?
+					testBarcode(
+						'event.png',
+						Barcode.FORMAT_QR_CODE,
+						'BEGIN:VEVENT\r\nSUMMARY:Testing an Event\r\nDTSTART:20190926T155900Z\r\nDTEND:20191003T165900Z\r\nLOCATION:Test Location\r\nDESCRIPTION:Testing a QR code calendar event\r\nEND:VEVENT\r\n',
+						Barcode.CALENDAR,
+						finish);
+				});
+
+				it('CONTACT', finish => {
+					// TODO: Test parsed data too!
+					testBarcode(
+						'vcard.png',
+						Barcode.FORMAT_QR_CODE,
+						'BEGIN:VCARD\nVERSION:3.0\nN:Chris Williams\nORG:Axway\nTITLE:Principal Software Architect II\nTEL:5855551234\nURL:http://www.axway.com\nEMAIL:cwilliams@axway.com\nADR:123 Main Street\nNOTE:memo\nEND:VCARD',
+						Barcode.CONTACT,
+						finish);
+				});
+
+				it('EMAIL', finish => {
+					// TODO: Test parsed data too!
+					testBarcode(
+						'email.png',
+						Barcode.FORMAT_QR_CODE,
+						'mailto:cwilliams@axway.com',
+						Barcode.EMAIL,
+						finish);
+				});
+
+				it('GEOLOCATION', finish => {
+					// TODO: Test parsed data too!
+					testBarcode(
+						'geo.png',
+						Barcode.FORMAT_QR_CODE,
+						'geo:38.8977,77.0365?q=White House',
+						Barcode.GEOLOCATION,
+						finish);
+				});
+
+				it('TELEPHONE', finish => {
+					// TODO: Test parsed data too!
+					testBarcode(
+						'phone.png',
+						Barcode.FORMAT_QR_CODE,
+						'tel:5855551234',
+						Barcode.TELEPHONE,
+						finish);
+				});
+
+				it('SMS', finish => {
+					// TODO: Test parsed data too!
+					testBarcode(
+						'sms.png',
+						Barcode.FORMAT_QR_CODE,
+						'smsto:5855551234:This is a test message!',
+						Barcode.SMS,
+						finish);
+				});
+
+				it('URL', finish => {
+					// TODO: Test parsed data too!
+					testBarcode(
+						'url.png',
+						Barcode.FORMAT_QR_CODE,
+						'http://www.axway.com',
+						Barcode.URL,
+						finish);
+				});
+
+				it('WIFI', finish => {
+					// TODO: Test parsed data too!
+					testBarcode(
+						'wifi.png',
+						Barcode.FORMAT_QR_CODE,
+						'WIFI:S:secret-wifi;T:WPA;P:secretp455w0rD;H:true;;',
+						Barcode.WIFI,
+						finish);
+				});
+			});
 
 			it('finds a Code 39 barcode in a blob image', finish => {
 				testBarcode(
