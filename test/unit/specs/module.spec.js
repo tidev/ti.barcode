@@ -19,57 +19,71 @@ describe('ti.barcode', function () {
 			it('FORMAT_NONE', () => {
 				expect(Barcode.FORMAT_NONE).toEqual(jasmine.any(Number));
 			});
+
 			it('FORMAT_QR_CODE', () => {
 				expect(Barcode.FORMAT_QR_CODE).toEqual(jasmine.any(Number));
 			});
+
 			it('FORMAT_DATA_MATRIX', () => {
 				expect(Barcode.FORMAT_DATA_MATRIX).toEqual(jasmine.any(Number));
 			});
+
 			it('FORMAT_UPC_E', () => {
 				expect(Barcode.FORMAT_UPC_E).toEqual(jasmine.any(Number));
 			});
+
 			it('FORMAT_UPC_A', () => {
 				expect(Barcode.FORMAT_UPC_A).toEqual(jasmine.any(Number));
 			});
+
 			it('FORMAT_EAN_8', () => {
 				expect(Barcode.FORMAT_EAN_8).toEqual(jasmine.any(Number));
 			});
+
 			it('FORMAT_EAN_13', () => {
 				expect(Barcode.FORMAT_EAN_13).toEqual(jasmine.any(Number));
 			});
+
 			it('FORMAT_CODE_128', () => {
 				expect(Barcode.FORMAT_CODE_128).toEqual(jasmine.any(Number));
 			});
+
 			it('FORMAT_CODE_39', () => {
 				expect(Barcode.FORMAT_CODE_39).toEqual(jasmine.any(Number));
 			});
-			// FIXME: Support CODE_93 and CODE_39_MOD_43 on Android!
-			if (IOS) {
-				it('FORMAT_CODE_93', () => {
-					expect(Barcode.FORMAT_CODE_93).toEqual(jasmine.any(Number));
-				});
-				it('FORMAT_CODE_39_MOD_43', () => {
-					expect(Barcode.FORMAT_CODE_39_MOD_43).toEqual(jasmine.any(Number));
-				});
-			}
+
+			// FIXME: Treat equivalent to CODE_39? Also set special hint for assumeCode39CheckDigit?
+			it('FORMAT_CODE_39_MOD_43', () => {
+				expect(Barcode.FORMAT_CODE_39_MOD_43).toEqual(jasmine.any(Number));
+			});
+
+			it('FORMAT_CODE_93', () => {
+				expect(Barcode.FORMAT_CODE_93).toEqual(jasmine.any(Number));
+			});
+
 			it('FORMAT_ITF', () => {
 				expect(Barcode.FORMAT_ITF).toEqual(jasmine.any(Number));
 			});
-			// FIXME: Support PDF_417 and INTERLEAVED_2_OF_5 on Android!
-			if (IOS) {
-				it('FORMAT_PDF_417', () => {
-					expect(Barcode.FORMAT_PDF_417).toEqual(jasmine.any(Number));
-				});
-				it('FORMAT_INTERLEAVED_2_OF_5', () => {
-					expect(Barcode.FORMAT_INTERLEAVED_2_OF_5).toEqual(jasmine.any(Number));
-				});
-			}
+
+			// This is deprecated and equivalent to ITF now!
+			it('INTERLEAVED_2_OF_5', () => {
+				expect(Barcode.INTERLEAVED_2_OF_5).toEqual(jasmine.any(Number));
+			});
+
+			it('FORMAT_PDF_417', () => {
+				expect(Barcode.FORMAT_PDF_417).toEqual(jasmine.any(Number));
+			});
+
 			it('FORMAT_AZTEC', () => {
 				expect(Barcode.FORMAT_AZTEC).toEqual(jasmine.any(Number));
 			});
 
 			it('FORMAT_RSS_14', () => {
 				expect(Barcode.FORMAT_RSS_14).toEqual(jasmine.any(Number));
+			});
+
+			it('FORMAT_RSS_EXPANDED', () => {
+				expect(Barcode.FORMAT_RSS_EXPANDED).toEqual(jasmine.any(Number));
 			});
 		});
 
