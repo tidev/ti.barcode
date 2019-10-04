@@ -166,6 +166,7 @@ describe('ti.barcode', function () {
 		});
 
 		if (IOS) {
+			// TODO: Deprecated
 			describe('.canShow()', () => {
 				it('is a Function', () => {
 					expect(Barcode.canShow).toEqual(jasmine.any(Function));
@@ -195,7 +196,11 @@ describe('ti.barcode', function () {
 				expect(Barcode.parse).toEqual(jasmine.any(Function));
 			});
 
-			function testBarcode(filename, format, result, contentType, finish) {
+			function testBarcode(filename, format, result, contentType, hints, finish) {
+				if (typeof hints === 'function') {
+					finish = hints;
+					hints = {};
+				}
 				// FIXME: Use getAsset on ios so we don't need to turn off app thinning?
 				const image = Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory, `images/${filename}`).read();
 				function error(err) {
@@ -207,8 +212,8 @@ describe('ti.barcode', function () {
 				function success(obj) {
 					Barcode.removeEventListener('success', success);
 					Barcode.removeEventListener('error', error);
-					// console.log(`${filename}, ${format}:`);
-					// console.log(obj);
+					console.log(`${filename}, ${format}:`);
+					console.log(obj);
 					try {
 						expect(obj).toEqual(jasmine.objectContaining({
 							format,
@@ -223,7 +228,7 @@ describe('ti.barcode', function () {
 				}
 				Barcode.addEventListener('error', error);
 				Barcode.addEventListener('success', success);
-				Barcode.parse({ image, acceptedFormats: [ format ] });
+				Barcode.parse(Object.assign(hints, { image, acceptedFormats: [ format ] }));
 			}
 
 			describe('finds structured contentTypes in QR codes', () => {
@@ -309,174 +314,206 @@ describe('ti.barcode', function () {
 				});
 			});
 
-			it('finds a Code 39 barcode in a blob image', finish => {
-				testBarcode(
-					'Code39Barcode.jpg',
-					Barcode.FORMAT_CODE_39,
-					'12345F',
-					Barcode.TEXT,
-					finish);
+			describe('finds various formats of barcodes from blob image', () => {
+				it('CODE_39', finish => {
+					testBarcode(
+						'Code39Barcode.jpg',
+						Barcode.FORMAT_CODE_39,
+						'12345F',
+						Barcode.TEXT,
+						finish);
+				});
+
+				it('CODE_93', finish => {
+					testBarcode(
+						'Code_93.png',
+						Barcode.FORMAT_CODE_93,
+						'WIKIPEDIA',
+						Barcode.TEXT,
+						finish);
+				});
+
+				it('CODE_128', finish => {
+					testBarcode(
+						'Code128Barcode.jpg',
+						Barcode.FORMAT_CODE_128,
+						'12345678',
+						Barcode.TEXT,
+						finish);
+				});
+
+				it('EAN_13 barcode with rest indicator', finish => {
+					testBarcode(
+						'EAN-13-5901234123457.png',
+						Barcode.FORMAT_EAN_13,
+						'5901234123457',
+						Barcode.TEXT,
+						finish);
+				});
+
+				it('EAN_8', finish => {
+					testBarcode(
+						'EAN8Barcode.jpg',
+						Barcode.FORMAT_EAN_8,
+						'12345670',
+						Barcode.TEXT,
+						finish);
+				});
+
+				it('UPC_A', finish => {
+					testBarcode(
+						'UPC-A-036000291452.png',
+						Barcode.FORMAT_UPC_A,
+						'036000291452',
+						Barcode.TEXT,
+						finish);
+				});
+
+				it('UPC_E', finish => {
+					testBarcode(
+						'upc-e.jpg',
+						Barcode.FORMAT_UPC_E,
+						'04252614',
+						Barcode.TEXT,
+						finish);
+				});
+
+				it('ITF 14', finish => {
+					testBarcode(
+						'itf14_barcode.jpg',
+						Barcode.FORMAT_ITF,
+						'00012345678905',
+						Barcode.TEXT,
+						finish);
+				});
+
+				it('INTERLEAVED_2_OF_5', finish => {
+					testBarcode(
+						'I2of5Barcode.jpg',
+						// FIXME: We have this defined as a separate constant, but ITF stands for "Interleaved Two of Five"
+						// So ITF should be correct!
+						// Barcode.FORMAT_INTERLEAVED_2_OF_5,
+						Barcode.FORMAT_ITF,
+						'161718',
+						Barcode.TEXT,
+						finish);
+				});
+
+				it('AZTEC', finish => {
+					testBarcode(
+						'Code-aztec.png',
+						Barcode.FORMAT_AZTEC,
+						'ZXing:http://code.google.com/p/zxing & http;//tinyurl.com/gcode-site/p/zxing = PHP:http://www.php.net = Google Code:http://code.google.com & http://tinyurl.com/gcode-site TinyURL:http://tinyurl.com = Mozilla:http://www.mozilla.org',
+						Barcode.TEXT,
+						finish);
+				});
+
+				it('PDF-417', finish => {
+					testBarcode(
+						'Better_Sample_PDF417.png',
+						Barcode.FORMAT_PDF_417,
+						'PDF417 is a stacked linear barcode symbol format used in a variety of applications, primarily transport, identification cards, and inventory management.',
+						Barcode.TEXT,
+						finish);
+				});
+
+				it('QR_CODE - Wikipedia', finish => {
+					testBarcode(
+						'Wikipedia_QR-Code.png',
+						Barcode.FORMAT_QR_CODE,
+						'http://wikipedia.org/',
+						Barcode.URL,
+						finish);
+				});
+
+				it('QR_CODE', finish => {
+					testBarcode(
+						'QRCode.png',
+						Barcode.FORMAT_QR_CODE,
+						'QR Code',
+						Barcode.TEXT,
+						finish);
+				});
+
+				it('CODABAR', finish => {
+					testBarcode(
+						'Rationalized-codabar.png',
+						Barcode.FORMAT_CODABAR,
+						'137255',
+						Barcode.TEXT,
+						finish);
+				});
+
+				// FIXME: Does not scan on Android/iOS, scans online at https://zxing.org/w/decode.jspx
+				xit('MAXICODE', finish => {
+					testBarcode(
+						'1024px-MaxiCode.png',
+						Barcode.FORMAT_MAXICODE,
+						'Wikipedia, the free encyclopedia',
+						Barcode.TEXT,
+						finish);
+				});
+
+				it('MAXICODE - UPS', finish => {
+					testBarcode(
+						'maxicode-ups-example.gif',
+						Barcode.FORMAT_MAXICODE,
+						'[)>�01�96336091062�840�002�1Z14647438�UPSN�410E1W�195��1/1��Y�135Reo�\n\nTAMPA�FL��',
+						Barcode.TEXT,
+						finish);
+				});
+
+				it('DATA_MATRIX', finish => {
+					testBarcode(
+						'Datamatrix.png',
+						Barcode.FORMAT_DATA_MATRIX,
+						'Wikipedia, the free encyclopedia',
+						Barcode.TEXT,
+						finish);
+				});
+
+				xit('DATA_MATRIX - USPS Pitney Bowes', finish => {
+					testBarcode(
+						'DataMatrix_US_franking_mark12.jpg',
+						Barcode.FORMAT_DATA_MATRIX,
+						// FIXME: text is garbled/invalid (which busts things when we try to print it!)
+						'��$ÂÐ�021Aùâ)�3åm�N���B2���������������Í¹2�0000Z­A�Å[�Ý�¿oÉ�ý¼à�s)0ëKÓ��$¿öý)y�ÞÕ',
+						Barcode.TEXT,
+						finish);
+				});
+
+				it('RSS-14', finish => {
+					testBarcode(
+						'RSS_14-Databar_14_00075678164125.png',
+						Barcode.FORMAT_RSS_14,
+						'00075678164125',
+						Barcode.TEXT,
+						finish);
+				});
 			});
 
-			it('finds a Code 93 barcode in a blob image', finish => {
-				testBarcode(
-					'Code_93.png',
-					Barcode.FORMAT_CODE_93,
-					'WIKIPEDIA',
-					Barcode.TEXT,
-					finish);
-			});
+			describe('supports hints', () => {
+				it('MAXICODE', finish => {
+					testBarcode(
+						'1024px-MaxiCode.png',
+						Barcode.FORMAT_MAXICODE,
+						'Wikipedia, the free encyclopedia',
+						Barcode.TEXT,
+						{ pureBarcode: true },
+						finish);
+				});
 
-			it('finds a Code 128 barcode in a blob image', finish => {
-				testBarcode(
-					'Code128Barcode.jpg',
-					Barcode.FORMAT_CODE_128,
-					'12345678',
-					Barcode.TEXT,
-					finish);
+				it('MAXICODE - UPS', finish => {
+					testBarcode(
+						'maxicode-ups-example.gif',
+						Barcode.FORMAT_MAXICODE,
+						'[)>�01�96336091062�840�002�1Z14647438�UPSN�410E1W�195��1/1��Y�135Reo�\n\nTAMPA�FL��',
+						Barcode.TEXT,
+						{ pureBarcode: true },
+						finish);
+				});
 			});
-
-			it('finds an EAN 13 barcode with rest indicator in a blob image', finish => {
-				testBarcode(
-					'EAN-13-5901234123457.png',
-					Barcode.FORMAT_EAN_13,
-					'5901234123457',
-					Barcode.TEXT,
-					finish);
-			});
-
-			it('finds an EAN 8 barcode in a blob image', finish => {
-				testBarcode(
-					'EAN8Barcode.jpg',
-					Barcode.FORMAT_EAN_8,
-					'12345670',
-					Barcode.TEXT,
-					finish);
-			});
-
-			it('finds a UPC A barcode in a blob image', finish => {
-				testBarcode(
-					'UPC-A-036000291452.png',
-					Barcode.FORMAT_UPC_A,
-					'036000291452',
-					Barcode.TEXT,
-					finish);
-			});
-
-			it('finds a UPC E barcode in a blob image', finish => {
-				testBarcode(
-					'upc-e.jpg',
-					Barcode.FORMAT_UPC_E,
-					'04252614',
-					Barcode.TEXT,
-					finish);
-			});
-
-			it('finds an ITF 14 barcode in a blob image', finish => {
-				testBarcode(
-					'itf14_barcode.jpg',
-					Barcode.FORMAT_ITF,
-					'00012345678905',
-					Barcode.TEXT,
-					finish);
-			});
-
-			it('finds an Interleaved 2 of 5 barcode in a blob image', finish => {
-				testBarcode(
-					'I2of5Barcode.jpg',
-					// FIXME: We have this defined as a separate constant, but ITF stands for "Interleaved Two of Five"
-					// So ITF should be correct!
-					// Barcode.FORMAT_INTERLEAVED_2_OF_5,
-					Barcode.FORMAT_ITF,
-					'161718',
-					Barcode.TEXT,
-					finish);
-			});
-
-			it('finds an Aztec barcode in a blob image', finish => {
-				testBarcode(
-					'Code-aztec.png',
-					Barcode.FORMAT_AZTEC,
-					'ZXing:http://code.google.com/p/zxing & http;//tinyurl.com/gcode-site/p/zxing = PHP:http://www.php.net = Google Code:http://code.google.com & http://tinyurl.com/gcode-site TinyURL:http://tinyurl.com = Mozilla:http://www.mozilla.org',
-					Barcode.TEXT,
-					finish);
-			});
-
-			it('finds a PDF-417 barcode in a blob image', finish => {
-				testBarcode(
-					'Better_Sample_PDF417.png',
-					Barcode.FORMAT_PDF_417,
-					'PDF417 is a stacked linear barcode symbol format used in a variety of applications, primarily transport, identification cards, and inventory management.',
-					Barcode.TEXT,
-					finish);
-			});
-
-			it('finds a QR Code barcode in a Wikipedia blob image', finish => {
-				testBarcode(
-					'Wikipedia_QR-Code.png',
-					Barcode.FORMAT_QR_CODE,
-					'http://wikipedia.org/',
-					Barcode.URL,
-					finish);
-			});
-
-			it('finds a QR Code barcode in a blob image', finish => {
-				testBarcode(
-					'QRCode.png',
-					Barcode.FORMAT_QR_CODE,
-					'QR Code',
-					Barcode.TEXT,
-					finish);
-			});
-
-			it('finds a Codabar barcode in a blob image', finish => {
-				testBarcode(
-					'Rationalized-codabar.png',
-					Barcode.FORMAT_CODABAR,
-					'137255',
-					Barcode.TEXT,
-					finish);
-			});
-
-			it('finds a Maxicode barcode in a blob image', finish => {
-				testBarcode(
-					'1024px-MaxiCode.png', // FIXME: Does not scan on Android, scans online at https://zxing.org/w/decode.jspx
-					Barcode.FORMAT_MAXICODE,
-					'Wikipedia, the free encyclopedia',
-					Barcode.TEXT,
-					finish);
-			});
-
-			// TODO: Try: https://www.barcodefaq.com/wp-content/uploads/2018/08/maxicode-ups-example.gif
-			// 
-
-			it('finds a Data Matrix barcode in a blob image', finish => {
-				testBarcode(
-					'Datamatrix.png',
-					Barcode.FORMAT_DATA_MATRIX,
-					'Wikipedia, the free encyclopedia',
-					Barcode.TEXT,
-					finish);
-			});
-
-			xit('finds a Data Matrix barcode in a blob USPS Pitney Bowes image', finish => {
-				testBarcode(
-					'DataMatrix_US_franking_mark12.jpg',
-					Barcode.FORMAT_DATA_MATRIX,
-					 // FIXME: text is garbled/invalid (which busts things when we try to print it!)
-					'��$ÂÐ�021Aùâ)�3åm�N���B2���������������Í¹2�0000Z­A�Å[�Ý�¿oÉ�ý¼à�s)0ëKÓ��$¿öý)y�ÞÕ',
-					Barcode.TEXT,
-					finish);
-			});
-
-			it('finds an RSS-14 barcode in a blob image', finish => {
-				testBarcode(
-					'RSS_14-Databar_14_00075678164125.png',
-					Barcode.FORMAT_RSS_14,
-					'00075678164125',
-					Barcode.TEXT,
-					finish);
-			});
+			// TODO: Pass in various hints/arguments! assumeGS1, tryHarder, characterSet, returnCodabarStartEnd, assumeCode39CheckDigit, allowedLengths, allowedEANExtensions
 		});
 	});
 });
