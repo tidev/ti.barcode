@@ -11,6 +11,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.appcelerator.kroll.KrollModule;
 import org.appcelerator.kroll.KrollDict;
@@ -192,31 +193,8 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 		}
 	}
 
-	static final Vector<BarcodeFormat> PRODUCT_FORMATS;
-	static final Vector<BarcodeFormat> ONE_D_FORMATS;
-	static final Vector<BarcodeFormat> QR_CODE_FORMATS;
-	static final Vector<BarcodeFormat> DATA_MATRIX_FORMATS;
-	static {
-		PRODUCT_FORMATS = new Vector<BarcodeFormat>(5);
-		PRODUCT_FORMATS.add(BarcodeFormat.UPC_A);
-		PRODUCT_FORMATS.add(BarcodeFormat.UPC_E);
-		PRODUCT_FORMATS.add(BarcodeFormat.EAN_13);
-		PRODUCT_FORMATS.add(BarcodeFormat.EAN_8);
-		PRODUCT_FORMATS.add(BarcodeFormat.RSS_14);
-		ONE_D_FORMATS = new Vector<BarcodeFormat>(PRODUCT_FORMATS.size() + 4);
-		ONE_D_FORMATS.addAll(PRODUCT_FORMATS);
-		ONE_D_FORMATS.add(BarcodeFormat.CODE_39);
-		ONE_D_FORMATS.add(BarcodeFormat.CODE_93);
-		ONE_D_FORMATS.add(BarcodeFormat.CODE_128);
-		ONE_D_FORMATS.add(BarcodeFormat.ITF);
-		QR_CODE_FORMATS = new Vector<BarcodeFormat>(1);
-		QR_CODE_FORMATS.add(BarcodeFormat.QR_CODE);
-		DATA_MATRIX_FORMATS = new Vector<BarcodeFormat>(1);
-		DATA_MATRIX_FORMATS.add(BarcodeFormat.DATA_MATRIX);
-	}
-
 	@SuppressWarnings("rawtypes")
-	private Hashtable<DecodeHintType, Object> populateHints(HashMap args) {
+	private Map<DecodeHintType, Object> populateHints(HashMap args) {
 		Hashtable<DecodeHintType, Object> hints = new Hashtable<DecodeHintType, Object>();
 		if (args.containsKey("acceptedFormats")) {
 			Object[] acceptedFormats = (Object[]) args.get("acceptedFormats");
@@ -231,6 +209,57 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 		// Allow setting "tryHarder"
 		if (args.containsKey("tryHarder") && TiConvert.toBoolean(args.get("tryHarder"))) {
 			hints.put(DecodeHintType.TRY_HARDER, true);
+		}
+
+		// Allow setting "pureBarcode"
+		if (args.containsKey("pureBarcode") && TiConvert.toBoolean(args.get("pureBarcode"))) {
+			hints.put(DecodeHintType.PURE_BARCODE, true);
+		}
+
+		// Allow setting "assumeGS1"
+		if (args.containsKey("assumeGS1") && TiConvert.toBoolean(args.get("assumeGS1"))) {
+			hints.put(DecodeHintType.ASSUME_GS1, true);
+		}
+
+		// RETURN_CODABAR_START_END Boolean
+		if (args.containsKey("returnCodabarStartEnd") && TiConvert.toBoolean(args.get("returnCodabarStartEnd"))) {
+			hints.put(DecodeHintType.RETURN_CODABAR_START_END, true);
+		}
+
+		// ASSUME_CODE_39_CHECK_DIGIT Boolean
+		if (args.containsKey("assumeCode39CheckDigit") && TiConvert.toBoolean(args.get("assumeCode39CheckDigit"))) {
+			hints.put(DecodeHintType.ASSUME_CODE_39_CHECK_DIGIT, true);
+		}
+
+		// CHARACTER_SET String
+		if (args.containsKey("characterSet")) {
+			hints.put(DecodeHintType.CHARACTER_SET, TiConvert.toString(args.get("characterSet")));
+		}
+
+		// ALLOWED_LENGTHS int[]
+		if (args.containsKey("allowedLengths")) {
+			Object[] allowedLengths = (Object[]) args.get("allowedLengths");
+			if (allowedLengths.length > 0) {
+				int[] allowedLengthArray = new int[ allowedLengths.length ];
+				int i = 0;
+				for (Object allowedLength : allowedLengths) {
+					allowedLengthArray[i++] = TiConvert.toInt(allowedLength);
+				}
+				hints.put(DecodeHintType.ALLOWED_LENGTHS, allowedLengthArray);
+			}
+		}
+
+		// ALLOWED_EAN_EXTENSIONS int[]
+		if (args.containsKey("allowedEANExtensions")) {
+			Object[] allowedEANExtensions = (Object[]) args.get("allowedEANExtensions");
+			if (allowedEANExtensions.length > 0) {
+				int[] eanExtensions = new int[ allowedEANExtensions.length ];
+				int i = 0;
+				for (Object eanExtension : allowedEANExtensions) {
+					eanExtensions[i++] = TiConvert.toInt(eanExtension);
+				}
+				hints.put(DecodeHintType.ALLOWED_EAN_EXTENSIONS, eanExtensions);
+			}
 		}
 		return hints;
 	}
@@ -247,10 +276,15 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 			Bitmap image = ref.getBitmap();
 
 			int w = image.getWidth(), h = image.getHeight();
+
+			// FIXME: Online zxing website seems to be able to handle maxicode images we cannot. Due to luminance source?
+			// Due to binarizer?
+			// Maybe because of Android premultiplied rgb pixels stuff?
+
 			int[] rgb = new int[w * h];
 			image.getPixels(rgb, 0, w, 0, 0, w, h);
-
 			LuminanceSource source = new RGBLuminanceSource(w, h, rgb);
+
 			BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
 			MultiFormatReader reader = new MultiFormatReader();
 			reader.setHints(populateHints(args));
@@ -292,6 +326,11 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 				Intents.Scan.overlayProxy = null;
 			}
 
+			Map<DecodeHintType, Object> hints = populateHints(args);
+			// character set and possible formats are specified differently for intent...
+			if (hints.containsKey(DecodeHintType.CHARACTER_SET)) {
+				intent.putExtra(Intents.Scan.CHARACTER_SET, (String) hints.get(DecodeHintType.CHARACTER_SET));
+			}
 			if (args.containsKey("acceptedFormats")) {
 				Object[] acceptedFormats = (Object[]) args.get("acceptedFormats");
 				if (acceptedFormats.length > 0) {
@@ -372,6 +411,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 		dict.put("code", resultCode);
 		dict.put("contentType", contentType);
 		dict.put("data", parseData(contentType, contents));
+		// TODO: Include raw bytes in form of Ti.Buffer?
 		fireEvent("success", dict);
 	}
 
