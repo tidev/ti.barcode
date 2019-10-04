@@ -190,7 +190,7 @@
   if (!error && result) {
     [self handleSuccessResult:result.text withFormat:result.barcodeFormat];
   } else {
-    [self fireEvent:@"error" withObject:@{ @"message" : @"Unknown error occurred." }];
+    [self fireEvent:@"error" withObject:@{ @"message" : @"Scan Failed", @"exception": error.localizedDescription }];
     return NUMBOOL(NO);
   }
   return NUMBOOL(YES);
