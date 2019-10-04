@@ -536,6 +536,70 @@ properties:
     optional: true
     platforms: [android]
 
+  - name: assumeGS1
+    summary: |
+        An optional boolean to assume the barcode is being processed as a GS1 barcode, and modify behavior as needed.
+        https://zxing.github.io/zxing/apidocs/
+    type: Boolean
+    optional: true
+    platforms: [android]
+
+  - name: pureBarcode
+    summary: |
+        An optional boolean to assume the image is a pure monochrome image of a barcode.
+        https://zxing.github.io/zxing/apidocs/
+    type: Boolean
+    optional: true
+    platforms: [android]
+
+  - name: tryHarder
+    summary: |
+        An optional boolean to spend more time to try to find a barcode; optimize for accuracy, not speed.
+        https://zxing.github.io/zxing/apidocs/
+    type: Boolean
+    optional: true
+    platforms: [android]
+
+  - name: returnCodabarStartEnd
+    summary: |
+        An optional boolean which if true, will return the start and end digits in a Codabar barcode instead of stripping them.
+        https://zxing.github.io/zxing/apidocs/
+    type: Boolean
+    optional: true
+    platforms: [android]
+
+  - name: assumeCode39CheckDigit
+    summary: |
+        An optional boolean which if true, will assume Code 39 codes employ a check digit.
+        https://zxing.github.io/zxing/apidocs/
+    type: Boolean
+    optional: true
+    platforms: [android]
+
+  - name: characterSet
+    summary: |
+        An optional string that specifies what character encoding to use when decoding, where applicable
+        https://zxing.github.io/zxing/apidocs/
+    type: String
+    optional: true
+    platforms: [android]
+
+  - name: allowedLengths
+    summary: |
+        An optional int[] that specifies allowed lengths of encoded data -- reject anything else.
+        https://zxing.github.io/zxing/apidocs/
+    type: Array<Number>
+    optional: true
+    platforms: [android]
+
+  - name: allowedEANExtensions
+    summary: |
+        An optional int[] that specifies allowed extension lengths for EAN or UPC barcodes.
+        https://zxing.github.io/zxing/apidocs/
+    type: Array<Number>
+    optional: true
+    platforms: [android]
+
 ---
 name: BarcodeParseDict
 summary: Simple object passed to <Modules.Barcode.parse> to parse a Ti.Blob image for barcodes.
@@ -553,3 +617,67 @@ properties:
         Check out the "Barcode Format Constants" section below to see the available int constants.
     type: Array<Number>
     optional: true
+
+  - name: assumeGS1
+    summary: |
+        An optional boolean to assume the barcode is being processed as a GS1 barcode, and modify behavior as needed.
+        https://zxing.github.io/zxing/apidocs/
+    type: Boolean
+    optional: true
+    platforms: [android]
+
+  - name: pureBarcode
+    summary: |
+        An optional boolean to assume the image is a pure monochrome image of a barcode.
+        https://zxing.github.io/zxing/apidocs/
+    type: Boolean
+    optional: true
+    platforms: [android]
+
+  - name: tryHarder
+    summary: |
+        An optional boolean to spend more time to try to find a barcode; optimize for accuracy, not speed.
+        https://zxing.github.io/zxing/apidocs/
+    type: Boolean
+    optional: true
+    platforms: [android]
+
+  - name: returnCodabarStartEnd
+    summary: |
+        An optional boolean which if true, will return the start and end digits in a Codabar barcode instead of stripping them.
+        https://zxing.github.io/zxing/apidocs/
+    type: Boolean
+    optional: true
+    platforms: [android]
+
+  - name: assumeCode39CheckDigit
+    summary: |
+        An optional boolean which if true, will assume Code 39 codes employ a check digit.
+        https://zxing.github.io/zxing/apidocs/
+    type: Boolean
+    optional: true
+    platforms: [android]
+
+  - name: characterSet
+    summary: |
+        An optional string that specifies what character encoding to use when decoding, where applicable
+        https://zxing.github.io/zxing/apidocs/
+    type: String
+    optional: true
+    platforms: [android]
+
+  - name: allowedLengths
+    summary: |
+        An optional int[] that specifies allowed lengths of encoded data -- reject anything else.
+        https://zxing.github.io/zxing/apidocs/
+    type: Array<Number>
+    optional: true
+    platforms: [android]
+
+  - name: allowedEANExtensions
+    summary: |
+        An optional int[] that specifies allowed extension lengths for EAN or UPC barcodes.
+        https://zxing.github.io/zxing/apidocs/
+    type: Array<Number>
+    optional: true
+    platforms: [android]
