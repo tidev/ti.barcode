@@ -230,9 +230,6 @@ describe('ti.barcode', function () {
 					if (err) {
 						return finish.fail(err);
 					}
-					console.log(`${filename}, ${format}:`);
-					// console.log(obj);
-					console.log(JSON.stringify(Buffer.from(obj.bytes)));
 					try {
 						expect(obj).toEqual(jasmine.objectContaining({
 							format,
@@ -241,8 +238,8 @@ describe('ti.barcode', function () {
 							// TODO: Check code? data?
 						}));
 						finish();
-					} catch (err) {
-						finish.fail(err);
+					} catch (e) {
+						finish.fail(e);
 					}
 				});
 			}
@@ -420,12 +417,12 @@ describe('ti.barcode', function () {
 					// 		Barcode.TEXT,
 					// 		finish);
 					// } else {
-						testBarcode(
-							'UPC-A-036000291452.png',
-							Barcode.FORMAT_UPC_A,
-							'036000291452',
-							Barcode.TEXT,
-							finish);
+					testBarcode(
+						'UPC-A-036000291452.png',
+						Barcode.FORMAT_UPC_A,
+						'036000291452',
+						Barcode.TEXT,
+						finish);
 					// }
 				});
 
@@ -543,21 +540,7 @@ describe('ti.barcode', function () {
 						finish);
 				});
 
-				// FIXME: Fails on iOS
-				// {"type":"Buffer","data":[34,45,23,33,0,21,2,18,11,0,59,42,41,59,40,30,48,49,29,57,54,49,26,49,52,54,52,55,52,51,56,29,21,16,19,14,29,52,49,48,5,49,23,29,49,57,53,29,29,49,47,49,29,29,25,29,49,51,53,18,63,5,15,29,59,0,62,10,63,20,1,13,16,1,29,6,12,30,62,4,63,33,33,33,33,33,33,33,33,33,33,33,33,33]}
 				it('MAXICODE - UPS', finish => {
-					// const text = 
-					// 	IOS ?
-					// 		'[)>0196336091062840  21Z14647438UPSN410E1W1951/1Y135Reo\n\nTAMPAFL' :
-					// 		'[)>\u001e01\u001d96336091062\u001d840\u001d002\u001d1Z14647438\u001dUPSN\u001d410E1W\u001d195\u001d\u001d1/1\u001d\u001dY\u001d135Reo\u001d\n\nTAMPA\u001dFL\u001e\u0004';// Android
-					// testBarcode(
-					// 	'maxicode-ups-example.gif',
-					// 	Barcode.FORMAT_MAXICODE,
-					// 	text,
-					// 	Barcode.TEXT,
-					// 	{ pureBarcode: true },
-					// 	finish);
-
 					// test with actual raw bytes, since trasnlating to text garbles it
 					readBarcode('maxicode-ups-example.gif', { pureBarcode: true }, (err, obj) => {
 						if (err) {
@@ -638,7 +621,7 @@ describe('ti.barcode', function () {
 								0x9a, 0x5a, 0x42, 0xb9, 0x0e, 0xc7, 0x82, 0x86, 0xd1, 0x6e, 0xbe, 0xb4, 0xd1, 0x9f, 0xa9, 0xda,
 								0x79, 0xa9, 0x76, 0x13, 0xd4, 0xba, 0xed, 0x06, 0xe0, 0x1b, 0x02, 0x81, 0x47, 0xdd, 0x74, 0x0c,
 								0xa2, 0x39, 0xcf, 0x66, 0xfc, 0x94, 0x2b, 0xc1, 0x58, 0xee, 0x86, 0x1d, 0xb3, 0x4a, 0xe0, 0x77,
-								0x0f, 0xa5 
+								0x0f, 0xa5
 							]));
 							finish();
 						} catch (e) {
