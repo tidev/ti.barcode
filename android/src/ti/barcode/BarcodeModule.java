@@ -20,6 +20,7 @@ import org.appcelerator.titanium.TiApplication;
 import org.appcelerator.titanium.TiBlob;
 import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.kroll.common.Log;
+import org.appcelerator.titanium.TiC;
 import org.appcelerator.titanium.util.TiActivityResultHandler;
 import org.appcelerator.titanium.util.TiActivitySupport;
 import org.appcelerator.titanium.util.TiConvert;
@@ -48,6 +49,7 @@ import com.google.zxing.common.HybridBinarizer;
 import ti.barcode.FrontCamera;
 
 import ti.modules.titanium.BufferProxy;
+import ti.modules.titanium.codec.CodecModule;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -423,11 +425,14 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
     dict.put("code", resultCode);
     dict.put("contentType", contentType);
     dict.put("data", parseData(contentType, contents));
+    BufferProxy buffer = null;
     if (bytes != null && bytes.length > 0) {
-      dict.put("bytes", new BufferProxy(bytes));
+      buffer = new BufferProxy(bytes);
     } else {
-      dict.put("bytes", new BufferProxy()); // 0-length empty buffer/array
+      buffer = new BufferProxy(); // 0-length empty buffer/array
     }
+    buffer.setProperty(TiC.PROPERTY_BYTE_ORDER, CodecModule.getByteOrder(null));
+    dict.put("bytes", buffer);
     fireEvent("success", dict);
   }
 
