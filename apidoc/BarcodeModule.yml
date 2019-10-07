@@ -188,6 +188,8 @@ properties:
     summary: |
         Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
         and the [success](Modules.Barcode.success) event to specify accepted formats.
+
+        Please note that Maxicode support is considered Beta, and requires using the [pureBarcode](BarcodeParseDict.pureBarcode) hint.
     type: Number
     permission: read-only
     since: "3.1.0"
@@ -540,6 +542,8 @@ properties:
     summary: |
         An optional boolean to assume the barcode is being processed as a GS1 barcode, and modify behavior as needed.
         https://zxing.github.io/zxing/apidocs/
+
+        Please note that this hint only applies to [CODE_128](Modules.Barcode.FORMAT_CODE_128) format barcodes.
     type: Boolean
     optional: true
     platforms: [android]
@@ -564,6 +568,8 @@ properties:
     summary: |
         An optional boolean which if true, will return the start and end digits in a Codabar barcode instead of stripping them.
         https://zxing.github.io/zxing/apidocs/
+
+        Please note that this hint only applies to [CODABAR](Modules.Barcode.FORMAT_CODABAR) format barcodes.
     type: Boolean
     optional: true
     platforms: [android]
@@ -572,6 +578,8 @@ properties:
     summary: |
         An optional boolean which if true, will assume Code 39 codes employ a check digit.
         https://zxing.github.io/zxing/apidocs/
+
+        Please note that this hint only applies to [CODE_39](Modules.Barcode.FORMAT_CODE_39) format barcodes.
     type: Boolean
     optional: true
     platforms: [android]
@@ -622,6 +630,8 @@ properties:
     summary: |
         An optional boolean to assume the barcode is being processed as a GS1 barcode, and modify behavior as needed.
         https://zxing.github.io/zxing/apidocs/
+
+        Please note that this hint only applies to [CODE_128](Modules.Barcode.FORMAT_CODE_128) format barcodes.
     type: Boolean
     optional: true
     platforms: [android]
@@ -646,6 +656,8 @@ properties:
     summary: |
         An optional boolean which if true, will return the start and end digits in a Codabar barcode instead of stripping them.
         https://zxing.github.io/zxing/apidocs/
+
+        Please note that this hint only applies to [CODABAR](Modules.Barcode.FORMAT_CODABAR) format barcodes.
     type: Boolean
     optional: true
     platforms: [android]
@@ -654,6 +666,8 @@ properties:
     summary: |
         An optional boolean which if true, will assume Code 39 codes employ a check digit.
         https://zxing.github.io/zxing/apidocs/
+
+        Please note that this hint only applies to [CODE_39](Modules.Barcode.FORMAT_CODE_39) format barcodes.
     type: Boolean
     optional: true
     platforms: [android]
