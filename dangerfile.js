@@ -1,4 +1,4 @@
-/* global danger, fail, warn, message */
+/* global danger, fail, message */
 
 // requires
 const junit = require('@seadub/danger-plugin-junit').default;

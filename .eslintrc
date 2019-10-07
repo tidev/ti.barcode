@@ -1,15 +1,16 @@
 {
-  "extends": [ "axway/env-node", "axway/+mocha"],
+  "extends": [ "axway/env-titanium", "axway/env-node" ],
   "parserOptions": {
     "ecmaVersion": 2015,
     "sourceType": "script"
   },
-  "globals": {
-    "Ti": false,
-    "Titanium": false,
-    "__filename": false,
-    "__dirname": false,
-    "kroll": false,
-    "jasmine": false
-  }
+  "overrides": [
+    {
+      "files": [ "dangerfile.js" ],
+      "parserOptions": {
+        "ecmaVersion": 2017,
+        "sourceType": "module"
+      }
+    }
+  ]
 }

@@ -1,3 +1,4 @@
+/* eslint-env node, jasmine */
 let Barcode;
 
 const IOS = (Ti.Platform.osname === 'iphone' || Ti.Platform.osname === 'ipad');
@@ -7,6 +8,7 @@ describe('ti.barcode', function () {
 
 	it('can be required', () => {
 		Barcode = require('ti.barcode');
+
 		expect(Barcode).toBeDefined();
 	});
 
@@ -91,33 +93,43 @@ describe('ti.barcode', function () {
 			it('UNKNOWN', () => {
 				expect(Barcode.UNKNOWN).toEqual(0);
 			});
+
 			it('URL', () => {
 				expect(Barcode.URL).toEqual(1);
 			});
+
 			it('SMS', () => {
 				expect(Barcode.SMS).toEqual(2);
 			});
+
 			it('TELEPHONE', () => {
 				expect(Barcode.TELEPHONE).toEqual(3);
 			});
+
 			it('TEXT', () => {
 				expect(Barcode.TEXT).toEqual(4);
 			});
+
 			it('CALENDAR', () => {
 				expect(Barcode.CALENDAR).toEqual(5);
 			});
+
 			it('GEOLOCATION', () => {
 				expect(Barcode.GEOLOCATION).toEqual(6);
 			});
+
 			it('EMAIL', () => {
 				expect(Barcode.EMAIL).toEqual(7);
 			});
+
 			it('CONTACT', () => {
 				expect(Barcode.CONTACT).toEqual(8);
 			});
+
 			it('BOOKMARK', () => {
 				expect(Barcode.BOOKMARK).toEqual(9);
 			});
+
 			it('WIFI', () => {
 				expect(Barcode.WIFI).toEqual(10);
 			});

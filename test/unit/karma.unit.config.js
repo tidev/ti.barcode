@@ -30,11 +30,11 @@ module.exports = config => {
 		plugins: [
 			'karma-*',
 			{
-			   'framework:projectManagerHook': ['factory', projectManagerHook]
+				'framework:projectManagerHook': [ 'factory', projectManagerHook ]
 			}
 		],
 		titanium: {
-			sdkVersion: config.sdkVersion || '8.2.1.GA'
+			sdkVersion: config.sdkVersion || '8.2.1.v20191001063013'
 		},
 		customLaunchers: {
 			android: {
