@@ -9,7 +9,7 @@
     "format:ios": "npm run lint:ios -- --fix",
     "format:js": "npm run lint:js -- --fix",
     "lint": "npm run lint:android && npm run lint:ios && npm run lint:docs",
-    "lint:android": "clang-format-lint android/src/**/*.java",
+    "lint:android": "clang-format-lint android/src/ti/**/*.java",
     "lint:docs": "tdoc-validate -w Titanium.Module,Titanium.UI.View,Titanium.Blob,Titanium.Buffer apidoc",
     "lint:ios": "clang-format-lint ios/**/*.m ios/**/*.h",
     "lint:js": "eslint .",
@@ -68,7 +68,7 @@
       "npx clang-format -style=file -i",
       "git add"
     ],
-    "*.java": [
+    "android/src/ti/**/*.java": [
       "npx clang-format -style=file -i",
       "git add"
     ],
