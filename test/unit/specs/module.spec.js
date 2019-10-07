@@ -185,20 +185,15 @@ describe('ti.barcode', function () {
 			// TODO: Can we test capturing? I assume it needs permissions...
 		});
 
-		// TODO: ios has: freezeCapture(), unfreezeCapture(), captureStillImage()
-		// FIXME: iOS has a huge feature parity issue between the capture and parse methods.
-		// They use totally different APIs, and parse() can really only pick up QR codes.
-		// While capture uses AVFoundation and can pick up a much wider array of codes.
-		// Android meanwhile uses zxing, and seems to handle even a wider array of code types
 		describe('.parse()', () => {
 			// Try out a number of samples from: https://commons.wikimedia.org/wiki/Barcode
 			it('is a Function', () => {
 				expect(Barcode.parse).toEqual(jasmine.any(Function));
 			});
 
-			function testBarcode(filename, format, result, contentType, hints, finish) {
+			function readBarcode(filename, hints, callback) {
 				if (typeof hints === 'function') {
-					finish = hints;
+					callback = hints;
 					hints = {};
 				}
 				// FIXME: Use getAsset on ios so we don't need to turn off app thinning?
@@ -206,14 +201,38 @@ describe('ti.barcode', function () {
 				function error(err) {
 					Barcode.removeEventListener('success', success);
 					Barcode.removeEventListener('error', error);
-					finish.fail(err);
+					callback(err);
 				}
 
 				function success(obj) {
 					Barcode.removeEventListener('success', success);
 					Barcode.removeEventListener('error', error);
+					callback(null, obj);
+				}
+				Barcode.addEventListener('error', error);
+				Barcode.addEventListener('success', success);
+				try {
+					const combined = Object.assign(hints, { image });
+					Barcode.parse(combined);
+				} catch (err) {
+					Barcode.removeEventListener('error', error);
+					Barcode.removeEventListener('success', success);
+					callback(err);
+				}
+			}
+
+			function testBarcode(filename, format, result, contentType, hints, finish) {
+				if (typeof hints === 'function') {
+					finish = hints;
+					hints = {};
+				}
+				readBarcode(filename, hints, (err, obj) => {
+					if (err) {
+						return finish.fail(err);
+					}
 					console.log(`${filename}, ${format}:`);
-					console.log(obj);
+					// console.log(obj);
+					console.log(JSON.stringify(Buffer.from(obj.bytes)));
 					try {
 						expect(obj).toEqual(jasmine.objectContaining({
 							format,
@@ -225,10 +244,7 @@ describe('ti.barcode', function () {
 					} catch (err) {
 						finish.fail(err);
 					}
-				}
-				Barcode.addEventListener('error', error);
-				Barcode.addEventListener('success', success);
-				Barcode.parse(Object.assign(hints, { image, acceptedFormats: [ format ] }));
+				});
 			}
 
 			describe('finds structured contentTypes in QR codes', () => {
@@ -323,6 +339,7 @@ describe('ti.barcode', function () {
 						Barcode.TEXT,
 						finish);
 				});
+				// TODO: Try with assumeCode39CheckDigit
 
 				it('CODE_93', finish => {
 					testBarcode(
@@ -333,7 +350,7 @@ describe('ti.barcode', function () {
 						finish);
 				});
 
-				it('CODE_128', finish => {
+				it('CODE_128 - w/o assumeGS1 hint', finish => {
 					testBarcode(
 						'Code128Barcode.jpg',
 						Barcode.FORMAT_CODE_128,
@@ -342,7 +359,38 @@ describe('ti.barcode', function () {
 						finish);
 				});
 
-				it('EAN_13 barcode with rest indicator', finish => {
+				// FIXME: If we're assuming GS1 here, I believe this is supposed to start with "]C0"
+				// But zxing doesn't do that pre-pending for us...
+				it('CODE_128 - w/ assumeGS1 hint', finish => {
+					testBarcode(
+						'Code128Barcode.jpg',
+						Barcode.FORMAT_CODE_128,
+						'12345678',
+						Barcode.TEXT,
+						{ assumeGS1: true },
+						finish);
+				});
+
+				it('CODE_128 - GS1 w/o assumeGS1 hint', finish => {
+					testBarcode(
+						'GS1-128.png',
+						Barcode.FORMAT_CODE_128,
+						'01950123456789033103000123',
+						Barcode.TEXT,
+						finish);
+				});
+
+				it('CODE_128 - GS1 w/ assumeGS1 hint', finish => {
+					testBarcode(
+						'GS1-128.png',
+						Barcode.FORMAT_CODE_128,
+						']C101950123456789033103000123',
+						Barcode.TEXT,
+						{ assumeGS1: true },
+						finish);
+				});
+
+				it('EAN_13 - w/ rest indicator', finish => {
 					testBarcode(
 						'EAN-13-5901234123457.png',
 						Barcode.FORMAT_EAN_13,
@@ -361,12 +409,24 @@ describe('ti.barcode', function () {
 				});
 
 				it('UPC_A', finish => {
-					testBarcode(
-						'UPC-A-036000291452.png',
-						Barcode.FORMAT_UPC_A,
-						'036000291452',
-						Barcode.TEXT,
-						finish);
+					// FIXME: Intermittently fails on iOS, giving '0036000291452' with EAN_13 format!
+					// Note that technically an EAN-13 barcode with a leading 0 is equivalent to a UPC-A barcode!
+					// see https://www.nationwidebarcode.com/are-upc-a-and-ean-13-the-same/
+					// if (IOS) {
+					// 	testBarcode(
+					// 		'UPC-A-036000291452.png',
+					// 		Barcode.FORMAT_EAN_13,
+					// 		'0036000291452',
+					// 		Barcode.TEXT,
+					// 		finish);
+					// } else {
+						testBarcode(
+							'UPC-A-036000291452.png',
+							Barcode.FORMAT_UPC_A,
+							'036000291452',
+							Barcode.TEXT,
+							finish);
+					// }
 				});
 
 				it('UPC_E', finish => {
@@ -435,7 +495,7 @@ describe('ti.barcode', function () {
 						finish);
 				});
 
-				it('CODABAR', finish => {
+				it('CODABAR - rationalized', finish => {
 					testBarcode(
 						'Rationalized-codabar.png',
 						Barcode.FORMAT_CODABAR,
@@ -444,23 +504,79 @@ describe('ti.barcode', function () {
 						finish);
 				});
 
-				// FIXME: Does not scan on Android/iOS, scans online at https://zxing.org/w/decode.jspx
-				xit('MAXICODE', finish => {
+				it('CODABAR', finish => {
+					testBarcode(
+						'codabar-40156.gif',
+						Barcode.FORMAT_CODABAR,
+						'40156',
+						Barcode.TEXT,
+						finish);
+				});
+
+				it('CODABAR w/ returnCodabarStartEnd hint', finish => {
+					testBarcode(
+						'codabar-40156.gif',
+						Barcode.FORMAT_CODABAR,
+						'A40156B',
+						Barcode.TEXT,
+						{ returnCodabarStartEnd: true },
+						finish);
+				});
+
+				it('CODABAR - reationalized w/ returnCodabarStartEnd hint', finish => {
+					testBarcode(
+						'Rationalized-codabar.png',
+						Barcode.FORMAT_CODABAR,
+						'C137255C',
+						Barcode.TEXT,
+						{ returnCodabarStartEnd: true },
+						finish);
+				});
+
+				it('MAXICODE', finish => {
 					testBarcode(
 						'1024px-MaxiCode.png',
 						Barcode.FORMAT_MAXICODE,
 						'Wikipedia, the free encyclopedia',
 						Barcode.TEXT,
+						{ pureBarcode: true },
 						finish);
 				});
 
+				// FIXME: Fails on iOS
+				// {"type":"Buffer","data":[34,45,23,33,0,21,2,18,11,0,59,42,41,59,40,30,48,49,29,57,54,49,26,49,52,54,52,55,52,51,56,29,21,16,19,14,29,52,49,48,5,49,23,29,49,57,53,29,29,49,47,49,29,29,25,29,49,51,53,18,63,5,15,29,59,0,62,10,63,20,1,13,16,1,29,6,12,30,62,4,63,33,33,33,33,33,33,33,33,33,33,33,33,33]}
 				it('MAXICODE - UPS', finish => {
-					testBarcode(
-						'maxicode-ups-example.gif',
-						Barcode.FORMAT_MAXICODE,
-						'[)>�01�96336091062�840�002�1Z14647438�UPSN�410E1W�195��1/1��Y�135Reo�\n\nTAMPA�FL��',
-						Barcode.TEXT,
-						finish);
+					// const text = 
+					// 	IOS ?
+					// 		'[)>0196336091062840  21Z14647438UPSN410E1W1951/1Y135Reo\n\nTAMPAFL' :
+					// 		'[)>\u001e01\u001d96336091062\u001d840\u001d002\u001d1Z14647438\u001dUPSN\u001d410E1W\u001d195\u001d\u001d1/1\u001d\u001dY\u001d135Reo\u001d\n\nTAMPA\u001dFL\u001e\u0004';// Android
+					// testBarcode(
+					// 	'maxicode-ups-example.gif',
+					// 	Barcode.FORMAT_MAXICODE,
+					// 	text,
+					// 	Barcode.TEXT,
+					// 	{ pureBarcode: true },
+					// 	finish);
+
+					// test with actual raw bytes, since trasnlating to text garbles it
+					readBarcode('maxicode-ups-example.gif', { pureBarcode: true }, (err, obj) => {
+						if (err) {
+							return finish.fail(err);
+						}
+						try {
+							expect(Buffer.from(obj.bytes)).toEqual(Buffer.from([
+								0x22, 0x2d, 0x17, 0x21, 0x00, 0x15, 0x02, 0x12, 0x0b, 0x00, 0x3b, 0x2a, 0x29, 0x3b, 0x28, 0x1e,
+								0x30, 0x31, 0x1d, 0x39, 0x36, 0x31, 0x1a, 0x31, 0x34, 0x36, 0x34, 0x37, 0x34, 0x33, 0x38, 0x1d,
+								0x15, 0x10, 0x13, 0x0e, 0x1d, 0x34, 0x31, 0x30, 0x05, 0x31, 0x17, 0x1d, 0x31, 0x39, 0x35, 0x1d,
+								0x1d, 0x31, 0x2f, 0x31, 0x1d, 0x1d, 0x19, 0x1d, 0x31, 0x33, 0x35, 0x12, 0x3f, 0x05, 0x0f, 0x1d,
+								0x3b, 0x00, 0x3e, 0x0a, 0x3f, 0x14, 0x01, 0x0d, 0x10, 0x01, 0x1d, 0x06, 0x0c, 0x1e, 0x3e, 0x04,
+								0x3f, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21, 0x21
+							]));
+							finish();
+						} catch (e) {
+							finish.fail(e);
+						}
+					});
 				});
 
 				it('DATA_MATRIX', finish => {
@@ -472,14 +588,63 @@ describe('ti.barcode', function () {
 						finish);
 				});
 
-				xit('DATA_MATRIX - USPS Pitney Bowes', finish => {
+				// it('DATA_MATRIX - GS1', finish => {
+				// 	testBarcode(
+				// 		'GS1-DataMatrix.png',
+				// 		Barcode.FORMAT_DATA_MATRIX,
+				// 		'Wikipedia, the free encyclopedia',
+				// 		Barcode.TEXT,
+				// 		finish);
+				// });
+
+				// Test cases from https://www.packagingdigest.com/bar-coding/pmp-gs1-datamatrix-fnc1-versus-gs-as-the-variable-length-field-separator-character-091116
+				// FIXME: In both cases the library reports the use of ASCII code 29 (\u001d) GS (group separator) character
+				// Technically the first and second should differ somehow?
+				// Also, the first FNC1 character (\u001d) is *supposed* to be replaced by "]d2" when we're assuming GS1 (in the same way that in CODE_128 it gets replaced by "]C1")
+				// But zxing doesn't do that (or even look at assumeGS1 for this format!)
+				// See https://jira.appcelerator.org/browse/MOD-2481
+				it('DATA_MATRIX - GS1 w/ FNC1 encoding', finish => {
 					testBarcode(
-						'DataMatrix_US_franking_mark12.jpg',
+						'F1vsGSencodingF1.jpg',
 						Barcode.FORMAT_DATA_MATRIX,
-						// FIXME: text is garbled/invalid (which busts things when we try to print it!)
-						'��$ÂÐ�021Aùâ)�3åm�N���B2���������������Í¹2�0000Z­A�Å[�Ý�¿oÉ�ý¼à�s)0ëKÓ��$¿öý)y�ÞÕ',
+						'\u001d010031234567890621123456789012\u001d300144',
 						Barcode.TEXT,
+						{ assumeGS1: true },
 						finish);
+				});
+
+				it('DATA_MATRIX - GS1 w/ GS encoding', finish => {
+					testBarcode(
+						'F1vsGSencodingGS.jpg',
+						Barcode.FORMAT_DATA_MATRIX,
+						'\u001d010031234567890621123456789012\u001d300144',
+						Barcode.TEXT,
+						{ assumeGS1: true },
+						finish);
+				});
+
+				it('DATA_MATRIX - USPS Pitney Bowes', finish => {
+					// test with actual raw bytes, since trasnlating to text garbles it
+					readBarcode('DataMatrix_US_franking_mark12.jpg', (err, obj) => {
+						if (err) {
+							return finish.fail(err);
+						}
+						try {
+							expect(Buffer.from(obj.bytes)).toEqual(Buffer.from([
+								0xe7, 0x85, 0xc1, 0x57, 0x10, 0x44, 0xe8, 0xad, 0x73, 0x0a, 0x9f, 0x45, 0x92, 0x11, 0xed, 0x5a,
+								0x22, 0x6a, 0x88, 0x40, 0x46, 0x29, 0x72, 0x07, 0xa4, 0x74, 0xf9, 0x5e, 0x03, 0x25, 0x1e, 0xb3,
+								0x49, 0xde, 0x74, 0x0a, 0x9f, 0x37, 0xce, 0x67, 0xf5, 0x8b, 0x21, 0x83, 0x05, 0x13, 0x79, 0x3d,
+								0xd2, 0x68, 0xfd, 0xbd, 0xa5, 0x98, 0x65, 0xd6, 0x14, 0x3f, 0x7f, 0xed, 0xc2, 0xfa, 0x3f, 0xf4,
+								0x9a, 0x5a, 0x42, 0xb9, 0x0e, 0xc7, 0x82, 0x86, 0xd1, 0x6e, 0xbe, 0xb4, 0xd1, 0x9f, 0xa9, 0xda,
+								0x79, 0xa9, 0x76, 0x13, 0xd4, 0xba, 0xed, 0x06, 0xe0, 0x1b, 0x02, 0x81, 0x47, 0xdd, 0x74, 0x0c,
+								0xa2, 0x39, 0xcf, 0x66, 0xfc, 0x94, 0x2b, 0xc1, 0x58, 0xee, 0x86, 0x1d, 0xb3, 0x4a, 0xe0, 0x77,
+								0x0f, 0xa5 
+							]));
+							finish();
+						} catch (e) {
+							finish.fail(e);
+						}
+					});
 				});
 
 				it('RSS-14', finish => {
@@ -491,29 +656,6 @@ describe('ti.barcode', function () {
 						finish);
 				});
 			});
-
-			describe('supports hints', () => {
-				it('MAXICODE', finish => {
-					testBarcode(
-						'1024px-MaxiCode.png',
-						Barcode.FORMAT_MAXICODE,
-						'Wikipedia, the free encyclopedia',
-						Barcode.TEXT,
-						{ pureBarcode: true },
-						finish);
-				});
-
-				it('MAXICODE - UPS', finish => {
-					testBarcode(
-						'maxicode-ups-example.gif',
-						Barcode.FORMAT_MAXICODE,
-						'[)>�01�96336091062�840�002�1Z14647438�UPSN�410E1W�195��1/1��Y�135Reo�\n\nTAMPA�FL��',
-						Barcode.TEXT,
-						{ pureBarcode: true },
-						finish);
-				});
-			});
-			// TODO: Pass in various hints/arguments! assumeGS1, tryHarder, characterSet, returnCodabarStartEnd, assumeCode39CheckDigit, allowedLengths, allowedEANExtensions
 		});
 	});
 });
