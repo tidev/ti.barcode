@@ -47,6 +47,8 @@ import com.google.zxing.client.android.camera.open.CameraFacing;
 import com.google.zxing.common.HybridBinarizer;
 import ti.barcode.FrontCamera;
 
+import ti.modules.titanium.BufferProxy;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -291,7 +293,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 			Result rawResult = reader.decode(bitmap, populateHints(args));
 			String format = rawResult.getBarcodeFormat().toString();
 			String result = rawResult.toString();
-			processResult(format, result, Activity.RESULT_OK);
+			processResult(format, result, rawResult.getRawBytes(), Activity.RESULT_OK);
 
 		} catch (NotFoundException e) {
 			HashMap<String, Object> errdict = new HashMap<String, Object>();
@@ -396,7 +398,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 		fireEvent("cancel", cancelDict);
 	}
 
-	public void processResult(String format, String contents, int resultCode) {
+	public void processResult(String format, String contents, byte[] bytes, int resultCode) {
 		int contentType = getContentType(format, contents);
 		HashMap<String, Object> dict = new HashMap<String, Object>();
 		int formatIndex = FORMAT_STRINGS.indexOf(format);
@@ -410,7 +412,11 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 		dict.put("code", resultCode);
 		dict.put("contentType", contentType);
 		dict.put("data", parseData(contentType, contents));
-		// TODO: Include raw bytes in form of Ti.Buffer?
+		if (bytes != null && bytes.length > 0) {
+			dict.put("bytes", new BufferProxy(bytes));
+		} else {
+			dict.put("bytes", new BufferProxy()); // 0-length empty buffer/array
+		}
 		fireEvent("success", dict);
 	}
 
@@ -425,7 +431,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 		}
 
 		try {
-			processResult(data.getStringExtra(Intents.Scan.RESULT_FORMAT), data.getStringExtra(Intents.Scan.RESULT), resultCode);
+			processResult(data.getStringExtra(Intents.Scan.RESULT_FORMAT), data.getStringExtra(Intents.Scan.RESULT), data.getByteArrayExtra(Intents.Scan.RESULT_BYTES), resultCode);
 		} catch (Exception e) {
 			Log.e(LCAT, "Hit exception while processing barcode! " + e.toString());
 			e.printStackTrace();
