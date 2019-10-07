@@ -13,6 +13,7 @@
 #import "TiOverlayView.h"
 #import "TiUtils.h"
 #import "TiViewProxy.h"
+#import "TiBuffer.h"
 #import "ZXCapture.h"
 
 @implementation TiBarcodeModule
@@ -70,16 +71,7 @@
   BOOL showRectangle = [TiUtils boolValue:@"showRectangle" properties:args def:YES];
   BOOL preventRotation = [TiUtils boolValue:@"preventRotation" properties:args def:NO];
 
-  NSMutableArray *acceptedFormats = [args objectForKey:@"acceptedFormats"];
-
   _overlayViewProxy = [args objectForKey:@"overlay"];
-
-  if (acceptedFormats.count != 0) {
-    if ([acceptedFormats containsObject:@"-1"]) {
-      NSLog(@"[WARN] The code-format FORMAT_NONE is deprecated. Use an empty array instead or don't specify formats.");
-      [acceptedFormats removeObject:@"-1"];
-    }
-  }
 
   NSError *error = nil;
   NSError *cameraError = nil;
@@ -92,7 +84,8 @@
 
   _barcodeViewController.capture.camera = _useFrontCamera ? _barcodeViewController.capture.front : _barcodeViewController.capture.back;
   _barcodeViewController.capture.delegate = self;
-  [self addBarcodeFormats:acceptedFormats];
+  ZXDecodeHints *hints = [self generateHints:args];
+  _barcodeViewController.capture.hints = hints;
 
   if (_displayedMessage != nil) {
     [[_barcodeViewController overlayView] setDisplayMessage:_displayedMessage];
@@ -181,14 +174,14 @@
   ZXLuminanceSource *source = [[ZXCGImageLuminanceSource alloc] initWithCGImage:imageRef];
   ZXHybridBinarizer *binarizer = [ZXHybridBinarizer binarizerWithSource:source];
   ZXBinaryBitmap *bitmap = [ZXBinaryBitmap binaryBitmapWithBinarizer:binarizer];
-  ZXDecodeHints *hints = [ZXDecodeHints hints];
+  ZXDecodeHints *hints = [self generateHints:args];
   ZXMultiFormatReader *reader = [ZXMultiFormatReader reader];
 
   NSError *error;
 
   ZXResult *result = [reader decode:bitmap hints:hints error:&error];
   if (!error && result) {
-    [self handleSuccessResult:result.text withFormat:result.barcodeFormat];
+    [self handleSuccessResult:result.text withFormat:result.barcodeFormat withBytes:result.rawBytes];
   } else {
     [self fireEvent:@"error" withObject:@{ @"message" : @"Scan Failed", @"exception": error.localizedDescription }];
     return NUMBOOL(NO);
@@ -197,6 +190,55 @@
 }
 
 #pragma mark Internal
+- (ZXDecodeHints *)generateHints:(NSDictionary *)args
+{
+  ZXDecodeHints *hints = [ZXDecodeHints hints];
+  hints.assumeCode39CheckDigit = [TiUtils boolValue:@"assumeCode39CheckDigit" properties:args def:NO];
+  hints.assumeGS1 = [TiUtils boolValue:@"assumeGS1" properties:args def:NO];
+  hints.pureBarcode = [TiUtils boolValue:@"pureBarcode" properties:args def:NO];
+  hints.returnCodaBarStartEnd = [TiUtils boolValue:@"returnCodabarStartEnd" properties:args def:NO];
+  hints.tryHarder = [TiUtils boolValue:@"tryHarder" properties:args def:NO];
+
+  NSArray *allowedLengths;
+  ENSURE_ARG_OR_NIL_FOR_KEY(allowedLengths, args, @"allowedLengths", NSArray);
+  if (allowedLengths) {
+    hints.allowedLengths = allowedLengths;
+  }
+
+  NSArray *allowedEANExtensions;
+  ENSURE_ARG_OR_NIL_FOR_KEY(allowedEANExtensions, args, @"allowedEANExtensions", NSArray);
+  if (allowedEANExtensions) {
+    NSUInteger length = [allowedEANExtensions count];
+    ZXIntArray *extensions = [[ZXIntArray alloc] initWithLength:length];
+    for (NSUInteger i = 0; i < length; i++)
+    {
+      NSNumber *extension = [allowedEANExtensions objectAtIndex:i];
+      int32_t val = [extension intValue];
+      extensions.array[i] = val;
+    }
+    hints.allowedEANExtensions = extensions;
+  }
+
+  NSString *characterSet;
+  ENSURE_ARG_OR_NIL_FOR_KEY(characterSet, args, @"characterSet", NSString);
+  if (characterSet) {
+    NSStringEncoding encoding = [TiUtils charsetToEncoding:characterSet];
+    hints.encoding = encoding;
+  }
+  
+  NSMutableArray *acceptedFormats = [args objectForKey:@"acceptedFormats"];
+  if (acceptedFormats.count != 0) {
+    if ([acceptedFormats containsObject:@"-1"]) {
+      NSLog(@"[WARN] The code-format FORMAT_NONE is deprecated. Use an empty array instead or don't specify formats.");
+      [acceptedFormats removeObject:@"-1"];
+    }
+  }
+  for (id format in acceptedFormats) {
+    [hints addPossibleFormat:format];
+  }
+
+  return hints;
+}
 
 - (UIView *)prepareOverlayWithProxy:(TiViewProxy *)overlayProxy
 {
@@ -426,7 +468,7 @@
   [event setObject:data forKey:@"data"];
 }
 
-- (void)parseSuccessResult:(NSString *)result withFormat:(ZXBarcodeFormat)format
+- (void)parseSuccessResult:(NSString *)result withFormat:(ZXBarcodeFormat)format withBytes:(ZXByteArray *)bytes
 {
   NSLog(@"[DEBUG] Received barcode result = %@", result);
 
@@ -473,29 +515,26 @@
     [event setObject:[self TEXT] forKey:@"contentType"];
   }
   [event setObject:[NSNumber numberWithInteger:format] forKey:@"format"];
-
+  
+  TiBuffer *buffer = [[TiBuffer alloc] _initWithPageContext:[self executionContext]];
+  if (bytes) {
+    [buffer setData:[NSMutableData dataWithBytes:bytes.array length:bytes.length]];
+  } else {
+    [buffer setData:[NSMutableData dataWithCapacity:0]];
+  }
+  [event setObject:buffer forKey:@"bytes"];
+  
   [self fireEvent:@"success" withObject:event];
 }
 
-- (void)handleSuccessResult:(NSString *)result withFormat:(ZXBarcodeFormat)format
+- (void)handleSuccessResult:(NSString *)result withFormat:(ZXBarcodeFormat)format withBytes:(ZXByteArray *)bytes
 {
   @try {
-    [self parseSuccessResult:result withFormat:format];
+    [self parseSuccessResult:result withFormat:format withBytes:bytes];
   }
   @catch (NSException *e) {
     [self fireEvent:@"error" withObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:[e reason], @"message", nil]];
   }
-}
-
-- (void)addBarcodeFormats:(NSArray *)formats
-{
-  ZXDecodeHints *hints = [ZXDecodeHints hints];
-  for (id format in formats) {
-    [hints addPossibleFormat:format];
-  }
-  hints.assumeGS1 = YES;
-  //hints.tryHarder = YES;
-  _barcodeViewController.capture.hints = hints;
 }
 
 #pragma mark TiOverlayViewDelegate
@@ -547,7 +586,7 @@ MAKE_SYSTEM_PROP(WIFI, 10);
 
   NSLog(result.text);
 
-  [self handleSuccessResult:result.text withFormat:result.barcodeFormat];
+  [self handleSuccessResult:result.text withFormat:result.barcodeFormat withBytes:result.rawBytes];
 
   if (!keepOpen) {
     [self closeScanner];
