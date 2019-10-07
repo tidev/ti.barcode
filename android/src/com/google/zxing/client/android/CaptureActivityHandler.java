@@ -107,9 +107,10 @@ public final class CaptureActivityHandler extends Handler {
 		if (activity.doKeepOpen()) {
 			String scanResultFormat = msgObj.getStringExtra(Intents.Scan.RESULT_FORMAT);
 			String scanResult = msgObj.getStringExtra(Intents.Scan.RESULT);
+			byte[] scanBytes = msgObj.getByteArrayExtra(Intents.Scan.RESULT_BYTES);
 			BarcodeModule barcodeModule = BarcodeModule.getInstance();
 			if (barcodeModule != null) {
-				barcodeModule.processResult(scanResultFormat, scanResult, Activity.RESULT_OK);
+				barcodeModule.processResult(scanResultFormat, scanResult, scanBytes, Activity.RESULT_OK);
 			} else {
 				Log.e(TAG, "Unable to find an instance of the barcode module!");			
 			}
