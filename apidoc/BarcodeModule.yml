@@ -422,6 +422,10 @@ events:
       - name: data
         summary: The parsed fields associated with the contentType.
         type: Object
+
+      - name: bytes
+        summary: The raw byte array contents of the barcode, when available
+        type: Titanium.Buffer
     
   - name: error
     summary: Sent when an error occurs.
