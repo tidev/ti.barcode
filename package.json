@@ -4,7 +4,7 @@
   "description": "Lets you process 1D/2D barcodes",
   "scripts": {
     "lint": "npm run lint:docs",
-    "lint:docs": "tdoc-validate -w Titanium.Module,Titanium.UI.View,Titanium.Blob apidoc",
+    "lint:docs": "tdoc-validate -w Titanium.Module,Titanium.UI.View,Titanium.Blob,Titanium.Buffer apidoc",
     "test": "npm run lint && npm test",
     "test:unit": "karma start test/unit/karma.unit.config.js",
     "test:android": "npm run test:unit -- --browsers android",
