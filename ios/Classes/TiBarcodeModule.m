@@ -8,12 +8,12 @@
 #import "LayoutConstraint.h"
 #import "TiApp.h"
 #import "TiBase.h"
-#import "TiHost.h"
 #import "TiBlob.h"
+#import "TiBuffer.h"
+#import "TiHost.h"
 #import "TiOverlayView.h"
 #import "TiUtils.h"
 #import "TiViewProxy.h"
-#import "TiBuffer.h"
 #import "ZXCapture.h"
 
 @implementation TiBarcodeModule
@@ -183,7 +183,7 @@
   if (!error && result) {
     [self handleSuccessResult:result.text withFormat:result.barcodeFormat withBytes:result.rawBytes];
   } else {
-    [self fireEvent:@"error" withObject:@{ @"message" : @"Scan Failed", @"exception": error.localizedDescription }];
+    [self fireEvent:@"error" withObject:@{ @"message" : @"Scan Failed", @"exception" : error.localizedDescription }];
     return NUMBOOL(NO);
   }
   return NUMBOOL(YES);
@@ -210,8 +210,7 @@
   if (allowedEANExtensions) {
     NSUInteger length = [allowedEANExtensions count];
     ZXIntArray *extensions = [[ZXIntArray alloc] initWithLength:length];
-    for (NSUInteger i = 0; i < length; i++)
-    {
+    for (NSUInteger i = 0; i < length; i++) {
       NSNumber *extension = [allowedEANExtensions objectAtIndex:i];
       int32_t val = [extension intValue];
       extensions.array[i] = val;
@@ -225,7 +224,7 @@
     NSStringEncoding encoding = [TiUtils charsetToEncoding:characterSet];
     hints.encoding = encoding;
   }
-  
+
   NSMutableArray *acceptedFormats = [args objectForKey:@"acceptedFormats"];
   if (acceptedFormats.count != 0) {
     if ([acceptedFormats containsObject:@"-1"]) {
@@ -515,7 +514,7 @@
     [event setObject:[self TEXT] forKey:@"contentType"];
   }
   [event setObject:[NSNumber numberWithInteger:format] forKey:@"format"];
-  
+
   TiBuffer *buffer = [[TiBuffer alloc] _initWithPageContext:[self executionContext]];
   if (bytes) {
     [buffer setData:[NSMutableData dataWithBytes:bytes.array length:bytes.length]];
@@ -523,7 +522,7 @@
     [buffer setData:[NSMutableData dataWithCapacity:0]];
   }
   [event setObject:buffer forKey:@"bytes"];
-  
+
   [self fireEvent:@"success" withObject:event];
 }
 

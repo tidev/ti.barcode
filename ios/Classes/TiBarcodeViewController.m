@@ -114,8 +114,9 @@
 {
   [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
   [_overlayView updateViewsWithFrame:CGRectMake(_overlayView.frame.origin.x, _overlayView.frame.origin.y, size.width, size.height)];
-  [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-  }
+  [coordinator
+      animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+      }
       completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         [self applyOrientation];
       }];
