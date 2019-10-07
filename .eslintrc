@@ -1,0 +1,15 @@
+{
+  "extends": [ "axway/env-node", "axway/+mocha"],
+  "parserOptions": {
+    "ecmaVersion": 2015,
+    "sourceType": "script"
+  },
+  "globals": {
+    "Ti": false,
+    "Titanium": false,
+    "__filename": false,
+    "__dirname": false,
+    "kroll": false,
+    "jasmine": false
+  }
+}
