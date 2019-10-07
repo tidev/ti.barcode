@@ -287,9 +287,8 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 
 			BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
 			MultiFormatReader reader = new MultiFormatReader();
-			reader.setHints(populateHints(args));
 
-			Result rawResult = reader.decode(bitmap);
+			Result rawResult = reader.decode(bitmap, populateHints(args));
 			String format = rawResult.getBarcodeFormat().toString();
 			String result = rawResult.toString();
 			processResult(format, result, Activity.RESULT_OK);
