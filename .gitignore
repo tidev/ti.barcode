@@ -29,3 +29,6 @@ libs/
 TESTS-*.xml
 
 node_modules/
+
+ios/Carthage/
+ios/platform/

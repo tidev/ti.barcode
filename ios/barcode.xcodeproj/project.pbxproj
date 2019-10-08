@@ -28,11 +28,11 @@
 		190E5FF02109BC8A00FCEA5D /* TiBarcodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 190E5FEC2109BC8A00FCEA5D /* TiBarcodeViewController.m */; };
 		190E5FF32109BCB400FCEA5D /* TiOverlayView.h in Headers */ = {isa = PBXBuildFile; fileRef = 190E5FF12109BCB400FCEA5D /* TiOverlayView.h */; };
 		190E5FF42109BCB400FCEA5D /* TiOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 190E5FF22109BCB400FCEA5D /* TiOverlayView.m */; };
-		191ECD1321DC657F005CAC7E /* libZXingObjC-iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 191ECD0621DC6556005CAC7E /* libZXingObjC-iOS.a */; };
 		246732D911E27BC500D39AF7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 246732D811E27BC500D39AF7 /* Foundation.framework */; };
 		24DE9E1111C5FE74003F90F6 /* TiBarcodeModuleAssets.h in Headers */ = {isa = PBXBuildFile; fileRef = 24DE9E0F11C5FE74003F90F6 /* TiBarcodeModuleAssets.h */; };
 		24DE9E1211C5FE74003F90F6 /* TiBarcodeModuleAssets.m in Sources */ = {isa = PBXBuildFile; fileRef = 24DE9E1011C5FE74003F90F6 /* TiBarcodeModuleAssets.m */; };
 		AA747D9F0F9514B9006C5449 /* TiBarcode_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = AA747D9E0F9514B9006C5449 /* TiBarcode_Prefix.pch */; };
+		B733F20A234CD925008D571F /* ZXingObjC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B733F209234CD925008D571F /* ZXingObjC.framework */; };
 		DAF8E7AF1300AF8B00C06BC6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8E7AE1300AF8B00C06BC6 /* UIKit.framework */; };
 		DAF8E7B21300AF9400C06BC6 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8E7B11300AF9400C06BC6 /* AudioToolbox.framework */; };
 		DAF8E7B51300AF9E00C06BC6 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8E7B41300AF9E00C06BC6 /* CoreGraphics.framework */; };
@@ -41,55 +41,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		191ECD0521DC6556005CAC7E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 191ECCFC21DC6556005CAC7E /* ZXingObjC.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 25403CB3166A96FA00E13304;
-			remoteInfo = "ZXingObjC-iOS";
-		};
-		191ECD0721DC6556005CAC7E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 191ECCFC21DC6556005CAC7E /* ZXingObjC.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 25403CC4166A96FA00E13304;
-			remoteInfo = "Unit Tests iOS";
-		};
-		191ECD0921DC6556005CAC7E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 191ECCFC21DC6556005CAC7E /* ZXingObjC.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 25404166166AADAC00E13304;
-			remoteInfo = "ZXingObjC-osx";
-		};
-		191ECD0B21DC6556005CAC7E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 191ECCFC21DC6556005CAC7E /* ZXingObjC.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 25404178166AADAC00E13304;
-			remoteInfo = "Unit Tests OS X";
-		};
-		191ECD0D21DC6556005CAC7E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 191ECCFC21DC6556005CAC7E /* ZXingObjC.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 2540439E166ABA0A00E13304;
-			remoteInfo = "OS X Framework";
-		};
-		191ECD0F21DC6556005CAC7E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 191ECCFC21DC6556005CAC7E /* ZXingObjC.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = DB72547F1A523C9200EFF81B;
-			remoteInfo = "iOS Framework";
-		};
-		191ECD1121DC6573005CAC7E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 191ECCFC21DC6556005CAC7E /* ZXingObjC.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 25403CB2166A96FA00E13304;
-			remoteInfo = "ZXingObjC-iOS";
-		};
 		24416B8411C4CA280047AFDD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -106,12 +57,12 @@
 		190E5FEC2109BC8A00FCEA5D /* TiBarcodeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TiBarcodeViewController.m; path = Classes/TiBarcodeViewController.m; sourceTree = "<group>"; };
 		190E5FF12109BCB400FCEA5D /* TiOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TiOverlayView.h; path = Classes/TiOverlayView.h; sourceTree = "<group>"; };
 		190E5FF22109BCB400FCEA5D /* TiOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TiOverlayView.m; path = Classes/TiOverlayView.m; sourceTree = "<group>"; };
-		191ECCFC21DC6556005CAC7E /* ZXingObjC.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ZXingObjC.xcodeproj; path = "ZXingObjC-master/ZXingObjC.xcodeproj"; sourceTree = "<group>"; };
 		246732D811E27BC500D39AF7 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		24DD6D1B1134B66800162E58 /* titanium.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = titanium.xcconfig; sourceTree = "<group>"; };
 		24DE9E0F11C5FE74003F90F6 /* TiBarcodeModuleAssets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TiBarcodeModuleAssets.h; path = Classes/TiBarcodeModuleAssets.h; sourceTree = "<group>"; };
 		24DE9E1011C5FE74003F90F6 /* TiBarcodeModuleAssets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TiBarcodeModuleAssets.m; path = Classes/TiBarcodeModuleAssets.m; sourceTree = "<group>"; };
 		AA747D9E0F9514B9006C5449 /* TiBarcode_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TiBarcode_Prefix.pch; sourceTree = SOURCE_ROOT; };
+		B733F209234CD925008D571F /* ZXingObjC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ZXingObjC.framework; path = platform/ZXingObjC.framework; sourceTree = "<group>"; };
 		D2AAC07E0554694100DB518D /* libTiBarcode.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTiBarcode.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAF8E7AE1300AF8B00C06BC6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		DAF8E7B11300AF9400C06BC6 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -125,9 +76,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				191ECD1321DC657F005CAC7E /* libZXingObjC-iOS.a in Frameworks */,
 				246732D911E27BC500D39AF7 /* Foundation.framework in Frameworks */,
 				DAF8E7AF1300AF8B00C06BC6 /* UIKit.framework in Frameworks */,
+				B733F20A234CD925008D571F /* ZXingObjC.framework in Frameworks */,
 				DAF8E7B21300AF9400C06BC6 /* AudioToolbox.framework in Frameworks */,
 				DAF8E7B51300AF9E00C06BC6 /* CoreGraphics.framework in Frameworks */,
 				DAF8E7B71300AF9E00C06BC6 /* QuartzCore.framework in Frameworks */,
@@ -160,6 +111,7 @@
 		0867D69AFE84028FC02AAC07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B733F209234CD925008D571F /* ZXingObjC.framework */,
 				246732D811E27BC500D39AF7 /* Foundation.framework */,
 				DAF8E7AE1300AF8B00C06BC6 /* UIKit.framework */,
 				DAF8E7B11300AF9400C06BC6 /* AudioToolbox.framework */,
@@ -173,7 +125,6 @@
 		08FB77AEFE84172EC02AAC07 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				19777719210EF44400565614 /* ThirdParty */,
 				190E5FF12109BCB400FCEA5D /* TiOverlayView.h */,
 				190E5FF22109BCB400FCEA5D /* TiOverlayView.m */,
 				190E5FE92109BC8900FCEA5D /* TiBarcodeModule.h */,
@@ -184,27 +135,6 @@
 				24DE9E1011C5FE74003F90F6 /* TiBarcodeModuleAssets.m */,
 			);
 			name = Classes;
-			sourceTree = "<group>";
-		};
-		191ECCFD21DC6556005CAC7E /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				191ECD0621DC6556005CAC7E /* libZXingObjC-iOS.a */,
-				191ECD0821DC6556005CAC7E /* Unit Tests iOS.xctest */,
-				191ECD0A21DC6556005CAC7E /* libZXingObjC-osx.a */,
-				191ECD0C21DC6556005CAC7E /* Unit Tests OS X.xctest */,
-				191ECD0E21DC6556005CAC7E /* ZXingObjC.framework */,
-				191ECD1021DC6556005CAC7E /* ZXingObjC.framework */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		19777719210EF44400565614 /* ThirdParty */ = {
-			isa = PBXGroup;
-			children = (
-				191ECCFC21DC6556005CAC7E /* ZXingObjC.xcodeproj */,
-			);
-			name = ThirdParty;
 			sourceTree = "<group>";
 		};
 		32C88DFF0371C24200C91783 /* Other Sources */ = {
@@ -245,7 +175,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				191ECD1221DC6573005CAC7E /* PBXTargetDependency */,
 			);
 			name = barcode;
 			productName = barcode;
@@ -271,12 +200,6 @@
 			mainGroup = 0867D691FE84028FC02AAC07 /* barcode */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 191ECCFD21DC6556005CAC7E /* Products */;
-					ProjectRef = 191ECCFC21DC6556005CAC7E /* ZXingObjC.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				D2AAC07D0554694100DB518D /* barcode */,
@@ -284,51 +207,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		191ECD0621DC6556005CAC7E /* libZXingObjC-iOS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libZXingObjC-iOS.a";
-			remoteRef = 191ECD0521DC6556005CAC7E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		191ECD0821DC6556005CAC7E /* Unit Tests iOS.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = "Unit Tests iOS.xctest";
-			remoteRef = 191ECD0721DC6556005CAC7E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		191ECD0A21DC6556005CAC7E /* libZXingObjC-osx.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libZXingObjC-osx.a";
-			remoteRef = 191ECD0921DC6556005CAC7E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		191ECD0C21DC6556005CAC7E /* Unit Tests OS X.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = "Unit Tests OS X.xctest";
-			remoteRef = 191ECD0B21DC6556005CAC7E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		191ECD0E21DC6556005CAC7E /* ZXingObjC.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = ZXingObjC.framework;
-			remoteRef = 191ECD0D21DC6556005CAC7E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		191ECD1021DC6556005CAC7E /* ZXingObjC.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = ZXingObjC.framework;
-			remoteRef = 191ECD0F21DC6556005CAC7E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		24416B8011C4CA220047AFDD /* ShellScript */ = {
@@ -361,11 +239,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		191ECD1221DC6573005CAC7E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "ZXingObjC-iOS";
-			targetProxy = 191ECD1121DC6573005CAC7E /* PBXContainerItemProxy */;
-		};
 		24416B8511C4CA280047AFDD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = D2AAC07D0554694100DB518D /* barcode */;
@@ -385,6 +258,10 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DSTROOT = /tmp/TiBarcode.dst;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -402,11 +279,8 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
-					"\"zxing/cpp/core/src\"",
-					"\"zxing/iphone/ZXingWidget/Classes\"/**",
 					"$(TITANIUM_BASE_SDK)",
 					"$(TITANIUM_BASE_SDK2)",
-					"\"ZXingObjC-master\"/**",
 				);
 				INSTALL_PATH = /usr/local/lib;
 				OTHER_CFLAGS = (
@@ -437,6 +311,10 @@
 				CLANG_ENABLE_MODULES = YES;
 				DSTROOT = /tmp/TiBarcode.dst;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -454,11 +332,8 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
-					"\"zxing/cpp/core/src\"",
-					"\"zxing/iphone/ZXingWidget/Classes\"/**",
 					"$(TITANIUM_BASE_SDK)",
 					"$(TITANIUM_BASE_SDK2)",
-					"\"ZXingObjC-master\"/**",
 				);
 				INSTALL_PATH = /usr/local/lib;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -505,11 +380,8 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
-					"\"zxing/cpp/core/src\"",
-					"\"zxing/iphone/ZXingWidget/Classes\"/**",
 					"$(TITANIUM_BASE_SDK)",
 					"$(TITANIUM_BASE_SDK2)",
-					"\"ZXingObjC-master\"/**",
 				);
 				INSTALL_PATH = /usr/local/lib;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -556,11 +428,8 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
-					"\"zxing/cpp/core/src\"",
-					"\"zxing/iphone/ZXingWidget/Classes\"/**",
 					"$(TITANIUM_BASE_SDK)",
 					"$(TITANIUM_BASE_SDK2)",
-					"\"ZXingObjC-master\"/**",
 				);
 				INSTALL_PATH = /usr/local/lib;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;

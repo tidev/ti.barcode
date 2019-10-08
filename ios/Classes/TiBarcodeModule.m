@@ -14,7 +14,6 @@
 #import "TiOverlayView.h"
 #import "TiUtils.h"
 #import "TiViewProxy.h"
-#import "ZXCapture.h"
 
 @implementation TiBarcodeModule
 
@@ -469,8 +468,6 @@
 
 - (void)parseSuccessResult:(NSString *)result withFormat:(ZXBarcodeFormat)format withBytes:(ZXByteArray *)bytes
 {
-  NSLog(@"[DEBUG] Received barcode result = %@", result);
-
   NSMutableDictionary *event = [NSMutableDictionary dictionary];
   [event setObject:result forKey:@"result"];
   NSString *prefixCheck = [[result substringToIndex:MIN(20, [result length])] lowercaseString];
