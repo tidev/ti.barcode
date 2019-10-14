@@ -126,8 +126,7 @@ properties:
     permission: read-only
     platforms: [iphone, ipad]
     deprecated:
-        since: "2.0.0"
-        removed: "2.0.0"
+        since: "5.0.0"
 
   - name: FORMAT_ITF
     summary: |
@@ -164,7 +163,7 @@ properties:
     permission: read-only
     platforms: [android, iphone, ipad]
     deprecated:
-        since: "2.0.0"
+        since: "5.0.0"
 
   - name: FORMAT_RSS_14
     summary: |
@@ -550,7 +549,6 @@ properties:
         Please note that this hint only applies to [CODE_128](Modules.Barcode.FORMAT_CODE_128) format barcodes.
     type: Boolean
     optional: true
-    platforms: [android]
 
   - name: pureBarcode
     summary: |
@@ -558,7 +556,6 @@ properties:
         https://zxing.github.io/zxing/apidocs/
     type: Boolean
     optional: true
-    platforms: [android]
 
   - name: tryHarder
     summary: |
@@ -566,7 +563,6 @@ properties:
         https://zxing.github.io/zxing/apidocs/
     type: Boolean
     optional: true
-    platforms: [android]
 
   - name: returnCodabarStartEnd
     summary: |
@@ -576,7 +572,6 @@ properties:
         Please note that this hint only applies to [CODABAR](Modules.Barcode.FORMAT_CODABAR) format barcodes.
     type: Boolean
     optional: true
-    platforms: [android]
 
   - name: assumeCode39CheckDigit
     summary: |
@@ -586,7 +581,6 @@ properties:
         Please note that this hint only applies to [CODE_39](Modules.Barcode.FORMAT_CODE_39) format barcodes.
     type: Boolean
     optional: true
-    platforms: [android]
 
   - name: characterSet
     summary: |
@@ -594,7 +588,6 @@ properties:
         https://zxing.github.io/zxing/apidocs/
     type: String
     optional: true
-    platforms: [android]
 
   - name: allowedLengths
     summary: |
@@ -602,7 +595,6 @@ properties:
         https://zxing.github.io/zxing/apidocs/
     type: Array<Number>
     optional: true
-    platforms: [android]
 
   - name: allowedEANExtensions
     summary: |
@@ -610,7 +602,6 @@ properties:
         https://zxing.github.io/zxing/apidocs/
     type: Array<Number>
     optional: true
-    platforms: [android]
 
 ---
 name: BarcodeParseDict
@@ -638,7 +629,6 @@ properties:
         Please note that this hint only applies to [CODE_128](Modules.Barcode.FORMAT_CODE_128) format barcodes.
     type: Boolean
     optional: true
-    platforms: [android]
 
   - name: pureBarcode
     summary: |
@@ -646,7 +636,6 @@ properties:
         https://zxing.github.io/zxing/apidocs/
     type: Boolean
     optional: true
-    platforms: [android]
 
   - name: tryHarder
     summary: |
@@ -654,7 +643,6 @@ properties:
         https://zxing.github.io/zxing/apidocs/
     type: Boolean
     optional: true
-    platforms: [android]
 
   - name: returnCodabarStartEnd
     summary: |
@@ -664,7 +652,6 @@ properties:
         Please note that this hint only applies to [CODABAR](Modules.Barcode.FORMAT_CODABAR) format barcodes.
     type: Boolean
     optional: true
-    platforms: [android]
 
   - name: assumeCode39CheckDigit
     summary: |
@@ -674,7 +661,6 @@ properties:
         Please note that this hint only applies to [CODE_39](Modules.Barcode.FORMAT_CODE_39) format barcodes.
     type: Boolean
     optional: true
-    platforms: [android]
 
   - name: characterSet
     summary: |
@@ -690,7 +676,6 @@ properties:
         https://zxing.github.io/zxing/apidocs/
     type: Array<Number>
     optional: true
-    platforms: [android]
 
   - name: allowedEANExtensions
     summary: |
@@ -698,4 +683,3 @@ properties:
         https://zxing.github.io/zxing/apidocs/
     type: Array<Number>
     optional: true
-    platforms: [android]
