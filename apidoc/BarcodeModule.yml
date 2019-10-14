@@ -398,9 +398,9 @@ events:
     summary: Fired upon a successful barcode scan.
     properties:
       - name: format
-        summary: The format of the barcode
-        type: String
-        platforms: [android]
+        summary: The format of the barcode. Reported with a value of one of the Modules.Barcode.FORMAT_* constant if matching a known format. Otehrwise, may report a string value.
+        type: String,Number
+        platforms: [android, iphone, ipad]
             
       - name: result
         summary: The raw contents of the barcode
