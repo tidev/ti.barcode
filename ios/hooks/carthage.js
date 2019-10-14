@@ -28,6 +28,10 @@ function init (logger, config, cli, _appc) {
 		pre: function (builder, done) {
 			logger.info('Running carthage...');
 
+			// FIX for when platform dir doesn't already exist at builder init time. It assumes it's in the parent dir,
+			// but here we force it to look in ios subdir since we generate the platform dir on the fly here
+			builder.platformDir = path.join(builder.projectDir, 'platform');
+
 			const p = spawn('carthage', [ 'bootstrap', '--platform', 'ios', '--cache-builds' ], { cwd: builder.projectDir });
 			p.stderr.on('data', data => logger.error(data.toString().trim()));
 			p.stdout.on('data', data => logger.trace(data.toString().trim()));
