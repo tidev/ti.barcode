@@ -13,7 +13,7 @@
     "lint:docs": "tdoc-validate -w Titanium.Module,Titanium.UI.View,Titanium.Blob,Titanium.Buffer apidoc",
     "lint:ios": "clang-format-lint ios/**/*.m ios/**/*.h",
     "lint:js": "eslint .",
-    "test": "npm run lint && npm test",
+    "test": "npm run lint",
     "test:unit": "karma start test/unit/karma.unit.config.js",
     "test:android": "npm run test:unit -- --browsers android",
     "test:ios": "npm run test:unit -- --browsers ios"
