@@ -1,4 +1,3 @@
-/* eslint-env node, jasmine */
 let Barcode;
 
 const IOS = (Ti.Platform.osname === 'iphone' || Ti.Platform.osname === 'ipad');
