@@ -1,4 +1,4 @@
-# Titanium Barcode Module
+# Titanium Barcode Module [![Build Status](https://jenkins.appcelerator.org/buildStatus/icon?job=modules%2Fti.barcode%2Fmaster)](https://jenkins.appcelerator.org/job/modules/job/ti.barcode/job/master/) [![@titanium-sdk/ti.barcode](https://img.shields.io/npm/v/@titanium-sdk/ti.barcode.png)](https://www.npmjs.com/package/@titanium-sdk/ti.barcode)
 
 This is the Barcode Module for Titanium built on top of the ZXing library (Android)
 and AVFoundation (iOS).
