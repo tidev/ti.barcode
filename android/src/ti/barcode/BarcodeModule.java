@@ -43,7 +43,7 @@ import org.appcelerator.titanium.view.TiDrawableReference;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import sun.rmi.runtime.Log;
+import android.util.Log;
 import ti.modules.titanium.BufferProxy;
 import ti.modules.titanium.codec.CodecModule;
 
