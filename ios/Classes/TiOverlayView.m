@@ -18,6 +18,7 @@ CGFloat _kPadding = 10;
 {
   self = [super initWithFrame:frame];
   if (self) {
+    _overlay = overlay;
     _showRectangle = showRectangle;
     self.backgroundColor = [UIColor clearColor];
     if (showCancel) {
@@ -32,6 +33,7 @@ CGFloat _kPadding = 10;
     if (overlay != nil) {
       [self.layer addSublayer:overlay.layer];
     }
+    [self bringSubviewToFront:_cancelButton];
   }
   return self;
 }
@@ -39,6 +41,7 @@ CGFloat _kPadding = 10;
 - (void)updateViewsWithFrame:(CGRect)newFrame
 {
   self.frame = newFrame;
+  _overlay.frame = CGRectMake(_overlay.frame.origin.x, _overlay.frame.origin.y, newFrame.size.width, newFrame.size.height);
   if (self.frame.size.width > self.frame.size.height) {
     _kPadding = 70;
   } else {

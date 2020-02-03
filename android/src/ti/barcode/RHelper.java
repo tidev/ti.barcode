@@ -9,9 +9,11 @@ package ti.barcode;
 import org.appcelerator.titanium.util.TiRHelper;
 import org.appcelerator.titanium.util.TiRHelper.ResourceNotFoundException;
 
-public class RHelper {
+public class RHelper
+{
 
-	public static int getString(String str) {
+	public static int getString(String str)
+	{
 		try {
 			return TiRHelper.getApplicationResource("string." + str);
 		} catch (ResourceNotFoundException e) {
@@ -20,7 +22,8 @@ public class RHelper {
 		}
 	}
 
-	public static int getLayout(String str) {
+	public static int getLayout(String str)
+	{
 		try {
 			return TiRHelper.getApplicationResource("layout." + str);
 		} catch (ResourceNotFoundException e) {
@@ -29,7 +32,8 @@ public class RHelper {
 		}
 	}
 
-	public static int getId(String str) {
+	public static int getId(String str)
+	{
 		try {
 			return TiRHelper.getApplicationResource("id." + str);
 		} catch (ResourceNotFoundException e) {
@@ -38,7 +42,8 @@ public class RHelper {
 		}
 	}
 
-	public static int getDrawable(String str) {
+	public static int getDrawable(String str)
+	{
 		try {
 			return TiRHelper.getApplicationResource("drawable." + str);
 		} catch (ResourceNotFoundException e) {
@@ -47,7 +52,8 @@ public class RHelper {
 		}
 	}
 
-	public static int getColor(String str) {
+	public static int getColor(String str)
+	{
 		try {
 			return TiRHelper.getApplicationResource("color." + str);
 		} catch (ResourceNotFoundException e) {
@@ -56,7 +62,8 @@ public class RHelper {
 		}
 	}
 
-	public static int getRaw(String str) {
+	public static int getRaw(String str)
+	{
 		try {
 			return TiRHelper.getApplicationResource("raw." + str);
 		} catch (ResourceNotFoundException e) {
@@ -65,7 +72,8 @@ public class RHelper {
 		}
 	}
 
-	public static int getXML(String str) {
+	public static int getXML(String str)
+	{
 		try {
 			return TiRHelper.getApplicationResource("xml." + str);
 		} catch (ResourceNotFoundException e) {

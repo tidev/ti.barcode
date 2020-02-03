@@ -4,10 +4,11 @@ import android.hardware.Camera;
 import android.util.Log;
 import com.google.zxing.client.android.camera.open.CameraFacing;
 
-public class FrontCamera {
-	
+public class FrontCamera
+{
 
-	public static int getFrontCamera() {
+	public static int getFrontCamera()
+	{
 		int index = 0;
 		int numCameras = Camera.getNumberOfCameras();
 		if (numCameras == 0) {
@@ -24,7 +25,7 @@ public class FrontCamera {
 			}
 			index++;
 		}
-		
+
 		return -1;
 	}
 }

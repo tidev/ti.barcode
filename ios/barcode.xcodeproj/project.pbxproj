@@ -28,12 +28,11 @@
 		190E5FF02109BC8A00FCEA5D /* TiBarcodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 190E5FEC2109BC8A00FCEA5D /* TiBarcodeViewController.m */; };
 		190E5FF32109BCB400FCEA5D /* TiOverlayView.h in Headers */ = {isa = PBXBuildFile; fileRef = 190E5FF12109BCB400FCEA5D /* TiOverlayView.h */; };
 		190E5FF42109BCB400FCEA5D /* TiOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 190E5FF22109BCB400FCEA5D /* TiOverlayView.m */; };
-		1977771C210EF49200565614 /* MTBBarcodeScanner.m in Sources */ = {isa = PBXBuildFile; fileRef = 1977771A210EF49200565614 /* MTBBarcodeScanner.m */; };
-		1977771D210EF49200565614 /* MTBBarcodeScanner.h in Headers */ = {isa = PBXBuildFile; fileRef = 1977771B210EF49200565614 /* MTBBarcodeScanner.h */; };
 		246732D911E27BC500D39AF7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 246732D811E27BC500D39AF7 /* Foundation.framework */; };
 		24DE9E1111C5FE74003F90F6 /* TiBarcodeModuleAssets.h in Headers */ = {isa = PBXBuildFile; fileRef = 24DE9E0F11C5FE74003F90F6 /* TiBarcodeModuleAssets.h */; };
 		24DE9E1211C5FE74003F90F6 /* TiBarcodeModuleAssets.m in Sources */ = {isa = PBXBuildFile; fileRef = 24DE9E1011C5FE74003F90F6 /* TiBarcodeModuleAssets.m */; };
 		AA747D9F0F9514B9006C5449 /* TiBarcode_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = AA747D9E0F9514B9006C5449 /* TiBarcode_Prefix.pch */; };
+		B733F20A234CD925008D571F /* ZXingObjC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B733F209234CD925008D571F /* ZXingObjC.framework */; };
 		DAF8E7AF1300AF8B00C06BC6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8E7AE1300AF8B00C06BC6 /* UIKit.framework */; };
 		DAF8E7B21300AF9400C06BC6 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8E7B11300AF9400C06BC6 /* AudioToolbox.framework */; };
 		DAF8E7B51300AF9E00C06BC6 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8E7B41300AF9E00C06BC6 /* CoreGraphics.framework */; };
@@ -58,13 +57,12 @@
 		190E5FEC2109BC8A00FCEA5D /* TiBarcodeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TiBarcodeViewController.m; path = Classes/TiBarcodeViewController.m; sourceTree = "<group>"; };
 		190E5FF12109BCB400FCEA5D /* TiOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TiOverlayView.h; path = Classes/TiOverlayView.h; sourceTree = "<group>"; };
 		190E5FF22109BCB400FCEA5D /* TiOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TiOverlayView.m; path = Classes/TiOverlayView.m; sourceTree = "<group>"; };
-		1977771A210EF49200565614 /* MTBBarcodeScanner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MTBBarcodeScanner.m; path = Classes/MTBBarcodeScanner.m; sourceTree = "<group>"; };
-		1977771B210EF49200565614 /* MTBBarcodeScanner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MTBBarcodeScanner.h; path = Classes/MTBBarcodeScanner.h; sourceTree = "<group>"; };
 		246732D811E27BC500D39AF7 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		24DD6D1B1134B66800162E58 /* titanium.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = titanium.xcconfig; sourceTree = "<group>"; };
 		24DE9E0F11C5FE74003F90F6 /* TiBarcodeModuleAssets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TiBarcodeModuleAssets.h; path = Classes/TiBarcodeModuleAssets.h; sourceTree = "<group>"; };
 		24DE9E1011C5FE74003F90F6 /* TiBarcodeModuleAssets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TiBarcodeModuleAssets.m; path = Classes/TiBarcodeModuleAssets.m; sourceTree = "<group>"; };
 		AA747D9E0F9514B9006C5449 /* TiBarcode_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TiBarcode_Prefix.pch; sourceTree = SOURCE_ROOT; };
+		B733F209234CD925008D571F /* ZXingObjC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ZXingObjC.framework; path = platform/ZXingObjC.framework; sourceTree = "<group>"; };
 		D2AAC07E0554694100DB518D /* libTiBarcode.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTiBarcode.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAF8E7AE1300AF8B00C06BC6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		DAF8E7B11300AF9400C06BC6 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -80,6 +78,7 @@
 			files = (
 				246732D911E27BC500D39AF7 /* Foundation.framework in Frameworks */,
 				DAF8E7AF1300AF8B00C06BC6 /* UIKit.framework in Frameworks */,
+				B733F20A234CD925008D571F /* ZXingObjC.framework in Frameworks */,
 				DAF8E7B21300AF9400C06BC6 /* AudioToolbox.framework in Frameworks */,
 				DAF8E7B51300AF9E00C06BC6 /* CoreGraphics.framework in Frameworks */,
 				DAF8E7B71300AF9E00C06BC6 /* QuartzCore.framework in Frameworks */,
@@ -112,6 +111,7 @@
 		0867D69AFE84028FC02AAC07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B733F209234CD925008D571F /* ZXingObjC.framework */,
 				246732D811E27BC500D39AF7 /* Foundation.framework */,
 				DAF8E7AE1300AF8B00C06BC6 /* UIKit.framework */,
 				DAF8E7B11300AF9400C06BC6 /* AudioToolbox.framework */,
@@ -125,7 +125,6 @@
 		08FB77AEFE84172EC02AAC07 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				19777719210EF44400565614 /* MTBBarcodeScanner */,
 				190E5FF12109BCB400FCEA5D /* TiOverlayView.h */,
 				190E5FF22109BCB400FCEA5D /* TiOverlayView.m */,
 				190E5FE92109BC8900FCEA5D /* TiBarcodeModule.h */,
@@ -136,15 +135,6 @@
 				24DE9E1011C5FE74003F90F6 /* TiBarcodeModuleAssets.m */,
 			);
 			name = Classes;
-			sourceTree = "<group>";
-		};
-		19777719210EF44400565614 /* MTBBarcodeScanner */ = {
-			isa = PBXGroup;
-			children = (
-				1977771B210EF49200565614 /* MTBBarcodeScanner.h */,
-				1977771A210EF49200565614 /* MTBBarcodeScanner.m */,
-			);
-			name = MTBBarcodeScanner;
 			sourceTree = "<group>";
 		};
 		32C88DFF0371C24200C91783 /* Other Sources */ = {
@@ -167,7 +157,6 @@
 				AA747D9F0F9514B9006C5449 /* TiBarcode_Prefix.pch in Headers */,
 				190E5FEE2109BC8A00FCEA5D /* TiBarcodeViewController.h in Headers */,
 				190E5FED2109BC8A00FCEA5D /* TiBarcodeModule.h in Headers */,
-				1977771D210EF49200565614 /* MTBBarcodeScanner.h in Headers */,
 				24DE9E1111C5FE74003F90F6 /* TiBarcodeModuleAssets.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -205,6 +194,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* barcode */;
@@ -240,7 +230,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				190E5FF42109BCB400FCEA5D /* TiOverlayView.m in Sources */,
-				1977771C210EF49200565614 /* MTBBarcodeScanner.m in Sources */,
 				190E5FF02109BC8A00FCEA5D /* TiBarcodeViewController.m in Sources */,
 				190E5FEF2109BC8A00FCEA5D /* TiBarcodeModule.m in Sources */,
 				24DE9E1211C5FE74003F90F6 /* TiBarcodeModuleAssets.m in Sources */,
@@ -264,10 +253,16 @@
 			buildSettings = {
 				"ARCHS[sdk=iphoneos*]" = "$(ARCHS_STANDARD)";
 				"ARCHS[sdk=iphonesimulator*]" = "$(ARCHS_STANDARD)";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DSTROOT = /tmp/TiBarcode.dst;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/platform",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -285,8 +280,6 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
-					"\"zxing/cpp/core/src\"",
-					"\"zxing/iphone/ZXingWidget/Classes\"/**",
 					"$(TITANIUM_BASE_SDK)",
 					"$(TITANIUM_BASE_SDK2)",
 				);
@@ -316,8 +309,14 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				"ARCHS[sdk=iphoneos*]" = "$(ARCHS_STANDARD)";
 				"ARCHS[sdk=iphonesimulator*]" = "$(ARCHS_STANDARD)";
+				CLANG_ENABLE_MODULES = YES;
 				DSTROOT = /tmp/TiBarcode.dst;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/platform",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -335,8 +334,6 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
-					"\"zxing/cpp/core/src\"",
-					"\"zxing/iphone/ZXingWidget/Classes\"/**",
 					"$(TITANIUM_BASE_SDK)",
 					"$(TITANIUM_BASE_SDK2)",
 				);
@@ -385,8 +382,6 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
-					"\"zxing/cpp/core/src\"",
-					"\"zxing/iphone/ZXingWidget/Classes\"/**",
 					"$(TITANIUM_BASE_SDK)",
 					"$(TITANIUM_BASE_SDK2)",
 				);
@@ -435,8 +430,6 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
-					"\"zxing/cpp/core/src\"",
-					"\"zxing/iphone/ZXingWidget/Classes\"/**",
 					"$(TITANIUM_BASE_SDK)",
 					"$(TITANIUM_BASE_SDK2)",
 				);

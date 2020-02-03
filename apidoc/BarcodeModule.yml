@@ -1,0 +1,687 @@
+---
+name: Modules.Barcode
+summary: Add-on Barcode module
+description: |
+    #### System Requirements
+
+    - [x] Titanium SDK 5.5.1+
+    - [x] Camera Permissions set in your tiapp.xml:
+
+        <ti:app>
+          ...
+          <ios>
+            <plist>
+              <dict>
+                <key>NSCameraUsageDescription</key>
+                <string>We need permission to access your device camera.</string>
+              </dict>
+            </plist>
+          </ios>
+          ...
+        </ti:app>
+
+extends: Titanium.Module
+since: { android: "3.1.0", iphone: "3.2.0", ipad: "3.2.0" }
+platforms: [android, iphone, ipad]
+excludes:
+    methods: [addEventListener, fireEvent, removeEventListener]
+    properties: [bubbleParent]
+
+properties:
+  - name: FORMAT_NONE
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+    deprecated:
+        since: "5.0.0"
+
+  - name: FORMAT_QR_CODE
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: FORMAT_DATA_MATRIX
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: FORMAT_UPC_E
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: FORMAT_UPC_A
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: FORMAT_EAN_8
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: FORMAT_EAN_13
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: FORMAT_CODE_128
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: FORMAT_CODE_39
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: FORMAT_CODE_93
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: FORMAT_CODE_39_MOD_43
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    platforms: [iphone, ipad]
+    deprecated:
+        since: "5.0.0"
+
+  - name: FORMAT_ITF
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: FORMAT_PDF_417
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: FORMAT_AZTEC
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: FORMAT_INTERLEAVED_2_OF_5
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    platforms: [android, iphone, ipad]
+    deprecated:
+        since: "5.0.0"
+
+  - name: FORMAT_RSS_14
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: FORMAT_RSS_EXPANDED
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: FORMAT_MAXICODE
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+
+        Please note that Maxicode support is considered Beta, and requires using the [pureBarcode](BarcodeParseDict.pureBarcode) hint.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: FORMAT_CODABAR
+    summary: |
+        Used in the [capture](Modules.Barcode.capture) and [parse](Modules.Barcode.parse) methods
+        and the [success](Modules.Barcode.success) event to specify accepted formats.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: UNKNOWN
+    summary: |
+        Used in the [success](Modules.Barcode.success) event
+        to specify the assumed content type of the barcode.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: URL
+    summary: |
+        Used in the [success](Modules.Barcode.success) event
+        to specify the assumed content type of the barcode.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: SMS
+    summary: |
+        Used in the [success](Modules.Barcode.success) event
+        to specify the assumed content type of the barcode.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: TELEPHONE
+    summary: |
+        Used in the [success](Modules.Barcode.success) event
+        to specify the assumed content type of the barcode.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: TEXT
+    summary: |
+        Used in the [success](Modules.Barcode.success) event
+        to specify the assumed content type of the barcode.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: CALENDAR
+    summary: |
+        Used in the [success](Modules.Barcode.success) event
+        to specify the assumed content type of the barcode.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: GEOLOCATION
+    summary: |
+        Used in the [success](Modules.Barcode.success) event
+        to specify the assumed content type of the barcode.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: EMAIL
+    summary: |
+        Used in the [success](Modules.Barcode.success) event
+        to specify the assumed content type of the barcode.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: CONTACT
+    summary: |
+        Used in the [success](Modules.Barcode.success) event
+        to specify the assumed content type of the barcode.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: BOOKMARK
+    summary: |
+        Used in the [success](Modules.Barcode.success) event
+        to specify the assumed content type of the barcode.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: WIFI
+    summary: |
+        Used in the [success](Modules.Barcode.success) event
+        to specify the assumed content type of the barcode.
+    type: Number
+    permission: read-only
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: allowRotation
+    summary: |
+        Value that indicates if the barcode capture should analyze captured images in either portrait or landscape device
+        orientation. (Warning: Analyzing both the captured image and the rotated version(s) of the image will increase the
+        processing time of the capture.)
+
+        * true: Captured images will be analyzed in both portrait and landscape orientation.
+        * false [default]: Captured images will be analyzed using only the current device orientation.
+    type: Boolean
+    default: false
+    platforms: [iphone, ipad]
+    deprecated:
+        since: "2.0.0"
+        removed: "2.0.0"
+
+  - name: allowMenu
+    summary: Whether or not to allow the built-in ZXing menu to display.
+    type: Boolean
+    default: true
+    since: "3.1.0"
+    platforms: [android]
+
+  - name: allowInstructions
+    summary: Whether or not to display helpful instructions or a changelog when the app is updated.
+    type: Boolean
+    default: true
+    since: "3.1.0"
+    platforms: [android]
+
+  - name: displayedMessage
+    summary: Controls the message that is displayed to the end user when they are capturing a barcode.
+    type: String
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: useFrontCamera
+    summary: |
+        Controls whether or not the front camera on the device will be used to capture barcodes.
+        On Android, this requires API level 9 (Android OS 2.3) or higher.
+        If no front camera is available, this will gracefully fall back to utilize whatever camera is available.
+    type: Boolean
+    default: false
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: useLED
+    summary: |
+        Whether or not to use the LED when scanning barcodes (also known as the flashlight, torch, or some derivation thereof).
+    type: Boolean
+    default: false
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+methods:
+
+  - name: cancel
+    summary: Cancels and closes the currently open capture window.
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: canShow
+    summary: Whether the barcode scanner camera is allowed.
+    platforms: [iphone, ipad]
+    returns:
+      type: Boolean
+    deprecated:
+      since: "2.0.0"
+
+  - name: capture
+    summary: |
+        Brings up the camera and begins the capture sequence for processing a barcode.
+    parameters:
+      - name: dictionary
+        summary: optional
+        type: BarcodeCaptureDict
+        optional: true
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+  - name: parse
+    summary: |
+        Parses a blob image for barcodes.
+    parameters:
+      - name: dictionary
+        summary: optional
+        type: BarcodeParseDict
+        optional: true
+    since: "3.1.0"
+    platforms: [android, iphone, ipad]
+
+events:
+  - name: success
+    summary: Fired upon a successful barcode scan.
+    properties:
+      - name: format
+        summary: The format of the barcode. Reported with a value of one of the Modules.Barcode.FORMAT_* constant if matching a known format. Otehrwise, may report a string value.
+        type: [String,Number]
+        platforms: [android, iphone, ipad]
+            
+      - name: result
+        summary: The raw contents of the barcode
+        type: String
+        
+      - name: code
+        summary: |
+            The activity result code from the scanning activity. Use the result constants defined in the [Ti.Android](Titanium.Android) namespace
+
+            <Titanium.Android.RESULT_CANCELED>, <Titanium.Android.RESULT_FIRST_USER>, or
+            <Titanium.Android.RESULT_OK>
+        type: Number
+        platforms: [android]
+
+      - name: contentType
+        summary: The type of barcode content. Use the constants defined in this module to determine which.
+        type: Number
+
+      - name: data
+        summary: The parsed fields associated with the contentType.
+        type: Object
+
+      - name: bytes
+        summary: The raw byte array contents of the barcode, when available
+        type: Titanium.Buffer
+    
+  - name: error
+    summary: Sent when an error occurs.
+    properties:
+      - name: message
+        summary: The error message
+        type: String
+            
+      - name: code
+        summary: |
+            The activity result code from the scanning activity. Use the result constants defined in the [Ti.Android](Titanium.Android) namespace
+
+            <Titanium.Android.RESULT_CANCELED>, <Titanium.Android.RESULT_FIRST_USER>, or
+            <Titanium.Android.RESULT_OK>
+        type: Number
+        platforms: [android]
+
+  - name: cancel
+    summary: Sent when the scanning process is canceled.
+    properties:
+      - name: message
+        summary: The error message
+        type: String
+            
+      - name: code
+        summary: |
+            The activity result code from the scanning activity. Use the result constants defined in the [Ti.Android](Titanium.Android) namespace
+
+            <Titanium.Android.RESULT_CANCELED>, <Titanium.Android.RESULT_FIRST_USER>, or
+            <Titanium.Android.RESULT_OK>
+        type: Number
+        platforms: [android]
+
+---
+name: BarcodeCaptureDict
+summary: Simple object passed to <Modules.Barcode.capture> to capture a Barcode.
+properties:
+
+  - name: animate
+    summary: |
+        Indicates if the device should animate between the current activity and the camera activity when the current activity is in a different orientation than the camera. Default is true.
+    type: Boolean
+    optional: true
+    default: true
+    platforms: [android, iphone, ipad]
+
+  - name: showCancel
+    summary: |
+        Whether or not to include the default cancel button. Defaults to true.
+    type: Boolean
+    optional: true
+    default: true
+    platforms: [iphone, ipad]
+
+  - name: showRectangle
+    summary: |
+        Whether or not to include the default rectangle around the scanning area. Defaults to true.
+    type: Boolean
+    optional: true
+    default: true
+    platforms: [android, iphone, ipad]
+
+  - name: overlay
+    summary: |
+        The view to lay on top of the camera activity.
+    type: Titanium.UI.View
+    optional: true
+    platforms: [android, iphone, ipad]
+
+  - name: keepOpen
+    summary: |
+        Whether or not to keep the barcode scanner open after a barcode is recognized. Defaults to false.
+        When set to true, "success" will fire once every time a barcode is recognized, up to two times per second.
+        As such, it can fire multiple times for a single barcode!
+    type: Boolean
+    optional: true
+    default: false
+    platforms: [android, iphone, ipad]
+
+  - name: acceptedFormats
+    summary: |
+        An optional array of int constants detailing which barcode formats are accepted. Defaults to all formats.
+        Check out the "Barcode Format Constants" section below to see the available int constants.
+    type: Array<Number>
+    optional: true
+    platforms: [android, iphone, ipad]
+
+  - name: preventRotation
+    summary: |
+        Prevent the scanner from auto-rotating when the device is rotated. Default: true
+    type: Boolean
+    optional: true
+    default: true
+    platforms: [android, iphone, ipad]
+
+  - name: frameWidth
+    summary: |
+        Width of the rectangle that is shown in the scanner
+    type: Number
+    optional: true
+    platforms: [android]
+
+  - name: frameHeight
+    summary: |
+        Height of the rectangle that is shown in the scanner
+    type: Number
+    optional: true
+    platforms: [android]
+
+  - name: showInfoText
+    summary: |
+        Whether to show informational text
+    type: Boolean
+    optional: true
+    platforms: [android]
+
+  - name: assumeGS1
+    summary: |
+        An optional boolean to assume the barcode is being processed as a GS1 barcode, and modify behavior as needed.
+        https://zxing.github.io/zxing/apidocs/
+
+        Please note that this hint only applies to [CODE_128](Modules.Barcode.FORMAT_CODE_128) format barcodes.
+    type: Boolean
+    optional: true
+
+  - name: pureBarcode
+    summary: |
+        An optional boolean to assume the image is a pure monochrome image of a barcode.
+        https://zxing.github.io/zxing/apidocs/
+    type: Boolean
+    optional: true
+
+  - name: tryHarder
+    summary: |
+        An optional boolean to spend more time to try to find a barcode; optimize for accuracy, not speed.
+        https://zxing.github.io/zxing/apidocs/
+    type: Boolean
+    optional: true
+
+  - name: returnCodabarStartEnd
+    summary: |
+        An optional boolean which if true, will return the start and end digits in a Codabar barcode instead of stripping them.
+        https://zxing.github.io/zxing/apidocs/
+
+        Please note that this hint only applies to [CODABAR](Modules.Barcode.FORMAT_CODABAR) format barcodes.
+    type: Boolean
+    optional: true
+
+  - name: assumeCode39CheckDigit
+    summary: |
+        An optional boolean which if true, will assume Code 39 codes employ a check digit.
+        https://zxing.github.io/zxing/apidocs/
+
+        Please note that this hint only applies to [CODE_39](Modules.Barcode.FORMAT_CODE_39) format barcodes.
+    type: Boolean
+    optional: true
+
+  - name: characterSet
+    summary: |
+        An optional string that specifies what character encoding to use when decoding, where applicable
+        https://zxing.github.io/zxing/apidocs/
+    type: String
+    optional: true
+
+  - name: allowedLengths
+    summary: |
+        An optional int[] that specifies allowed lengths of encoded data -- reject anything else.
+        https://zxing.github.io/zxing/apidocs/
+    type: Array<Number>
+    optional: true
+
+  - name: allowedEANExtensions
+    summary: |
+        An optional int[] that specifies allowed extension lengths for EAN or UPC barcodes.
+        https://zxing.github.io/zxing/apidocs/
+    type: Array<Number>
+    optional: true
+
+---
+name: BarcodeParseDict
+summary: Simple object passed to <Modules.Barcode.parse> to parse a Ti.Blob image for barcodes.
+properties:
+
+  - name: image
+    summary: |
+        The image blob to parse for a barcode.
+    type: Titanium.Blob
+    optional: false
+
+  - name: acceptedFormats
+    summary: |
+        An optional array of int constants detailing which barcode formats are accepted. Defaults to all formats.
+        Check out the "Barcode Format Constants" section below to see the available int constants.
+    type: Array<Number>
+    optional: true
+
+  - name: assumeGS1
+    summary: |
+        An optional boolean to assume the barcode is being processed as a GS1 barcode, and modify behavior as needed.
+        https://zxing.github.io/zxing/apidocs/
+
+        Please note that this hint only applies to [CODE_128](Modules.Barcode.FORMAT_CODE_128) format barcodes.
+    type: Boolean
+    optional: true
+
+  - name: pureBarcode
+    summary: |
+        An optional boolean to assume the image is a pure monochrome image of a barcode.
+        https://zxing.github.io/zxing/apidocs/
+    type: Boolean
+    optional: true
+
+  - name: tryHarder
+    summary: |
+        An optional boolean to spend more time to try to find a barcode; optimize for accuracy, not speed.
+        https://zxing.github.io/zxing/apidocs/
+    type: Boolean
+    optional: true
+
+  - name: returnCodabarStartEnd
+    summary: |
+        An optional boolean which if true, will return the start and end digits in a Codabar barcode instead of stripping them.
+        https://zxing.github.io/zxing/apidocs/
+
+        Please note that this hint only applies to [CODABAR](Modules.Barcode.FORMAT_CODABAR) format barcodes.
+    type: Boolean
+    optional: true
+
+  - name: assumeCode39CheckDigit
+    summary: |
+        An optional boolean which if true, will assume Code 39 codes employ a check digit.
+        https://zxing.github.io/zxing/apidocs/
+
+        Please note that this hint only applies to [CODE_39](Modules.Barcode.FORMAT_CODE_39) format barcodes.
+    type: Boolean
+    optional: true
+
+  - name: characterSet
+    summary: |
+        An optional string that specifies what character encoding to use when decoding, where applicable
+        https://zxing.github.io/zxing/apidocs/
+    type: String
+    optional: true
+    platforms: [android]
+
+  - name: allowedLengths
+    summary: |
+        An optional int[] that specifies allowed lengths of encoded data -- reject anything else.
+        https://zxing.github.io/zxing/apidocs/
+    type: Array<Number>
+    optional: true
+
+  - name: allowedEANExtensions
+    summary: |
+        An optional int[] that specifies allowed extension lengths for EAN or UPC barcodes.
+        https://zxing.github.io/zxing/apidocs/
+    type: Array<Number>
+    optional: true

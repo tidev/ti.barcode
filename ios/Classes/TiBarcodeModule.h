@@ -4,19 +4,22 @@
  * Please see the LICENSE included with this distribution for details.
  */
 
-#import "MTBBarcodeScanner.h"
 #import "TiBarcodeViewController.h"
 #import "TiModule.h"
+#import <ZXingObjC/ZXingObjC.h>
+
 @class TiOverlayView;
 @class TiViewProxy;
 
-@interface TiBarcodeModule : TiModule <TiOverlayViewDelegate> {
+@interface TiBarcodeModule : TiModule <TiOverlayViewDelegate, ZXCaptureDelegate> {
   @private
   TiBarcodeViewController *_barcodeViewController;
-  MTBCamera _selectedCamera;
-  MTBTorchMode _selectedLEDMode;
+  BOOL _useFrontCamera;
+  BOOL _useLED;
   NSString *_displayedMessage;
   TiViewProxy *_overlayViewProxy;
+  BOOL keepOpen;
+  ZXCapture *zxCapture;
 }
 
 - (NSNumber *)canShow:(id)unused;
