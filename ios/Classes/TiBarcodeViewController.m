@@ -1,6 +1,6 @@
 /**
  * Ti.Barcode Module
- * Copyright (c) 2010-2018 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2010-2020 by Axway, Inc. All Rights Reserved.
  * Please see the LICENSE included with this distribution for details.
  */
 
@@ -41,10 +41,6 @@
                                                object:nil];
     if (_showRectangle) {
       CGRect rect = _overlayView.cropRect;
-      //      __weak TiBarcodeViewController *weakSelf = self;
-      //      [_scanner setDidStartScanningBlock:^(void) {
-      //        [[weakSelf scanner] setScanRect:rect];
-      //      }];
     }
   }
   return self;
@@ -106,7 +102,6 @@
 {
   if (_showRectangle) {
     CGRect rect = _overlayView.cropRect;
-    // [_scanner setScanRect:rect];
   }
 }
 
