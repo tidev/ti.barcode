@@ -16,7 +16,6 @@
 }
 
 - (instancetype)initWithDelegate:(id<TiOverlayViewDelegate>)delegate
-                      showCancel:(BOOL)shouldShowCancel
                    showRectangle:(BOOL)shouldShowRectangle
                      withOverlay:(UIView *)overlay
                  preventRotation:(BOOL)preventRotation
@@ -28,7 +27,6 @@
     self.capture = [[ZXCapture alloc] init];
 #endif
     _overlayView = [[TiOverlayView alloc] initWithFrame:[UIScreen mainScreen].bounds
-                                             showCancel:shouldShowCancel
                                           showRectangle:shouldShowRectangle
                                             withOverlay:overlay];
     _showRectangle = shouldShowRectangle;

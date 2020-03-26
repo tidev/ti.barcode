@@ -25,7 +25,6 @@
 - (TiOverlayView *)overlayView;
 
 - (id)initWithDelegate:(id<TiOverlayViewDelegate>)delegate
-            showCancel:(BOOL)shouldShowCancel
          showRectangle:(BOOL)shouldShowRectangle
            withOverlay:(UIView *)overlay
        preventRotation:(BOOL)preventRotation;

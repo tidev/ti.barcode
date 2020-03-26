@@ -66,7 +66,6 @@
 
   keepOpen = [TiUtils boolValue:[args objectForKey:@"keepOpen"] def:NO];
   BOOL animate = [TiUtils boolValue:[args objectForKey:@"animate"] def:YES];
-  BOOL showCancel = [TiUtils boolValue:@"showCancel" properties:args def:YES];
   BOOL showRectangle = [TiUtils boolValue:@"showRectangle" properties:args def:YES];
   BOOL preventRotation = [TiUtils boolValue:@"preventRotation" properties:args def:NO];
 
@@ -79,7 +78,7 @@
     [self rememberProxy:_overlayViewProxy];
     overlayView = [self prepareOverlayWithProxy:_overlayViewProxy];
   }
-  _barcodeViewController = [[TiBarcodeViewController alloc] initWithDelegate:self showCancel:showCancel showRectangle:showRectangle withOverlay:overlayView preventRotation:preventRotation];
+  _barcodeViewController = [[TiBarcodeViewController alloc] initWithDelegate:self showRectangle:showRectangle withOverlay:overlayView preventRotation:preventRotation];
 
   _barcodeViewController.capture.camera = _useFrontCamera ? _barcodeViewController.capture.front : _barcodeViewController.capture.back;
   _barcodeViewController.capture.delegate = self;

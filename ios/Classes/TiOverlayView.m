@@ -12,7 +12,6 @@ CGFloat _kPadding = 10;
 @implementation TiOverlayView
 
 - (id)initWithFrame:(CGRect)frame
-         showCancel:(BOOL)showCancel
       showRectangle:(BOOL)showRectangle
         withOverlay:(UIView *)overlay
 {
@@ -21,19 +20,12 @@ CGFloat _kPadding = 10;
     _overlay = overlay;
     _showRectangle = showRectangle;
     self.backgroundColor = [UIColor clearColor];
-    if (showCancel) {
-      _cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-      [_cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];
-      [_cancelButton addTarget:self action:@selector(cancel:) forControlEvents:UIControlEventTouchUpInside];
-      [self addSubview:_cancelButton];
-    }
 
     [self updateViewsWithFrame:frame];
 
     if (overlay != nil) {
       [self.layer addSublayer:overlay.layer];
     }
-    [self bringSubviewToFront:_cancelButton];
   }
   return self;
 }
@@ -53,12 +45,6 @@ CGFloat _kPadding = 10;
     rectSize2 = self.frame.size.height - _kPadding * 2;
   }
   _cropRect = CGRectMake(_kPadding, (self.frame.size.height - rectSize2) / 2, rectSize, rectSize2);
-
-  if (_cancelButton) {
-    CGSize theSize = CGSizeMake(100, 50);
-    CGRect theRect = CGRectMake((self.frame.size.width - theSize.width) / 2, _cropRect.origin.y + _cropRect.size.height + 20, theSize.width, theSize.height);
-    [_cancelButton setFrame:theRect];
-  }
   [self setNeedsDisplay];
 }
 
