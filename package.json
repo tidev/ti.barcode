@@ -1,6 +1,6 @@
 {
   "name": "@titanium-sdk/ti.barcode",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "Lets you process 1D/2D barcodes",
   "scripts": {
     "commit": "git-cz",
