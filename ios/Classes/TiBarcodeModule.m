@@ -106,7 +106,7 @@
       [self closeScanner];
     }
   }
-
+  _barcodeViewController.modalPresentationStyle = UIModalPresentationFullScreen;
   [[[[TiApp app] controller] topPresentedController] presentViewController:_barcodeViewController
                                                                   animated:animate
                                                                 completion:^{
