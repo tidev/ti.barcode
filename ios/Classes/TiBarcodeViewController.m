@@ -82,6 +82,11 @@
   return [[[TiApp app] controller] preferredStatusBarStyle];
 }
 
+- (BOOL)prefersStatusBarHidden
+{
+  return [[[TiApp app] controller] prefersStatusBarHidden];
+}
+
 - (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation
 {
   return [[[[TiApp app] controller] topContainerController] preferredInterfaceOrientationForPresentation];
