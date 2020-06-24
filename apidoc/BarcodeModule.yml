@@ -4,21 +4,23 @@ summary: Add-on Barcode module
 description: |
     #### System Requirements
 
-    - [x] Titanium SDK 5.5.1+
-    - [x] Camera Permissions set in your tiapp.xml:
+    - Titanium SDK 5.5.1+
+    - Camera Permissions set in your tiapp.xml:
 
-        <ti:app>
-          ...
-          <ios>
-            <plist>
-              <dict>
-                <key>NSCameraUsageDescription</key>
-                <string>We need permission to access your device camera.</string>
-              </dict>
-            </plist>
-          </ios>
-          ...
-        </ti:app>
+    ``` xml
+    <ti:app>
+      <!-- ... -->
+      <ios>
+        <plist>
+          <dict>
+            <key>NSCameraUsageDescription</key>
+            <string>We need permission to access your device camera.</string>
+          </dict>
+        </plist>
+      </ios>
+      <!-- ... -->
+    </ti:app>
+    ```
 
 extends: Titanium.Module
 since: { android: "3.1.0", iphone: "3.2.0", ipad: "3.2.0" }
