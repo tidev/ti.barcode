@@ -350,6 +350,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 
 			intent.putExtra(Intents.Scan.SHOW_RECTANGLE, argsDict.optBoolean("showRectangle", true));
 			intent.putExtra(Intents.Scan.KEEP_OPEN, argsDict.optBoolean("keepOpen", false));
+			intent.putExtra(Intents.Scan.SHOW_CANCEL, argsDict.optBoolean("showCancel", true));
 			frameWidth = argsDict.optInt("frameWidth", 0);
 			frameHeight = argsDict.optInt("frameHeight", 0);
 			intent.putExtra(Intents.Scan.SHOW_INFO_TEXT, argsDict.optBoolean("showInfoText", false));
@@ -357,6 +358,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 		} else {
 			Intents.Scan.overlayProxy = null;
 			intent.putExtra(Intents.Scan.SHOW_RECTANGLE, true);
+			intent.putExtra(Intents.Scan.SHOW_CANCEL, true);
 			intent.putExtra(Intents.Scan.KEEP_OPEN, false);
 			intent.putExtra(Intents.Scan.SHOW_INFO_TEXT, false);
 		}

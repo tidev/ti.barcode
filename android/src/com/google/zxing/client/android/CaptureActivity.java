@@ -57,6 +57,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -111,10 +112,12 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private String characterSet;
   private InactivityTimer inactivityTimer;
   private BeepManager beepManager;
+  private Button cancelButton;
 
   private boolean allowMenu;
   private boolean keepOpen;
   private boolean showRectangle;
+  private boolean showCancel;
 
   private AmbientLightManager ambientLightManager;
   private boolean showInfoText = false;
@@ -266,6 +269,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
         }
 
         showRectangle = intent.getBooleanExtra(Intents.Scan.SHOW_RECTANGLE, true);
+        showCancel = intent.getBooleanExtra(Intents.Scan.SHOW_CANCEL, true);
 		viewfinderView.setShowRectangle(showRectangle);
 		allowMenu = intent.getBooleanExtra(Intents.Scan.ALLOW_MENU, true);
 		if (intent.getBooleanExtra(Intents.Scan.ALLOW_INSTRUCTIONS, true)) {
@@ -312,6 +316,18 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       characterSet = intent.getStringExtra(Intents.Scan.CHARACTER_SET);
 
     }
+
+    cancelButton = findViewById(RHelper.getId("back_button"));
+    if(!showCancel)
+    {
+      cancelButton.setVisibility(View.GONE);
+    }
+    cancelButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        cancel();
+      }
+    });
 
     SurfaceView surfaceView = (SurfaceView) findViewById(RHelper.getId("preview_view"));
     SurfaceHolder surfaceHolder = surfaceView.getHolder();

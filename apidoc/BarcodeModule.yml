@@ -479,7 +479,7 @@ properties:
     type: Boolean
     optional: true
     default: true
-    platforms: [iphone, ipad]
+    platforms: [android, iphone, ipad]
 
   - name: showRectangle
     summary: |
