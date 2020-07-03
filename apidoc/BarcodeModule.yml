@@ -480,6 +480,7 @@ properties:
     optional: true
     default: true
     platforms: [android, iphone, ipad]
+    since: {android: "5.0.3"}
 
   - name: showRectangle
     summary: |
