@@ -32,7 +32,7 @@
 		24DE9E1111C5FE74003F90F6 /* TiBarcodeModuleAssets.h in Headers */ = {isa = PBXBuildFile; fileRef = 24DE9E0F11C5FE74003F90F6 /* TiBarcodeModuleAssets.h */; };
 		24DE9E1211C5FE74003F90F6 /* TiBarcodeModuleAssets.m in Sources */ = {isa = PBXBuildFile; fileRef = 24DE9E1011C5FE74003F90F6 /* TiBarcodeModuleAssets.m */; };
 		AA747D9F0F9514B9006C5449 /* TiBarcode_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = AA747D9E0F9514B9006C5449 /* TiBarcode_Prefix.pch */; };
-		B7539FE1251135C200FBF713 /* ZXingObjC.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = B7539FE0251135C200FBF713 /* ZXingObjC.xcframework */; };
+		B7539FE1251135C200FBF713 /* platform/ZXingObjC.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = B7539FE0251135C200FBF713 /* platform/ZXingObjC.xcframework */; };
 		DAF8E7AF1300AF8B00C06BC6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8E7AE1300AF8B00C06BC6 /* UIKit.framework */; };
 		DAF8E7B21300AF9400C06BC6 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8E7B11300AF9400C06BC6 /* AudioToolbox.framework */; };
 		DAF8E7B51300AF9E00C06BC6 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAF8E7B41300AF9E00C06BC6 /* CoreGraphics.framework */; };
@@ -62,7 +62,7 @@
 		24DE9E0F11C5FE74003F90F6 /* TiBarcodeModuleAssets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TiBarcodeModuleAssets.h; path = Classes/TiBarcodeModuleAssets.h; sourceTree = "<group>"; };
 		24DE9E1011C5FE74003F90F6 /* TiBarcodeModuleAssets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TiBarcodeModuleAssets.m; path = Classes/TiBarcodeModuleAssets.m; sourceTree = "<group>"; };
 		AA747D9E0F9514B9006C5449 /* TiBarcode_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TiBarcode_Prefix.pch; sourceTree = SOURCE_ROOT; };
-		B7539FE0251135C200FBF713 /* ZXingObjC.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = ZXingObjC.xcframework; sourceTree = "<group>"; };
+		B7539FE0251135C200FBF713 /* platform/ZXingObjC.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = platform/ZXingObjC.xcframework; sourceTree = "<group>"; };
 		D2AAC07E0554694100DB518D /* libTiBarcode.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTiBarcode.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAF8E7AE1300AF8B00C06BC6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		DAF8E7B11300AF9400C06BC6 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -79,7 +79,7 @@
 				246732D911E27BC500D39AF7 /* Foundation.framework in Frameworks */,
 				DAF8E7AF1300AF8B00C06BC6 /* UIKit.framework in Frameworks */,
 				DAF8E7B21300AF9400C06BC6 /* AudioToolbox.framework in Frameworks */,
-				B7539FE1251135C200FBF713 /* ZXingObjC.xcframework in Frameworks */,
+				B7539FE1251135C200FBF713 /* platform/ZXingObjC.xcframework in Frameworks */,
 				DAF8E7B51300AF9E00C06BC6 /* CoreGraphics.framework in Frameworks */,
 				DAF8E7B71300AF9E00C06BC6 /* QuartzCore.framework in Frameworks */,
 				DAF8E8571300DB7100C06BC6 /* CoreVideo.framework in Frameworks */,
@@ -111,7 +111,7 @@
 		0867D69AFE84028FC02AAC07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B7539FE0251135C200FBF713 /* ZXingObjC.xcframework */,
+				B7539FE0251135C200FBF713 /* platform/ZXingObjC.xcframework */,
 				246732D811E27BC500D39AF7 /* Foundation.framework */,
 				DAF8E7AE1300AF8B00C06BC6 /* UIKit.framework */,
 				DAF8E7B11300AF9400C06BC6 /* AudioToolbox.framework */,
@@ -352,9 +352,11 @@
 				ARCHS = "$(ARCHS_STANDARD)";
 				"ARCHS[sdk=iphoneos*]" = "$(ARCHS_STANDARD)";
 				"ARCHS[sdk=iphonesimulator*]" = "$(ARCHS_STANDARD)";
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEFINES_MODULE = YES;
 				DSTROOT = /tmp/TiBarcode.dst;
 				ENABLE_BITCODE = NO;
 				GCC_C_LANGUAGE_STANDARD = c99;
@@ -402,7 +404,9 @@
 				ARCHS = "$(ARCHS_STANDARD)";
 				"ARCHS[sdk=iphoneos*]" = "$(ARCHS_STANDARD)";
 				"ARCHS[sdk=iphonesimulator*]" = "$(ARCHS_STANDARD)";
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				DEFINES_MODULE = YES;
 				DSTROOT = /tmp/TiBarcode.dst;
 				ENABLE_BITCODE = NO;
 				GCC_C_LANGUAGE_STANDARD = c99;
