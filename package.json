@@ -52,7 +52,7 @@
     "karma-jasmine": "^4.0.1",
     "karma-junit-reporter": "^2.0.1",
     "karma-mocha-reporter": "^2.2.5",
-    "karma-titanium-launcher": "^0.7.5",
+    "karma-titanium-launcher": "^0.7.8",
     "lint-staged": "^9.4.1",
     "socket.io": "^2.2.0",
     "titanium-docgen": "^4.7.0"
