@@ -39,7 +39,7 @@
     "@seadub/clang-format-lint": "0.0.2",
     "@seadub/danger-plugin-dependencies": "^0.1.0",
     "@seadub/danger-plugin-junit": "^0.2.0",
-    "clang-format": "^1.2.3",
+    "clang-format": "^1.4.0",
     "commitizen": "^4.2.1",
     "danger": "^10.4.0",
     "eslint": "^7.9.0",
