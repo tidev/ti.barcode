@@ -481,7 +481,8 @@ properties:
     type: Boolean
     optional: true
     default: true
-    platforms: [iphone, ipad]
+    platforms: [android, iphone, ipad]
+    since: {android: "5.0.3"}
 
   - name: showRectangle
     summary: |

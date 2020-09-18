@@ -41,6 +41,7 @@ public final class Intents {
     public static final String ALLOW_INSTRUCTIONS = "ALLOW_INSTRUCTIONS";
     public static final String SHOW_INFO_TEXT = "SHOW_INFO_TEXT";
     public static final String PREVENT_ROTATION = "PREVENT_ROTATION";
+    public static final String SHOW_CANCEL = "SHOW_CANCEL";
     public static TiViewProxy overlayProxy = null;
 
     /**
