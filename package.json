@@ -1,6 +1,6 @@
 {
   "name": "@titanium-sdk/ti.barcode",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "description": "Lets you process 1D/2D barcodes",
   "scripts": {
     "commit": "git-cz",
@@ -56,7 +56,6 @@
     "lint-staged": "^11.0.0",
     "titanium-docgen": "^4.7.0"
   },
-  "dependencies": {},
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged",
