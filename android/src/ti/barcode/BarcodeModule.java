@@ -361,7 +361,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 		intent.putExtra(Intents.Scan.ALLOW_MENU, properties.optBoolean("allowMenu", true));
 		intent.putExtra(Intents.Scan.ALLOW_INSTRUCTIONS, properties.optBoolean("allowInstructions", true));
 		intent.putExtra(Intents.Scan.PROMPT_MESSAGE, properties.optString("displayedMessage", null));
-		intent.putExtra(Intents.Scan.RESULT_DISPLAY_DURATION_MS, properties.optInt("resultDuration", 1500));
+		intent.putExtra(Intents.Scan.RESULT_DISPLAY_DURATION_MS, (long) properties.optInt("resultDuration", 10));
 
 		// [MOD-217] -- Must set the package in order for it to automatically select the application as the source of the scanning activity.
 		intent.setPackage(TiApplication.getInstance().getPackageName());
