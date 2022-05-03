@@ -404,11 +404,11 @@ events:
         summary: The format of the barcode. Reported with a value of one of the Modules.Barcode.FORMAT_* constant if matching a known format. Otehrwise, may report a string value.
         type: [String,Number]
         platforms: [android, iphone, ipad]
-            
+
       - name: result
         summary: The raw contents of the barcode
         type: String
-        
+
       - name: code
         summary: |
             The activity result code from the scanning activity. Use the result constants defined in the [Ti.Android](Titanium.Android) namespace
@@ -429,14 +429,14 @@ events:
       - name: bytes
         summary: The raw byte array contents of the barcode, when available
         type: Titanium.Buffer
-    
+
   - name: error
     summary: Sent when an error occurs.
     properties:
       - name: message
         summary: The error message
         type: String
-            
+
       - name: code
         summary: |
             The activity result code from the scanning activity. Use the result constants defined in the [Ti.Android](Titanium.Android) namespace
@@ -452,7 +452,7 @@ events:
       - name: message
         summary: The error message
         type: String
-            
+
       - name: code
         summary: |
             The activity result code from the scanning activity. Use the result constants defined in the [Ti.Android](Titanium.Android) namespace
@@ -523,6 +523,14 @@ properties:
     optional: true
     default: true
     platforms: [android, iphone, ipad]
+
+  - name: resultDuration
+    summary: |
+        Time in milliseconds that the result will be visible after a scan.
+    type: Number
+    optional: true
+    default: 1500
+    platforms: [android]
 
   - name: frameWidth
     summary: |

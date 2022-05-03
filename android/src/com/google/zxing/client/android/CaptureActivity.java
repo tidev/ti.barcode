@@ -16,6 +16,7 @@
 
 package com.google.zxing.client.android;
 
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.DecodeHintType;
 import com.google.zxing.Result;
@@ -26,8 +27,6 @@ import com.google.zxing.client.android.clipboard.ClipboardInterface;
 import com.google.zxing.client.android.result.ResultButtonListener;
 import com.google.zxing.client.android.result.ResultHandler;
 import com.google.zxing.client.android.result.ResultHandlerFactory;
-import com.google.zxing.client.android.result.supplement.SupplementalInfoRetriever;
-import com.google.zxing.client.android.share.ShareActivity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -81,7 +80,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   private static final String TAG = CaptureActivity.class.getSimpleName();
 
-  private static final long DEFAULT_INTENT_RESULT_DURATION_MS = 10L;
+  private static final long DEFAULT_INTENT_RESULT_DURATION_MS = 1500L;
   private static final long BULK_MODE_SCAN_DELAY_MS = 1000L;
 
   private static final String[] ZXING_URLS = { "http://zxing.appspot.com/scan", "zxing://scan/" };
@@ -651,12 +650,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   }
 
   // Briefly show the contents of the barcode, then handle the result outside Barcode Scanner.
+
   private void handleDecodeExternally(Result rawResult, ResultHandler resultHandler, Bitmap barcode) {
-
-    if (barcode != null) {
-      viewfinderView.drawResultBitmap(barcode);
-    }
-
+    // get display time
     long resultDurationMS;
     if (getIntent() == null) {
       resultDurationMS = DEFAULT_INTENT_RESULT_DURATION_MS;
@@ -664,7 +660,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       resultDurationMS = getIntent().getLongExtra(Intents.Scan.RESULT_DISPLAY_DURATION_MS,
                                                   DEFAULT_INTENT_RESULT_DURATION_MS);
     }
-
     if (resultDurationMS > 0) {
       String rawResultString = String.valueOf(rawResult);
       if (rawResultString.length() > 32) {
@@ -673,6 +668,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       if (showInfoText) {
           statusView.setText(getString(resultHandler.getDisplayTitle()) + " : " + rawResultString);
       }
+    }
+
+    if (barcode != null && resultDurationMS > 0) {
+      viewfinderView.drawResultBitmap(barcode);
     }
 
     maybeSetClipboard(resultHandler);

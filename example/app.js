@@ -8,7 +8,7 @@ Barcode.allowRotation = true;
 Barcode.displayedMessage = ' ';
 Barcode.allowMenu = false;
 Barcode.allowInstructions = false;
-Barcode.useLED = true;
+// Barcode.useLED = true;
 
 var isAndroid = Ti.Platform.osname === 'android';
 var isiOS = !isAndroid;
@@ -50,12 +50,12 @@ var switchButton = Ti.UI.createButton({
 	borderRadius: 10,
 	borderWidth: 1,
 	opacity: 0.5,
-	width: 220,
+	width: 250,
 	height: 30,
 	bottom: 10
 });
 
-switchButton.addEventListener('click', function () {
+switchButton.addEventListener('click', function() {
 	Barcode.useFrontCamera = !Barcode.useFrontCamera;
 	switchButton.title = Barcode.useFrontCamera ? 'Back Camera' : 'Front Camera';
 });
@@ -76,11 +76,11 @@ var cancelButton = Ti.UI.createButton({
 	borderRadius: 10,
 	borderWidth: 1,
 	opacity: 0.5,
-	width: 220,
+	width: 250,
 	height: 30,
-	top: 20
+	top: 10
 });
-cancelButton.addEventListener('click', function () {
+cancelButton.addEventListener('click', function() {
 	Barcode.cancel();
 });
 overlay.add(cancelButton);
@@ -89,10 +89,16 @@ overlay.add(cancelButton);
  * Create a button that will trigger the barcode scanner.
  */
 var scanCode = Ti.UI.createButton({
-	title: 'Scan the Code',
-	width: 150,
-	height: 60,
-	top: 20
+	title: 'Scan the Code (continuous)',
+	width: 300,
+	height: 50,
+	top: 10
+});
+var scanCodeOnce = Ti.UI.createButton({
+	title: 'Scan the Code (one time)',
+	width: 300,
+	height: 50,
+	top: 10
 });
 
 var cameraPermission = (callback) => {
@@ -102,7 +108,7 @@ var cameraPermission = (callback) => {
 				callback(true);
 			}
 		} else {
-			Ti.Media.requestCameraPermissions(function (e) {
+			Ti.Media.requestCameraPermissions(function(e) {
 				if (e.success) {
 					if (callback) {
 						callback(true);
@@ -124,8 +130,8 @@ var cameraPermission = (callback) => {
 	}
 };
 
-scanCode.addEventListener('click', function () {
-	cameraPermission(function (re) {
+scanCode.addEventListener('click', function() {
+	cameraPermission(function(re) {
 		reset();
 		// Note: while the simulator will NOT show a camera stream in the simulator, you may still call "Barcode.capture"
 		// to test your barcode scanning overlay.
@@ -135,29 +141,50 @@ scanCode.addEventListener('click', function () {
 			showCancel: false,
 			showRectangle: false,
 			keepOpen: true
-			/* ,
-                    acceptedFormats: [
-                        Barcode.FORMAT_QR_CODE
-                    ]*/
+			/*,
+			acceptedFormats: [
+				Barcode.FORMAT_QR_CODE
+			]*/
 		});
 	});
 });
 scrollView.add(scanCode);
+
+scanCodeOnce.addEventListener('click', function() {
+	cameraPermission(function(re) {
+		reset();
+		// Note: while the simulator will NOT show a camera stream in the simulator, you may still call "Barcode.capture"
+		// to test your barcode scanning overlay.
+		Barcode.capture({
+			animate: true,
+			overlay: overlay,
+			showCancel: false,
+			showRectangle: false,
+			keepOpen: false,
+			resultDuration: 0
+			/*,
+			acceptedFormats: [
+				Barcode.FORMAT_QR_CODE
+			]*/
+		});
+	});
+});
+scrollView.add(scanCodeOnce);
 
 /**
  * Create a button that will show the gallery picker.
  */
 var scanImage = Ti.UI.createButton({
 	title: 'Scan Image from Gallery',
-	width: 150,
-	height: 60,
-	top: 20
+	width: 300,
+	height: 50,
+	top: 10
 });
 
-scanImage.addEventListener('click', function () {
+scanImage.addEventListener('click', function() {
 	reset();
 	Ti.Media.openPhotoGallery({
-		success: function (evt) {
+		success: function(evt) {
 			Barcode.parse({
 				image: evt.media
 				/* ,
@@ -189,7 +216,7 @@ function reset() {
 	scanParsed.text = ' ';
 }
 
-Barcode.addEventListener('error', function (e) {
+Barcode.addEventListener('error', function(e) {
 	scanContentType.text = ' ';
 	scanFormat.text = ' ';
 	scanParsed.text = ' ';
@@ -197,11 +224,11 @@ Barcode.addEventListener('error', function (e) {
 	console.log('An Error occured: ' + e);
 });
 
-Barcode.addEventListener('cancel', function (e) {
+Barcode.addEventListener('cancel', function(e) {
 	Ti.API.info('Cancel received');
 });
 
-Barcode.addEventListener('success', function (e) {
+Barcode.addEventListener('success', function(e) {
 	Ti.API.info('Success called with barcode: ' + e.result);
 	if (!scannedBarcodes['' + e.result]) {
 		scannedBarcodes[e.result] = true;
