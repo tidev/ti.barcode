@@ -1,5 +1,5 @@
 name: Android Build
-on: 
+on:
   push:
     paths-ignore:
     - 'ios/**'
@@ -17,15 +17,15 @@ jobs:
     env:
       CCACHE_DIR: ${{ github.workspace }}/.ccache
       USE_CCACHE: 1
-      SDK_VERSION: 9.3.2.GA
+      SDK_VERSION: 11.0.0.GA
       MODULE_ID: ti.barcode
     steps:
     - uses: actions/checkout@v2
 
-    - name: Use Node.js 12.x
+    - name: Use Node.js 14.x
       uses: actions/setup-node@v1
       with:
-        node-version: '12.x'
+        node-version: '14.x'
 
     - name: Cache Node.js modules
       id: node-cache
