@@ -55,7 +55,7 @@
 
 - (NSNumber *)canShow:(id)unused
 {
-  //TO DO: Remove
+  // TO DO: Remove
   return NUMBOOL(YES);
 }
 
@@ -561,7 +561,7 @@ MAKE_SYSTEM_PROP(FORMAT_RSS_14, kBarcodeFormatRSS14);
 MAKE_SYSTEM_PROP(FORMAT_RSS_EXPANDED, kBarcodeFormatRSSExpanded);
 MAKE_SYSTEM_PROP(FORMAT_UPC_A, kBarcodeFormatUPCA);
 MAKE_SYSTEM_PROP(FORMAT_UPC_E, kBarcodeFormatUPCE);
-//MAKE_SYSTEM_PROP(FORMAT_UPCEAN_EXTENSION, kBarcodeFormatUPCEANExtension); // extension, not a stand-alone
+// MAKE_SYSTEM_PROP(FORMAT_UPCEAN_EXTENSION, kBarcodeFormatUPCEANExtension); // extension, not a stand-alone
 
 MAKE_SYSTEM_PROP(UNKNOWN, 0);
 MAKE_SYSTEM_PROP(URL, 1);
