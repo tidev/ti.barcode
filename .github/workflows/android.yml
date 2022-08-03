@@ -27,6 +27,11 @@ jobs:
       with:
         node-version: '14.x'
 
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'adopt'
+        java-version: '11'
+
     - name: Cache Node.js modules
       id: node-cache
       uses: actions/cache@v2
