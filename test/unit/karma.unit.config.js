@@ -62,6 +62,6 @@ module.exports = config => {
 		concurrency: 1,
 		browserNoActivityTimeout: 220000,
 		captureTimeout: 2200000,
-		logLevel: config.LOG_DEBUG
+		logLevel: config.LOG_INFO
 	});
 };
