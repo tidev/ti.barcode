@@ -55,7 +55,7 @@ var switchButton = Ti.UI.createButton({
 	bottom: 10
 });
 
-switchButton.addEventListener('click', function() {
+switchButton.addEventListener('click', function () {
 	Barcode.useFrontCamera = !Barcode.useFrontCamera;
 	switchButton.title = Barcode.useFrontCamera ? 'Back Camera' : 'Front Camera';
 });
@@ -80,7 +80,7 @@ var cancelButton = Ti.UI.createButton({
 	height: 30,
 	top: 10
 });
-cancelButton.addEventListener('click', function() {
+cancelButton.addEventListener('click', function () {
 	Barcode.cancel();
 });
 overlay.add(cancelButton);
@@ -108,7 +108,7 @@ var cameraPermission = (callback) => {
 				callback(true);
 			}
 		} else {
-			Ti.Media.requestCameraPermissions(function(e) {
+			Ti.Media.requestCameraPermissions(function (e) {
 				if (e.success) {
 					if (callback) {
 						callback(true);
@@ -130,8 +130,8 @@ var cameraPermission = (callback) => {
 	}
 };
 
-scanCode.addEventListener('click', function() {
-	cameraPermission(function(re) {
+scanCode.addEventListener('click', function () {
+	cameraPermission(function (_re) {
 		reset();
 		// Note: while the simulator will NOT show a camera stream in the simulator, you may still call "Barcode.capture"
 		// to test your barcode scanning overlay.
@@ -141,7 +141,7 @@ scanCode.addEventListener('click', function() {
 			showCancel: false,
 			showRectangle: false,
 			keepOpen: true
-			/*,
+			/* ,
 			acceptedFormats: [
 				Barcode.FORMAT_QR_CODE
 			]*/
@@ -150,8 +150,8 @@ scanCode.addEventListener('click', function() {
 });
 scrollView.add(scanCode);
 
-scanCodeOnce.addEventListener('click', function() {
-	cameraPermission(function(re) {
+scanCodeOnce.addEventListener('click', function () {
+	cameraPermission(function (_re) {
 		reset();
 		// Note: while the simulator will NOT show a camera stream in the simulator, you may still call "Barcode.capture"
 		// to test your barcode scanning overlay.
@@ -162,7 +162,7 @@ scanCodeOnce.addEventListener('click', function() {
 			showRectangle: false,
 			keepOpen: false,
 			resultDuration: 0
-			/*,
+			/* ,
 			acceptedFormats: [
 				Barcode.FORMAT_QR_CODE
 			]*/
@@ -181,10 +181,10 @@ var scanImage = Ti.UI.createButton({
 	top: 10
 });
 
-scanImage.addEventListener('click', function() {
+scanImage.addEventListener('click', function () {
 	reset();
 	Ti.Media.openPhotoGallery({
-		success: function(evt) {
+		success: function (evt) {
 			Barcode.parse({
 				image: evt.media
 				/* ,
@@ -216,7 +216,7 @@ function reset() {
 	scanParsed.text = ' ';
 }
 
-Barcode.addEventListener('error', function(e) {
+Barcode.addEventListener('error', function (e) {
 	scanContentType.text = ' ';
 	scanFormat.text = ' ';
 	scanParsed.text = ' ';
@@ -224,11 +224,11 @@ Barcode.addEventListener('error', function(e) {
 	console.log('An Error occured: ' + e);
 });
 
-Barcode.addEventListener('cancel', function(e) {
+Barcode.addEventListener('cancel', function (e) {
 	Ti.API.info('Cancel received');
 });
 
-Barcode.addEventListener('success', function(e) {
+Barcode.addEventListener('success', function (e) {
 	Ti.API.info('Success called with barcode: ' + e.result);
 	if (!scannedBarcodes['' + e.result]) {
 		scannedBarcodes[e.result] = true;
