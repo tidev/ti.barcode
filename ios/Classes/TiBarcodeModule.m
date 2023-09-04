@@ -253,9 +253,6 @@
 {
   [overlayProxy windowWillOpen];
 
-//#ifndef TI_USE_AUTOLAYOUT
-//  ApplyConstraintToViewWithBounds([overlayProxy layoutProperties], (TiUIView *)[overlayProxy view], [[UIScreen mainScreen] bounds]);
-//#else
   CGSize size = [overlayProxy view].bounds.size;
 
   CGSize s = [[overlayProxy view] sizeThatFits:CGSizeMake(MAXFLOAT, MAXFLOAT)];
@@ -273,7 +270,6 @@
   CGRect rect = CGRectMake(0, 0, size.width, size.height);
   [TiUtils setView:[overlayProxy view] positionRect:rect];
   [overlayProxy layoutChildren:NO];
-//#endif
 
   return [overlayProxy view];
 }
