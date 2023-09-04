@@ -6,7 +6,7 @@
 
 #import "TiOverlayView.h"
 #import <UIKit/UIKit.h>
-#import <ZXingObjC/ZXingObjC.h>
+#import "ZXingObjC.h"
 
 @class TiOverlayView;
 

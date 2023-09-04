@@ -83,6 +83,8 @@
 
   _barcodeViewController.capture.camera = _useFrontCamera ? _barcodeViewController.capture.front : _barcodeViewController.capture.back;
   _barcodeViewController.capture.delegate = self;
+    
+    
   ZXDecodeHints *hints = [self generateHints:args];
   _barcodeViewController.capture.hints = hints;
 
@@ -106,12 +108,21 @@
       [self closeScanner];
     }
   }
-  _barcodeViewController.modalPresentationStyle = UIModalPresentationFullScreen;
-  [[[[TiApp app] controller] topPresentedController] presentViewController:_barcodeViewController
-                                                                  animated:animate
-                                                                completion:^{
-                                                                  _barcodeViewController.capture.torch = _useLED;
-                                                                }];
+#if TARGET_OS_MACCATALYST
+    _barcodeViewController.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+    [[[[TiApp app] controller] topPresentedController] presentViewController:_barcodeViewController
+                                                                    animated:animate
+                                                                  completion:^{
+        self->_barcodeViewController.capture.torch = self->_useLED;
+                                                                  }];
+#else
+    _barcodeViewController.modalPresentationStyle = UIModalPresentationFullScreen;
+    [[[[TiApp app] controller] topPresentedController] presentViewController:_barcodeViewController
+                                                                    animated:animate
+                                                                  completion:^{
+        self->_barcodeViewController.capture.torch = self->_useLED;
+                                                                  }];
+#endif
 }
 
 - (void)cancel:(id)unused
@@ -242,9 +253,9 @@
 {
   [overlayProxy windowWillOpen];
 
-#ifndef TI_USE_AUTOLAYOUT
-  ApplyConstraintToViewWithBounds([overlayProxy layoutProperties], (TiUIView *)[overlayProxy view], [[UIScreen mainScreen] bounds]);
-#else
+//#ifndef TI_USE_AUTOLAYOUT
+//  ApplyConstraintToViewWithBounds([overlayProxy layoutProperties], (TiUIView *)[overlayProxy view], [[UIScreen mainScreen] bounds]);
+//#else
   CGSize size = [overlayProxy view].bounds.size;
 
   CGSize s = [[overlayProxy view] sizeThatFits:CGSizeMake(MAXFLOAT, MAXFLOAT)];
@@ -262,7 +273,7 @@
   CGRect rect = CGRectMake(0, 0, size.width, size.height);
   [TiUtils setView:[overlayProxy view] positionRect:rect];
   [overlayProxy layoutChildren:NO];
-#endif
+//#endif
 
   return [overlayProxy view];
 }
