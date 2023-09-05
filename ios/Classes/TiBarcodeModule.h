@@ -6,7 +6,7 @@
 
 #import "TiBarcodeViewController.h"
 #import "TiModule.h"
-#import <ZXingObjC/ZXingObjC.h>
+#import "ZXingObjC.h"
 
 @class TiOverlayView;
 @class TiViewProxy;

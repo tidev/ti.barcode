@@ -27,10 +27,19 @@
 #if HAS_AVFF
     self.capture = [[ZXCapture alloc] init];
 #endif
-    _overlayView = [[TiOverlayView alloc] initWithFrame:[UIScreen mainScreen].bounds
-                                             showCancel:shouldShowCancel
-                                          showRectangle:shouldShowRectangle
-                                            withOverlay:overlay];
+
+#if TARGET_OS_MACCATALYST
+      _overlayView = [[TiOverlayView alloc] initWithFrame:overlay.bounds
+                                               showCancel:shouldShowCancel
+                                            showRectangle:shouldShowRectangle
+                                              withOverlay:overlay];
+#else
+      _overlayView = [[TiOverlayView alloc] initWithFrame:[UIScreen mainScreen].bounds
+                                               showCancel:shouldShowCancel
+                                            showRectangle:shouldShowRectangle
+                                              withOverlay:overlay];
+#endif
+      
     _showRectangle = shouldShowRectangle;
     _overlayView.delegate = delegate;
     _preventRotation = preventRotation;
@@ -55,8 +64,11 @@
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  [_overlayView updateViewsWithFrame:[UIScreen mainScreen].bounds];
-
+#if TARGET_OS_MACCATALYST
+    [_overlayView updateViewsWithFrame:[self view].bounds];
+#else
+    [_overlayView updateViewsWithFrame:[UIScreen mainScreen].bounds];
+#endif
   [[self view] addSubview:_overlayView];
   [[self view] bringSubviewToFront:_overlayView];
 #if HAS_AVFF
@@ -127,7 +139,11 @@
 #pragma mark - Private
 - (void)applyOrientation
 {
-  UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+#if TARGET_OS_MACCATALYST
+    UIInterfaceOrientation orientation = UIInterfaceOrientationPortrait;
+#else
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+#endif
   float scanRectRotation;
   float captureRotation;
 
