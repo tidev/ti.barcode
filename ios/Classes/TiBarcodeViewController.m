@@ -140,7 +140,7 @@
 - (void)applyOrientation
 {
 #if TARGET_OS_MACCATALYST
-    UIInterfaceOrientation orientation = UIInterfaceOrientationLandscapeLeft;
+    UIInterfaceOrientation orientation = UIInterfaceOrientationPortrait;
 #else
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
 #endif
