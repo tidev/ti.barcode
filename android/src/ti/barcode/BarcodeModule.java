@@ -131,6 +131,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 		defaultValues.put("allowInstructions", true);
 		defaultValues.put("useFrontCamera", false);
 		defaultValues.put("useLED", false);
+		defaultValues.put("copyToClipboard", false);
 	}
 
 	private static BarcodeModule _instance;
@@ -361,6 +362,7 @@ public class BarcodeModule extends KrollModule implements TiActivityResultHandle
 
 		intent.putExtra(Intents.Scan.ALLOW_MENU, properties.optBoolean("allowMenu", true));
 		intent.putExtra(Intents.Scan.ALLOW_INSTRUCTIONS, properties.optBoolean("allowInstructions", true));
+		intent.putExtra(Intents.Scan.KEY_COPY_TO_CLIPBOARD, properties.optBoolean("copyToClipboard", false));
 		intent.putExtra(Intents.Scan.PROMPT_MESSAGE, properties.optString("displayedMessage", null));
 		// [MOD-217] -- Must set the package in order for it to automatically select the application as the source of the scanning activity.
 		intent.setPackage(TiApplication.getInstance().getPackageName());

@@ -335,6 +335,13 @@ properties:
     since: "3.1.0"
     platforms: [android]
 
+  - name: copyToClipboard
+    summary: Whether or not copy the result to the clipboard
+    type: Boolean
+    default: false
+    since: "6.1.0"
+    platforms: [android]
+
   - name: displayedMessage
     summary: Controls the message that is displayed to the end user when they are capturing a barcode.
     type: String

@@ -8,6 +8,7 @@ Barcode.allowRotation = true;
 Barcode.displayedMessage = ' ';
 Barcode.allowMenu = false;
 Barcode.allowInstructions = false;
+// Barcode.copyToClipboard = true;
 // Barcode.useLED = true;
 
 var isAndroid = Ti.Platform.osname === 'android';

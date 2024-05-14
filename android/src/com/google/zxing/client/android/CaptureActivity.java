@@ -235,9 +235,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     inactivityTimer.onResume();
 
 
-    copyToClipboard = prefs.getBoolean(PreferencesActivity.KEY_COPY_TO_CLIPBOARD, true)
-        && (intent == null || intent.getBooleanExtra(Intents.Scan.SAVE_HISTORY, true));
-
+    copyToClipboard = intent.getBooleanExtra(Intents.Scan.KEY_COPY_TO_CLIPBOARD, false);
     source = IntentSource.NONE;
     sourceUrl = null;
     scanFromWebPageManager = null;

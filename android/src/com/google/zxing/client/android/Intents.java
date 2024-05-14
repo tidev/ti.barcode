@@ -185,6 +185,7 @@ public final class Intents {
      * Setting this to false will not save scanned codes in the history. Specified as a {@code boolean}.
      */
     public static final String SAVE_HISTORY = "SAVE_HISTORY";
+    public static final String KEY_COPY_TO_CLIPBOARD = "KEY_COPY_TO_CLIPBOARD";
 
     private Scan() {
     }
