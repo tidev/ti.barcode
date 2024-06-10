@@ -41,7 +41,7 @@
     "@seadub/danger-plugin-junit": "^0.3.0",
     "clang-format": "^1.8.0",
     "commitizen": "^4.2.5",
-    "danger": "^11.1.1",
+    "danger": "^12.3.1",
     "eslint": "^8.21.0",
     "eslint-config-axway": "^7.0.1",
     "eslint-plugin-jasmine": "^4.1.3",
