@@ -34,7 +34,7 @@
     ]
   },
   "devDependencies": {
-    "@commitlint/cli": "^17.0.3",
+    "@commitlint/cli": "^19.4.0",
     "@commitlint/config-conventional": "^17.0.3",
     "@seadub/clang-format-lint": "0.0.2",
     "@seadub/danger-plugin-dependencies": "^1.0.0",
