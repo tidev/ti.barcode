@@ -17,24 +17,24 @@ jobs:
     env:
       CCACHE_DIR: ${{ github.workspace }}/.ccache
       USE_CCACHE: 1
-      SDK_VERSION: 11.0.0.GA
+      SDK_VERSION: 12.3.0.GA
       MODULE_ID: ti.barcode
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
-    - name: Use Node.js 14.x
-      uses: actions/setup-node@v1
+    - name: Use Node.js
+      uses: actions/setup-node@v4
       with:
-        node-version: '14.x'
+        node-version: '18.x'
 
     - uses: actions/setup-java@v3
       with:
         distribution: 'adopt'
-        java-version: '11'
+        java-version: '17'
 
     - name: Cache Node.js modules
       id: node-cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: node_modules
         key: ${{ runner.OS }}-node-modules-${{ hashFiles('package-lock.json') }}
@@ -47,7 +47,7 @@ jobs:
       if: steps.node-cache.outputs.cache-hit != 'true'
 
     - name: Cache Gradle packages
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: |
           ~/.gradle/caches

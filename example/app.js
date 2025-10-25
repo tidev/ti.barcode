@@ -8,7 +8,8 @@ Barcode.allowRotation = true;
 Barcode.displayedMessage = ' ';
 Barcode.allowMenu = false;
 Barcode.allowInstructions = false;
-Barcode.useLED = true;
+// Barcode.copyToClipboard = true;
+// Barcode.useLED = true;
 
 var isAndroid = Ti.Platform.osname === 'android';
 var isiOS = !isAndroid;
@@ -50,7 +51,7 @@ var switchButton = Ti.UI.createButton({
 	borderRadius: 10,
 	borderWidth: 1,
 	opacity: 0.5,
-	width: 220,
+	width: 250,
 	height: 30,
 	bottom: 10
 });
@@ -76,9 +77,9 @@ var cancelButton = Ti.UI.createButton({
 	borderRadius: 10,
 	borderWidth: 1,
 	opacity: 0.5,
-	width: 220,
+	width: 250,
 	height: 30,
-	top: 20
+	top: 10
 });
 cancelButton.addEventListener('click', function () {
 	Barcode.cancel();
@@ -89,10 +90,16 @@ overlay.add(cancelButton);
  * Create a button that will trigger the barcode scanner.
  */
 var scanCode = Ti.UI.createButton({
-	title: 'Scan the Code',
-	width: 150,
-	height: 60,
-	top: 20
+	title: 'Scan the Code (continuous)',
+	width: 300,
+	height: 50,
+	top: 10
+});
+var scanCodeOnce = Ti.UI.createButton({
+	title: 'Scan the Code (one time)',
+	width: 300,
+	height: 50,
+	top: 10
 });
 
 var cameraPermission = (callback) => {
@@ -125,7 +132,7 @@ var cameraPermission = (callback) => {
 };
 
 scanCode.addEventListener('click', function () {
-	cameraPermission(function (re) {
+	cameraPermission(function (_re) {
 		reset();
 		// Note: while the simulator will NOT show a camera stream in the simulator, you may still call "Barcode.capture"
 		// to test your barcode scanning overlay.
@@ -136,22 +143,43 @@ scanCode.addEventListener('click', function () {
 			showRectangle: false,
 			keepOpen: true
 			/* ,
-                    acceptedFormats: [
-                        Barcode.FORMAT_QR_CODE
-                    ]*/
+			acceptedFormats: [
+				Barcode.FORMAT_QR_CODE
+			]*/
 		});
 	});
 });
 scrollView.add(scanCode);
+
+scanCodeOnce.addEventListener('click', function () {
+	cameraPermission(function (_re) {
+		reset();
+		// Note: while the simulator will NOT show a camera stream in the simulator, you may still call "Barcode.capture"
+		// to test your barcode scanning overlay.
+		Barcode.capture({
+			animate: true,
+			overlay: overlay,
+			showCancel: false,
+			showRectangle: false,
+			keepOpen: false,
+			resultDuration: 0
+			/* ,
+			acceptedFormats: [
+				Barcode.FORMAT_QR_CODE
+			]*/
+		});
+	});
+});
+scrollView.add(scanCodeOnce);
 
 /**
  * Create a button that will show the gallery picker.
  */
 var scanImage = Ti.UI.createButton({
 	title: 'Scan Image from Gallery',
-	width: 150,
-	height: 60,
-	top: 20
+	width: 300,
+	height: 50,
+	top: 10
 });
 
 scanImage.addEventListener('click', function () {
