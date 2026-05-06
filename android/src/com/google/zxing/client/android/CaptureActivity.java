@@ -51,7 +51,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -310,7 +309,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     }
 
-    SurfaceView surfaceView = (SurfaceView) findViewById(RHelper.getId("preview_view"));
+    PreviewSurfaceView surfaceView = (PreviewSurfaceView) findViewById(RHelper.getId("preview_view"));
     SurfaceHolder surfaceHolder = surfaceView.getHolder();
     if (hasSurface) {
       // The activity was paused but not stopped, so the surface still exists. Therefore
@@ -371,7 +370,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     beepManager.close();
     cameraManager.closeDriver();
     if (!hasSurface) {
-      SurfaceView surfaceView = (SurfaceView) findViewById(RHelper.getId("preview_view"));
+      PreviewSurfaceView surfaceView = (PreviewSurfaceView) findViewById(RHelper.getId("preview_view"));
       SurfaceHolder surfaceHolder = surfaceView.getHolder();
       surfaceHolder.removeCallback(this);
     }
@@ -758,6 +757,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
     try {
       cameraManager.openDriver(surfaceHolder);
+      PreviewSurfaceView surfaceView = (PreviewSurfaceView) findViewById(RHelper.getId("preview_view"));
+      android.graphics.Point previewSize = cameraManager.getPreviewSizeOnScreen();
+      if (previewSize != null) {
+        surfaceView.setPreviewSize(previewSize.x, previewSize.y);
+      }
       // Creating the handler starts the preview, which can also throw a RuntimeException.
       if (handler == null) {
         handler = new CaptureActivityHandler(this, decodeFormats, decodeHints, characterSet, cameraManager);
