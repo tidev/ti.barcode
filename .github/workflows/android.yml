@@ -85,11 +85,13 @@ jobs:
     - name: Build and Test
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 34
-        target: playstore
+        api-level: 33
+        target: google_apis
         arch: x86_64
         script: npm run test:android -- --sdkVersion ${{ env.SDK_VERSION }}
-        disable-animations: false # defaulting to true, the commands sent to emulator to do this sometimes run too quickly after boot and cause "adb: device offline" failures
+        emulator-options: -no-snapshot -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+        disable-animations: true
+
 
     - name: Show summary of ccache configuration and statistics counters
       run: ccache --show-stats
