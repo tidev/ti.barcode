@@ -56,6 +56,7 @@ import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -126,6 +127,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private static final int ABOUT_ID = Menu.FIRST + 4;
 
   private FrameLayout _layout;
+  private FrameLayout _overlayContainer;
   private static CaptureActivity _instance;
 
   public boolean doKeepOpen() {
@@ -186,10 +188,25 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     if (Intents.Scan.overlayProxy != null) {
         View overlayView = Intents.Scan.overlayProxy.getOrCreateView().getNativeView();
+        _overlayContainer = new FrameLayout(this);
+        _overlayContainer.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                                                                       FrameLayout.LayoutParams.MATCH_PARENT));
+        _overlayContainer.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+          @Override
+          public WindowInsets onApplyWindowInsets(View view, WindowInsets insets) {
+            view.setPadding(insets.getSystemWindowInsetLeft(),
+                            insets.getSystemWindowInsetTop(),
+                            insets.getSystemWindowInsetRight(),
+                            insets.getSystemWindowInsetBottom());
+            return insets;
+          }
+        });
         overlayView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
                                                                  FrameLayout.LayoutParams.MATCH_PARENT));
-        _layout.addView(overlayView);
-        overlayView.bringToFront();
+        _overlayContainer.addView(overlayView);
+        _layout.addView(_overlayContainer);
+        _overlayContainer.requestApplyInsets();
+        _overlayContainer.bringToFront();
     }
 
     hasSurface = false;
@@ -394,8 +411,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   @Override
   protected void onDestroy() {
     _instance = null;
-    if (Intents.Scan.overlayProxy != null) {
-        _layout.removeView(Intents.Scan.overlayProxy.getOrCreateView().getNativeView());
+    if (_overlayContainer != null) {
+        _overlayContainer.removeAllViews();
+        _layout.removeView(_overlayContainer);
+        _overlayContainer = null;
     }
 
     inactivityTimer.shutdown();
