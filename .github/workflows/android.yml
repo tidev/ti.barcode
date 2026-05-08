@@ -12,7 +12,7 @@ on:
 
 jobs:
   android:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     name: Android
     env:
       CCACHE_DIR: ${{ github.workspace }}/.ccache
@@ -67,7 +67,12 @@ jobs:
       name: Install Titanium SDK
 
     - name: Install ccache
-      run: brew install ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        create-symlink: true
+        key: ${{ runner.os }}-ccache-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-ccache-
 
     - name: Retrieve ccache
       uses: actions/cache@v4
@@ -80,7 +85,7 @@ jobs:
     - name: Build and Test
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 21
+        api-level: 34
         target: playstore
         script: npm run test:android -- --sdkVersion ${{ env.SDK_VERSION }}
         disable-animations: false # defaulting to true, the commands sent to emulator to do this sometimes run too quickly after boot and cause "adb: device offline" failures
