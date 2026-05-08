@@ -87,6 +87,7 @@ jobs:
       with:
         api-level: 34
         target: playstore
+        arch: x86_64
         script: npm run test:android -- --sdkVersion ${{ env.SDK_VERSION }}
         disable-animations: false # defaulting to true, the commands sent to emulator to do this sometimes run too quickly after boot and cause "adb: device offline" failures
 
