@@ -100,9 +100,9 @@ public final class ViewfinderView extends View {
     }
 
     if (resultBitmap != null) {
-      // Draw the opaque result bitmap over the scanning rectangle
+      // Draw the result bitmap without distorting its camera-frame aspect ratio.
       paint.setAlpha(CURRENT_POINT_OPACITY);
-      canvas.drawBitmap(resultBitmap, null, frame, paint);
+      canvas.drawBitmap(resultBitmap, null, getResultBitmapFrame(resultBitmap, frame), paint);
     } else {
       if (showRectangle) {
         // Draw a two pixel solid black border inside the framing rect
@@ -199,6 +199,16 @@ public final class ViewfinderView extends View {
 
   public void setShowRectangle(boolean showRectangle) {
     this.showRectangle = showRectangle;
+  }
+
+  private static Rect getResultBitmapFrame(Bitmap bitmap, Rect frame) {
+    float scale = Math.min(frame.width() / (float) bitmap.getWidth(),
+                           frame.height() / (float) bitmap.getHeight());
+    int width = Math.round(bitmap.getWidth() * scale);
+    int height = Math.round(bitmap.getHeight() * scale);
+    int left = frame.left + (frame.width() - width) / 2;
+    int top = frame.top + (frame.height() - height) / 2;
+    return new Rect(left, top, left + width, top + height);
   }
 
 }
