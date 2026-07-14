@@ -1,8 +1,12 @@
 package com.google.zxing.client.android;
 
 import android.content.Context;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.SurfaceView;
+
+import com.google.zxing.client.android.camera.CameraManager;
 
 public class PreviewSurfaceView extends SurfaceView {
 
@@ -29,19 +33,10 @@ public class PreviewSurfaceView extends SurfaceView {
       return;
     }
 
-    float previewRatio = previewWidth / (float) previewHeight;
-    float parentRatio = parentWidth / (float) parentHeight;
-
-    int measuredWidth;
-    int measuredHeight;
-    if (parentRatio < previewRatio) {
-      measuredWidth = Math.round(parentHeight * previewRatio);
-      measuredHeight = parentHeight;
-    } else {
-      measuredWidth = parentWidth;
-      measuredHeight = Math.round(parentWidth / previewRatio);
-    }
-
-    setMeasuredDimension(measuredWidth, measuredHeight);
+    // Reuse the exact center-crop math CameraManager uses to model the preview on screen,
+    // so the rendered preview and the decode mapping can never drift apart.
+    Rect previewRect = CameraManager.getPreviewRectOnScreen(new Point(parentWidth, parentHeight),
+                                                            new Point(previewWidth, previewHeight));
+    setMeasuredDimension(previewRect.width(), previewRect.height());
   }
 }

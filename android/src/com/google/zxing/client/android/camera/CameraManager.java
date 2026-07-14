@@ -313,7 +313,11 @@ public final class CameraManager {
     return framingRectInPreview;
   }
 
-  private static Rect getPreviewRectOnScreen(Point screenResolution, Point previewSizeOnScreen) {
+  /**
+   * Models the center-crop rect the preview occupies on screen. {@link com.google.zxing.client.android.PreviewSurfaceView}
+   * uses the same math to size itself, so the on-screen preview and the decode mapping stay in sync.
+   */
+  public static Rect getPreviewRectOnScreen(Point screenResolution, Point previewSizeOnScreen) {
     float previewRatio = previewSizeOnScreen.x / (float) previewSizeOnScreen.y;
     float screenRatio = screenResolution.x / (float) screenResolution.y;
 
@@ -365,7 +369,8 @@ public final class CameraManager {
   }
 
   public synchronized Point getPreviewSizeOnScreen() {
-    return configManager.getPreviewSizeOnScreen();
+    Point previewSizeOnScreen = configManager.getPreviewSizeOnScreen();
+    return previewSizeOnScreen == null ? null : new Point(previewSizeOnScreen);
   }
 
   
