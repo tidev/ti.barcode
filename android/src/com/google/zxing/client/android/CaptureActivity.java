@@ -53,6 +53,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Surface;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -180,6 +181,14 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
                                                   View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
       window.setStatusBarColor(Color.TRANSPARENT);
       window.setNavigationBarColor(Color.TRANSPARENT);
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      // Extend into display cutouts too, so the edge-to-edge preview is not letterboxed
+      // away from a notch in landscape.
+      WindowManager.LayoutParams attributes = window.getAttributes();
+      attributes.layoutInDisplayCutoutMode =
+          WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+      window.setAttributes(attributes);
     }
     _instance = this;
     _layout = (FrameLayout) View.inflate(this, RHelper.getLayout("capture"), null);
@@ -340,7 +349,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     }
 
-    PreviewSurfaceView surfaceView = (PreviewSurfaceView) findViewById(RHelper.getId("preview_view"));
+    SurfaceView surfaceView = (SurfaceView) findViewById(RHelper.getId("preview_view"));
     SurfaceHolder surfaceHolder = surfaceView.getHolder();
     if (hasSurface) {
       // The activity was paused but not stopped, so the surface still exists. Therefore
@@ -401,7 +410,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     beepManager.close();
     cameraManager.closeDriver();
     if (!hasSurface) {
-      PreviewSurfaceView surfaceView = (PreviewSurfaceView) findViewById(RHelper.getId("preview_view"));
+      SurfaceView surfaceView = (SurfaceView) findViewById(RHelper.getId("preview_view"));
       SurfaceHolder surfaceHolder = surfaceView.getHolder();
       surfaceHolder.removeCallback(this);
     }
