@@ -1,3 +1,14 @@
+# Android v7.0.1
+
+## Fixes
+- Preserve the camera preview aspect ratio: the preview surface now center-crops instead of stretching to fill the screen.
+- Preserve the continuous scan result bitmap aspect ratio when drawn in the viewfinder.
+- Keep the scanner overlay within system insets, so overlay controls are not covered by the status/navigation bars on edge-to-edge devices.
+- Compute the viewfinder/decode mapping from the real window size instead of `Display.getSize()`, so the visible framing rect matches the decoded region on devices with software navigation bars.
+- Keep the preview mapping consistent when the camera driver overrides the requested preview size.
+- Extend the preview into display cutouts (notch) in landscape instead of letterboxing.
+- Avoid a potential crash in the viewfinder when the framing rect cannot be mapped to the preview yet.
+
 # v5.0.0
 
 ## BREAKING CHANGES
