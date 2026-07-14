@@ -120,38 +120,42 @@ public final class ViewfinderView extends View {
         canvas.drawRect(frame.left + 2, middle - 1, frame.right - 1, middle + 2, paint);
       }
 
+      // The framing rect may not be mappable to the preview yet (or may map to a
+      // degenerate rect) — skip drawing the result points rather than crash.
       Rect previewFrame = cameraManager.getFramingRectInPreview();
-      float scaleX = frame.width() / (float) previewFrame.width();
-      float scaleY = frame.height() / (float) previewFrame.height();
+      if (previewFrame != null) {
+        float scaleX = frame.width() / (float) previewFrame.width();
+        float scaleY = frame.height() / (float) previewFrame.height();
 
-      List<ResultPoint> currentPossible = possibleResultPoints;
-      List<ResultPoint> currentLast = lastPossibleResultPoints;
-      int frameLeft = frame.left;
-      int frameTop = frame.top;
-      if (currentPossible.isEmpty()) {
-        lastPossibleResultPoints = null;
-      } else {
-        possibleResultPoints = new ArrayList<ResultPoint>(5);
-        lastPossibleResultPoints = currentPossible;
-        paint.setAlpha(CURRENT_POINT_OPACITY);
-        paint.setColor(resultPointColor);
-        synchronized (currentPossible) {
-          for (ResultPoint point : currentPossible) {
-            canvas.drawCircle(frameLeft + (int) (point.getX() * scaleX),
-                              frameTop + (int) (point.getY() * scaleY),
-                              POINT_SIZE, paint);
+        List<ResultPoint> currentPossible = possibleResultPoints;
+        List<ResultPoint> currentLast = lastPossibleResultPoints;
+        int frameLeft = frame.left;
+        int frameTop = frame.top;
+        if (currentPossible.isEmpty()) {
+          lastPossibleResultPoints = null;
+        } else {
+          possibleResultPoints = new ArrayList<ResultPoint>(5);
+          lastPossibleResultPoints = currentPossible;
+          paint.setAlpha(CURRENT_POINT_OPACITY);
+          paint.setColor(resultPointColor);
+          synchronized (currentPossible) {
+            for (ResultPoint point : currentPossible) {
+              canvas.drawCircle(frameLeft + (int) (point.getX() * scaleX),
+                                frameTop + (int) (point.getY() * scaleY),
+                                POINT_SIZE, paint);
+            }
           }
         }
-      }
-      if (currentLast != null) {
-        paint.setAlpha(CURRENT_POINT_OPACITY / 2);
-        paint.setColor(resultPointColor);
-        synchronized (currentLast) {
-          float radius = POINT_SIZE / 2.0f;
-          for (ResultPoint point : currentLast) {
-            canvas.drawCircle(frameLeft + (int) (point.getX() * scaleX),
-                              frameTop + (int) (point.getY() * scaleY),
-                              radius, paint);
+        if (currentLast != null) {
+          paint.setAlpha(CURRENT_POINT_OPACITY / 2);
+          paint.setColor(resultPointColor);
+          synchronized (currentLast) {
+            float radius = POINT_SIZE / 2.0f;
+            for (ResultPoint point : currentLast) {
+              canvas.drawCircle(frameLeft + (int) (point.getX() * scaleX),
+                                frameTop + (int) (point.getY() * scaleY),
+                                radius, paint);
+            }
           }
         }
       }
