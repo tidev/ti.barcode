@@ -48,7 +48,26 @@
 
 - (void)viewDidLoad
 {
+  // Capture at 1080p (ZXCapture defaults to 720p) so small or distant
+  // barcodes still have enough pixels to decode reliably. Must be set
+  // before the capture layer/session is first accessed.
+  self.capture.sessionPreset = AVCaptureSessionPreset1920x1080;
   self.capture.focusMode = AVCaptureFocusModeContinuousAutoFocus;
+
+  // Barcodes are close-range subjects: restricting the autofocus range
+  // speeds up focusing and avoids hunting to infinity (Apple's own
+  // recommendation for barcode scanning).
+  AVCaptureDevice *captureDevice = self.capture.captureDevice;
+  if (captureDevice != nil && [captureDevice lockForConfiguration:nil]) {
+    if (captureDevice.isAutoFocusRangeRestrictionSupported) {
+      captureDevice.autoFocusRangeRestriction = AVCaptureAutoFocusRangeRestrictionNear;
+    }
+    if (captureDevice.isSmoothAutoFocusSupported) {
+      captureDevice.smoothAutoFocusEnabled = YES;
+    }
+    [captureDevice unlockForConfiguration];
+  }
+
   [self.view.layer addSublayer:self.capture.layer];
 }
 
