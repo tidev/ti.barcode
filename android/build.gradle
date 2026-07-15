@@ -4,3 +4,11 @@ dependencies {
 	implementation 'com.google.zxing:android-core:3.3.0'
 	implementation 'com.google.zxing:android-integration:3.3.0'
 }
+
+// The vendored zxing-android client intentionally targets legacy (deprecated)
+// camera, preference and Wi-Fi APIs. Silence the per-usage deprecation
+// warnings so real problems remain visible in the build output.
+tasks.withType(JavaCompile).configureEach {
+	options.deprecation = false
+	options.compilerArgs << '-Xlint:-deprecation'
+}
