@@ -81,6 +81,13 @@
   }
   _barcodeViewController = [[TiBarcodeViewController alloc] initWithDelegate:self showCancel:showCancel showRectangle:showRectangle withOverlay:overlayView preventRotation:preventRotation];
 
+  CGFloat frameWidth = [TiUtils floatValue:@"frameWidth" properties:args def:0];
+  CGFloat frameHeight = [TiUtils floatValue:@"frameHeight" properties:args def:0];
+  if (frameWidth > 0 && frameHeight > 0) {
+    [[_barcodeViewController overlayView] setCustomFrameWidth:frameWidth];
+    [[_barcodeViewController overlayView] setCustomFrameHeight:frameHeight];
+  }
+
   _barcodeViewController.capture.camera = _useFrontCamera ? _barcodeViewController.capture.front : _barcodeViewController.capture.back;
   _barcodeViewController.capture.delegate = self;
   ZXDecodeHints *hints = [self generateHints:args];

@@ -1,3 +1,10 @@
+# iOS v7.1.0
+
+## New Features
+
+- `capture()` now honors `frameWidth`/`frameHeight` (in points) to size the scan area, matching Android: the drawn rectangle and the region ZXCapture decodes are both limited to a centered rect of the requested size. Useful for isolating a single barcode on dense sheets (e.g. a thin "laser slit" like `frameWidth: 300, frameHeight: 50`).
+- The viewfinder now draws a red "laser" line through the middle of the scan area, matching the Android UI, so users can aim at a specific barcode.
+
 # iOS v7.0.0
 
 ## BREAKING CHANGES

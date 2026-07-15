@@ -21,6 +21,12 @@
 @property (nonatomic, assign) CGRect cropRect;
 @property (nonatomic, copy) NSString *displayMessage;
 
+// Optional scan-area size (in points) requested via the module's
+// frameWidth/frameHeight capture options. When both are > 0, the crop
+// rect is a centered rect of this size instead of the default one.
+@property (nonatomic, assign) CGFloat customFrameWidth;
+@property (nonatomic, assign) CGFloat customFrameHeight;
+
 - (id)initWithFrame:(CGRect)frame
          showCancel:(BOOL)showCancel
       showRectangle:(BOOL)showRectangle
