@@ -103,6 +103,15 @@ CGFloat _kPadding = 10;
   CGContextRef c = UIGraphicsGetCurrentContext();
 
   if (_showRectangle) {
+    // Darken everything outside the scan area, matching the Android viewfinder.
+    CGContextSaveGState(c);
+    CGContextSetFillColorWithColor(c, [UIColor colorWithWhite:0 alpha:0.4].CGColor);
+    CGContextFillRect(c, CGRectMake(0, 0, rect.size.width, _cropRect.origin.y));
+    CGContextFillRect(c, CGRectMake(0, CGRectGetMaxY(_cropRect), rect.size.width, rect.size.height - CGRectGetMaxY(_cropRect)));
+    CGContextFillRect(c, CGRectMake(0, _cropRect.origin.y, _cropRect.origin.x, _cropRect.size.height));
+    CGContextFillRect(c, CGRectMake(CGRectGetMaxX(_cropRect), _cropRect.origin.y, rect.size.width - CGRectGetMaxX(_cropRect), _cropRect.size.height));
+    CGContextRestoreGState(c);
+
     CGFloat white[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
     CGContextSetStrokeColor(c, white);
     CGContextSetFillColor(c, white);

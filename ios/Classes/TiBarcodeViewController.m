@@ -165,36 +165,52 @@
 
 - (void)applyRectOfInterest:(UIInterfaceOrientation)orientation
 {
-  CGFloat scaleVideoX, scaleVideoY;
-  CGFloat videoSizeX, videoSizeY;
-  CGRect transformedVideoRect = _overlayView.cropRect;
+  // Raw capture buffer size, in sensor (landscape) orientation.
+  CGFloat videoWidth;
+  CGFloat videoHeight;
   if ([self.capture.sessionPreset isEqualToString:AVCaptureSessionPreset1920x1080]) {
-    videoSizeX = 1080;
-    videoSizeY = 1920;
+    videoWidth = 1920;
+    videoHeight = 1080;
   } else {
-    videoSizeX = 720;
-    videoSizeY = 1280;
-  }
-  if (UIInterfaceOrientationIsPortrait(orientation)) {
-    scaleVideoX = self.capture.layer.frame.size.width / videoSizeX;
-    scaleVideoY = self.capture.layer.frame.size.height / videoSizeY;
-
-    // Convert CGPoint under portrait mode to map with orientation of image
-    // because the image will be cropped before rotate
-    // reference: https://github.com/TheLevelUp/ZXingObjC/issues/222
-    CGFloat realX = transformedVideoRect.origin.y;
-    CGFloat realY = self.capture.layer.frame.size.width - transformedVideoRect.size.width - transformedVideoRect.origin.x;
-    CGFloat realWidth = transformedVideoRect.size.height;
-    CGFloat realHeight = transformedVideoRect.size.width;
-    transformedVideoRect = CGRectMake(realX, realY, realWidth, realHeight);
-
-  } else {
-    scaleVideoX = self.capture.layer.frame.size.width / videoSizeY;
-    scaleVideoY = self.capture.layer.frame.size.height / videoSizeX;
+    videoWidth = 1280;
+    videoHeight = 720;
   }
 
-  _captureSizeTransform = CGAffineTransformMakeScale(1.0 / scaleVideoX, 1.0 / scaleVideoY);
-  self.capture.scanRect = CGRectApplyAffineTransform(transformedVideoRect, _captureSizeTransform);
+  BOOL isPortrait = UIInterfaceOrientationIsPortrait(orientation);
+  CGSize layerSize = self.capture.layer.frame.size;
+
+  // Video dimensions as displayed on screen (swapped in portrait).
+  CGFloat displayedVideoWidth = isPortrait ? videoHeight : videoWidth;
+  CGFloat displayedVideoHeight = isPortrait ? videoWidth : videoHeight;
+
+  // The preview layer uses AVLayerVideoGravityResizeAspectFill: the video is
+  // scaled up until it fills the layer and the overflow is center-cropped
+  // off screen. Unproject the on-screen crop rect into video pixels,
+  // accounting for that hidden overflow — otherwise the decoded region
+  // drifts away from the drawn rectangle (badly so on 4:3 screens like iPads).
+  CGFloat fillScale = MAX(layerSize.width / displayedVideoWidth, layerSize.height / displayedVideoHeight);
+  CGFloat overflowX = (displayedVideoWidth * fillScale - layerSize.width) / 2;
+  CGFloat overflowY = (displayedVideoHeight * fillScale - layerSize.height) / 2;
+
+  CGRect cropRect = _overlayView.cropRect;
+  CGFloat videoX = (cropRect.origin.x + overflowX) / fillScale;
+  CGFloat videoY = (cropRect.origin.y + overflowY) / fillScale;
+  CGFloat videoRectWidth = cropRect.size.width / fillScale;
+  CGFloat videoRectHeight = cropRect.size.height / fillScale;
+
+  // ZXCapture crops the buffer BEFORE rotating it (ZXCapture decodeImage:),
+  // so express the rect in sensor (landscape) coordinates.
+  // reference: https://github.com/TheLevelUp/ZXingObjC/issues/222
+  CGRect scanRect;
+  if (isPortrait) {
+    scanRect = CGRectMake(videoY,
+                          displayedVideoWidth - videoRectWidth - videoX,
+                          videoRectHeight,
+                          videoRectWidth);
+  } else {
+    scanRect = CGRectMake(videoX, videoY, videoRectWidth, videoRectHeight);
+  }
+  self.capture.scanRect = scanRect;
 }
 
 @end
