@@ -11,6 +11,7 @@
 - The scan-area-to-sensor mapping now accounts for the preview's aspect-fill crop; previously the decoded region drifted away from the drawn rectangle, badly so on 4:3 screens (iPads).
 - Capture at 1080p instead of ZXCapture's 720p default and restrict autofocus to the near range, so small or distant barcodes decode reliably instead of producing corrupted reads.
 - `captureResult` no longer passes the scanned text as an `NSLog` format string (crash risk with `%` characters in barcode contents).
+- The scan area is applied even when `showRectangle` is `false`, matching Android — apps that hide the native rectangle to draw their own overlay keep the limited decode region.
 
 # iOS v7.0.0
 

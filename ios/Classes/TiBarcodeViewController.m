@@ -179,9 +179,10 @@
   [self.capture setTransform:transform];
   [self.capture setRotation:scanRectRotation];
   self.capture.layer.frame = _overlayView.frame;
-  if (_showRectangle) {
-    [self applyRectOfInterest:orientation];
-  }
+  // Limit the decoded region even when the native rectangle is not drawn:
+  // apps often pass showRectangle: false and draw their own overlay, and the
+  // scan area (frameWidth/frameHeight) must keep working — like on Android.
+  [self applyRectOfInterest:orientation];
 }
 
 - (void)applyRectOfInterest:(UIInterfaceOrientation)orientation
