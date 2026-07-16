@@ -3,7 +3,14 @@
 ## New Features
 
 - `capture()` now honors `frameWidth`/`frameHeight` (in points) to size the scan area, matching Android: the drawn rectangle and the region ZXCapture decodes are both limited to a centered rect of the requested size. Useful for isolating a single barcode on dense sheets (e.g. a thin "laser slit" like `frameWidth: 300, frameHeight: 50`).
-- The viewfinder now draws a red "laser" line through the middle of the scan area, matching the Android UI, so users can aim at a specific barcode.
+- The viewfinder now draws a red "laser" line through the middle of the scan area and darkens everything outside it, matching the Android UI, so users can aim at a specific barcode.
+- A system beep now plays for each new decoded value, matching the Android client's scan feedback (deduplicated: with `keepOpen` the same barcode decodes on every frame).
+
+## Fixes
+
+- The scan-area-to-sensor mapping now accounts for the preview's aspect-fill crop; previously the decoded region drifted away from the drawn rectangle, badly so on 4:3 screens (iPads).
+- Capture at 1080p instead of ZXCapture's 720p default and restrict autofocus to the near range, so small or distant barcodes decode reliably instead of producing corrupted reads.
+- `captureResult` no longer passes the scanned text as an `NSLog` format string (crash risk with `%` characters in barcode contents).
 
 # iOS v7.0.0
 
