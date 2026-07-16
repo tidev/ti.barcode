@@ -26,6 +26,12 @@
 
 #if HAS_AVFF
     self.capture = [[ZXCapture alloc] init];
+    // Capture at 1080p (ZXCapture defaults to 720p) so small or distant
+    // barcodes still have enough pixels to decode reliably. ZXCapture only
+    // applies the preset when it creates its capture session — which the
+    // camera setter triggers — so this must be set here, before anything
+    // else touches the capture object.
+    self.capture.sessionPreset = AVCaptureSessionPreset1920x1080;
 #endif
     _overlayView = [[TiOverlayView alloc] initWithFrame:[UIScreen mainScreen].bounds
                                              showCancel:shouldShowCancel
@@ -48,10 +54,6 @@
 
 - (void)viewDidLoad
 {
-  // Capture at 1080p (ZXCapture defaults to 720p) so small or distant
-  // barcodes still have enough pixels to decode reliably. Must be set
-  // before the capture layer/session is first accessed.
-  self.capture.sessionPreset = AVCaptureSessionPreset1920x1080;
   self.capture.focusMode = AVCaptureFocusModeContinuousAutoFocus;
 
   // Barcodes are close-range subjects: restricting the autofocus range
