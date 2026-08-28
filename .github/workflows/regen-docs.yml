@@ -1,6 +1,6 @@
 name: Regen Docs
 
-# Tells titaniumsdk.com to recompile this module's API docs.
+# Tells the docs sites to recompile this module's API docs.
 #
 # Fires on a change to apidoc/ and on a published release, rather than on every
 # merged pull request, so a direct push to master is not missed.
@@ -29,8 +29,8 @@ jobs:
       - run: npm ci
       - run: npm run lint:docs
 
-  # The dispatch itself lives in titanium-www so the payload shape is defined
-  # once for all 17 source repos instead of copied into each.
+  # titaniumsdk.com. The dispatch lives in titanium-www so the payload shape is
+  # defined once for all 17 source repos instead of copied into each.
   #
   # Deliberately independent of the lint job. Gating the dispatch on it means an
   # unrelated tooling problem stops the docs updating and nothing says so --
@@ -44,3 +44,20 @@ jobs:
     uses: tidev/titanium-www/.github/workflows/notify-api-docs.yml@main
     secrets:
       dispatch-token: ${{ secrets.REGEN_DOCS_GITHUB_TOKEN }}
+
+  # The old pipeline, kept running alongside the new one so the site currently
+  # being served stays current while the replacement is proven. It carries no
+  # payload because titanium-docs does not read one -- it rebuilds every source
+  # repo on any dispatch, which is the inefficiency titanium-www replaces.
+  #
+  # Delete this job once titaniumsdk.com is served from titanium-www (TI-52).
+  notify-legacy:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    name: Notify titanium-docs (legacy)
+    steps:
+      - uses: peter-evans/repository-dispatch@v3
+        with:
+          event-type: regen-api-docs
+          repository: tidev/titanium-docs
+          token: ${{ secrets.REGEN_DOCS_GITHUB_TOKEN }}
