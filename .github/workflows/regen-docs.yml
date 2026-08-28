@@ -1,39 +1,35 @@
 name: Regen Docs
+
+# Tells titaniumsdk.com to recompile this module's API docs.
+#
+# Fires on a change to apidoc/ and on a published release, rather than on every
+# merged pull request, so a direct push to the default branch is not missed.
 on:
-  workflow_dispatch:
-  pull_request:
-    types: [ closed ]
-    branches: [ master ]
-    paths: [ 'apidoc/**' ]
+  push:
+    branches: [master]
+    paths: ['apidoc/**']
+  release:
+    types: [published]
 
 jobs:
-  regen:
-    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
+  lint:
     runs-on: ubuntu-latest
-    name: Trigger Regen
-
+    name: Lint
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
+      - uses: actions/checkout@v6
 
-    - name: Setup node
-      uses: actions/setup-node@v2
-      with:
-        node-version: '16'
-        registry-url: 'https://registry.npmjs.org'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
 
-    - name: Install dependencies
-      run: npm ci
-      if: steps.node-cache.outputs.cache-hit != 'true'
+      - run: npm ci
+      - run: npm run lint:docs
 
-    - run: npm run lint:docs
-      name: Lint
-      
-    - name: Repository Dispatch
-      uses: peter-evans/repository-dispatch@v2
-      with:
-        event-type: regen-api-docs
-        token: ${{ secrets.REGEN_DOCS_GITHUB_TOKEN }}
-        repository: tidev/titanium-docs
+  # The dispatch itself lives in titanium-www so the payload shape is defined
+  # once for all 17 source repos instead of copied into each.
+  notify:
+    needs: lint
+    uses: tidev/titanium-www/.github/workflows/notify-api-docs.yml@main
+    secrets:
+      dispatch-token: ${{ secrets.REGEN_DOCS_GITHUB_TOKEN }}
