@@ -5,6 +5,8 @@
  */
 
 #import "TiBarcodeModule.h"
+#import <AudioToolbox/AudioToolbox.h>
+
 #import "LayoutConstraint.h"
 #import "TiApp.h"
 #import "TiBase.h"
@@ -65,6 +67,7 @@
   ENSURE_SINGLE_ARG_OR_NIL(args, NSDictionary);
 
   keepOpen = [TiUtils boolValue:[args objectForKey:@"keepOpen"] def:NO];
+  _lastScannedText = nil;
   BOOL animate = [TiUtils boolValue:[args objectForKey:@"animate"] def:YES];
   BOOL showCancel = [TiUtils boolValue:@"showCancel" properties:args def:YES];
   BOOL showRectangle = [TiUtils boolValue:@"showRectangle" properties:args def:YES];
@@ -80,6 +83,13 @@
     overlayView = [self prepareOverlayWithProxy:_overlayViewProxy];
   }
   _barcodeViewController = [[TiBarcodeViewController alloc] initWithDelegate:self showCancel:showCancel showRectangle:showRectangle withOverlay:overlayView preventRotation:preventRotation];
+
+  CGFloat frameWidth = [TiUtils floatValue:@"frameWidth" properties:args def:0];
+  CGFloat frameHeight = [TiUtils floatValue:@"frameHeight" properties:args def:0];
+  if (frameWidth > 0 && frameHeight > 0) {
+    [[_barcodeViewController overlayView] setCustomFrameWidth:frameWidth];
+    [[_barcodeViewController overlayView] setCustomFrameHeight:frameHeight];
+  }
 
   _barcodeViewController.capture.camera = _useFrontCamera ? _barcodeViewController.capture.front : _barcodeViewController.capture.back;
   _barcodeViewController.capture.delegate = self;
@@ -580,7 +590,14 @@ MAKE_SYSTEM_PROP(WIFI, 10);
   if (!result)
     return;
 
-  NSLog(result.text);
+  NSLog(@"[DEBUG] Ti.Barcode scanned: %@", result.text);
+
+  // Audible feedback, matching the Android client's beep. With keepOpen the
+  // same barcode decodes on every frame, so only beep when the value changes.
+  if (![result.text isEqualToString:_lastScannedText]) {
+    _lastScannedText = result.text;
+    AudioServicesPlaySystemSound(1057);
+  }
 
   [self handleSuccessResult:result.text withFormat:result.barcodeFormat withBytes:result.rawBytes];
 

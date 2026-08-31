@@ -19,7 +19,6 @@
   TiOverlayView *_overlayView;
   BOOL _showRectangle;
   BOOL _preventRotation;
-  CGAffineTransform _captureSizeTransform;
 }
 
 - (TiOverlayView *)overlayView;
