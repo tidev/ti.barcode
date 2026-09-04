@@ -16,6 +16,7 @@
 
 package com.google.zxing.client.android.camera;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Point;
@@ -24,6 +25,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
+import android.view.View;
 import android.view.WindowManager;
 
 import com.google.zxing.client.android.PreferencesActivity;
@@ -108,6 +110,15 @@ public final class CameraConfigurationManager {
 
     Point theScreenResolution = new Point();
     display.getSize(theScreenResolution);
+    // The capture activity lays out edge-to-edge (see CaptureActivity.onCreate), so the
+    // preview and viewfinder span the real window rather than Display.getSize(), which
+    // excludes the navigation bar. Prefer the actual content size when it is available.
+    if (context instanceof Activity) {
+      View content = ((Activity) context).findViewById(android.R.id.content);
+      if (content != null && content.getWidth() > 0 && content.getHeight() > 0) {
+        theScreenResolution.set(content.getWidth(), content.getHeight());
+      }
+    }
     screenResolution = theScreenResolution;
     Log.d(TAG, "Screen resolution in current orientation: " + screenResolution);
     cameraResolution = CameraConfigurationUtils.findBestPreviewSizeValue(parameters, screenResolution);
@@ -115,15 +126,22 @@ public final class CameraConfigurationManager {
     bestPreviewSize = CameraConfigurationUtils.findBestPreviewSizeValue(parameters, screenResolution);
     Log.d(TAG, "Best available preview size: " + bestPreviewSize);
 
+    previewSizeOnScreen = computePreviewSizeOnScreen();
+    Log.d(TAG, "Preview size on screen: " + previewSizeOnScreen);
+  }
+
+  /**
+   * Orients {@link #bestPreviewSize} to match the screen orientation. Always returns a copy so
+   * later corrections to {@code bestPreviewSize} cannot alias the returned point.
+   */
+  private Point computePreviewSizeOnScreen() {
     boolean isScreenPortrait = screenResolution.x < screenResolution.y;
     boolean isPreviewSizePortrait = bestPreviewSize.x < bestPreviewSize.y;
 
     if (isScreenPortrait == isPreviewSizePortrait) {
-      previewSizeOnScreen = bestPreviewSize;
-    } else {
-      previewSizeOnScreen = new Point(bestPreviewSize.y, bestPreviewSize.x);
+      return new Point(bestPreviewSize.x, bestPreviewSize.y);
     }
-    Log.d(TAG, "Preview size on screen: " + previewSizeOnScreen);
+    return new Point(bestPreviewSize.y, bestPreviewSize.x);
   }
 
   void setDesiredCameraParameters(OpenCamera camera, boolean safeMode) {
@@ -181,6 +199,13 @@ public final class CameraConfigurationManager {
           ", but after setting it, preview size is " + afterSize.width + 'x' + afterSize.height);
       bestPreviewSize.x = afterSize.width;
       bestPreviewSize.y = afterSize.height;
+      // Keep every size derived from the preview size consistent with what the driver
+      // actually selected, so the surface scaling, the framing-rect mapping and the
+      // preview-frame buffer dimensions all agree.
+      cameraResolution.x = afterSize.width;
+      cameraResolution.y = afterSize.height;
+      previewSizeOnScreen = computePreviewSizeOnScreen();
+      Log.d(TAG, "Corrected preview size on screen: " + previewSizeOnScreen);
     }
   }
 

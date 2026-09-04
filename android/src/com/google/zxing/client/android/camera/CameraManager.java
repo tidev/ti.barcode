@@ -296,28 +296,81 @@ public final class CameraManager {
       if (framingRect == null) {
         return null;
       }
-      Rect rect = new Rect(framingRect);
-      Point cameraResolution = configManager.getCameraResolution();
+      Point previewSizeOnScreen = configManager.getPreviewSizeOnScreen();
       Point screenResolution = configManager.getScreenResolution();
-      if (cameraResolution == null || screenResolution == null) {
+      if (previewSizeOnScreen == null || screenResolution == null) {
         // Called early, before init even finished
         return null;
       }
-      if(screenResolution.x < screenResolution.y){
-          rect.left = rect.left * cameraResolution.y / screenResolution.x;
-          rect.right = rect.right * cameraResolution.y / screenResolution.x;
-          rect.top = rect.top * cameraResolution.x / screenResolution.y;
-          rect.bottom = rect.bottom * cameraResolution.x / screenResolution.y;
-      } else {
-          // landscape
-          rect.left = rect.left * cameraResolution.x / screenResolution.x;
-          rect.right = rect.right * cameraResolution.x / screenResolution.x;
-          rect.top = rect.top * cameraResolution.y / screenResolution.y;
-          rect.bottom = rect.bottom * cameraResolution.y / screenResolution.y;
+
+      Rect previewRectOnScreen = getPreviewRectOnScreen(screenResolution, previewSizeOnScreen);
+      Rect rect = mapScreenRectToPreview(framingRect, previewRectOnScreen, previewSizeOnScreen);
+      if (rect.width() <= 0 || rect.height() <= 0) {
+        return null;
       }
       framingRectInPreview = rect;
     }
     return framingRectInPreview;
+  }
+
+  /**
+   * Models the center-crop rect the preview occupies on screen. {@link com.google.zxing.client.android.PreviewSurfaceView}
+   * uses the same math to size itself, so the on-screen preview and the decode mapping stay in sync.
+   */
+  public static Rect getPreviewRectOnScreen(Point screenResolution, Point previewSizeOnScreen) {
+    float previewRatio = previewSizeOnScreen.x / (float) previewSizeOnScreen.y;
+    float screenRatio = screenResolution.x / (float) screenResolution.y;
+
+    int previewWidth;
+    int previewHeight;
+    if (screenRatio < previewRatio) {
+      previewWidth = Math.round(screenResolution.y * previewRatio);
+      previewHeight = screenResolution.y;
+    } else {
+      previewWidth = screenResolution.x;
+      previewHeight = Math.round(screenResolution.x / previewRatio);
+    }
+
+    int left = (screenResolution.x - previewWidth) / 2;
+    int top = (screenResolution.y - previewHeight) / 2;
+    return new Rect(left, top, left + previewWidth, top + previewHeight);
+  }
+
+  private static Rect mapScreenRectToPreview(Rect screenRect,
+                                             Rect previewRectOnScreen,
+                                             Point previewSizeOnScreen) {
+    float scaleX = previewSizeOnScreen.x / (float) previewRectOnScreen.width();
+    float scaleY = previewSizeOnScreen.y / (float) previewRectOnScreen.height();
+
+    int left = clamp((int) Math.floor((screenRect.left - previewRectOnScreen.left) * scaleX),
+                     0,
+                     previewSizeOnScreen.x);
+    int right = clamp((int) Math.ceil((screenRect.right - previewRectOnScreen.left) * scaleX),
+                      0,
+                      previewSizeOnScreen.x);
+    int top = clamp((int) Math.floor((screenRect.top - previewRectOnScreen.top) * scaleY),
+                    0,
+                    previewSizeOnScreen.y);
+    int bottom = clamp((int) Math.ceil((screenRect.bottom - previewRectOnScreen.top) * scaleY),
+                       0,
+                       previewSizeOnScreen.y);
+
+    return new Rect(left, top, right, bottom);
+  }
+
+  private static int clamp(int value, int min, int max) {
+    if (value < min) {
+      return min;
+    }
+    if (value > max) {
+      return max;
+    }
+    return value;
+  }
+
+  public synchronized Point getPreviewSizeOnScreen() {
+    Point previewSizeOnScreen = configManager.getPreviewSizeOnScreen();
+    return previewSizeOnScreen == null ? null : new Point(previewSizeOnScreen);
   }
 
   

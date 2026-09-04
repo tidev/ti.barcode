@@ -37,8 +37,10 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -55,6 +57,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -125,6 +128,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private static final int ABOUT_ID = Menu.FIRST + 4;
 
   private FrameLayout _layout;
+  private FrameLayout _overlayContainer;
   private static CaptureActivity _instance;
 
   public boolean doKeepOpen() {
@@ -168,6 +172,24 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     Window window = getWindow();
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+      window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+      window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+      window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                                                  View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                                                  View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+      window.setStatusBarColor(Color.TRANSPARENT);
+      window.setNavigationBarColor(Color.TRANSPARENT);
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      // Extend into display cutouts too, so the edge-to-edge preview is not letterboxed
+      // away from a notch in landscape.
+      WindowManager.LayoutParams attributes = window.getAttributes();
+      attributes.layoutInDisplayCutoutMode =
+          WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+      window.setAttributes(attributes);
+    }
     _instance = this;
     _layout = (FrameLayout) View.inflate(this, RHelper.getLayout("capture"), null);
 
@@ -175,8 +197,25 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     if (Intents.Scan.overlayProxy != null) {
         View overlayView = Intents.Scan.overlayProxy.getOrCreateView().getNativeView();
-        _layout.addView(overlayView);
-        overlayView.bringToFront();
+        _overlayContainer = new FrameLayout(this);
+        _overlayContainer.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                                                                       FrameLayout.LayoutParams.MATCH_PARENT));
+        _overlayContainer.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+          @Override
+          public WindowInsets onApplyWindowInsets(View view, WindowInsets insets) {
+            view.setPadding(insets.getSystemWindowInsetLeft(),
+                            insets.getSystemWindowInsetTop(),
+                            insets.getSystemWindowInsetRight(),
+                            insets.getSystemWindowInsetBottom());
+            return insets;
+          }
+        });
+        overlayView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                                                                 FrameLayout.LayoutParams.MATCH_PARENT));
+        _overlayContainer.addView(overlayView);
+        _layout.addView(_overlayContainer);
+        _overlayContainer.requestApplyInsets();
+        _overlayContainer.bringToFront();
     }
 
     hasSurface = false;
@@ -381,8 +420,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   @Override
   protected void onDestroy() {
     _instance = null;
-    if (Intents.Scan.overlayProxy != null) {
-        _layout.removeView(Intents.Scan.overlayProxy.getOrCreateView().getNativeView());
+    if (_overlayContainer != null) {
+        _overlayContainer.removeAllViews();
+        _layout.removeView(_overlayContainer);
+        _overlayContainer = null;
     }
 
     inactivityTimer.shutdown();
@@ -758,6 +799,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
     try {
       cameraManager.openDriver(surfaceHolder);
+      PreviewSurfaceView surfaceView = (PreviewSurfaceView) findViewById(RHelper.getId("preview_view"));
+      android.graphics.Point previewSize = cameraManager.getPreviewSizeOnScreen();
+      if (previewSize != null) {
+        surfaceView.setPreviewSize(previewSize.x, previewSize.y);
+      }
       // Creating the handler starts the preview, which can also throw a RuntimeException.
       if (handler == null) {
         handler = new CaptureActivityHandler(this, decodeFormats, decodeHints, characterSet, cameraManager);
