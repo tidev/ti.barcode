@@ -4,7 +4,7 @@
 #
 version: 6.0.0
 apiversion: 2
-architectures: armv7 i386 x86_64 arm64
+architectures: arm64 x86_64
 description: Lets you process 1D/2D barcodes.
 author: Stephen Tramer, Jeff English, Hans Knöchel, Vijay Singh
 license: Apache-2.0
