@@ -1,3 +1,14 @@
+# iOS v7.0.0
+
+## BREAKING CHANGES
+
+- Mac Catalyst is no longer supported: the vendored `ZXingObjC.xcframework` was repackaged with modern slices only (`ios-arm64` device, `ios-arm64_x86_64-simulator`), dropping the `armv7`/`i386` (32-bit) and Mac Catalyst slices. The manifest now declares `mac: false` and `architectures: arm64 x86_64`.
+
+## Changes
+
+- Built against Titanium SDK 13.3.0.GA.
+- Fixed module builds on Xcode 26 by pointing `iphoneos`/`iphonesimulator` builds at their matching TitaniumKit xcframework slices instead of a recursive framework search path.
+
 # v5.0.0
 
 ## BREAKING CHANGES
