@@ -47,12 +47,24 @@ CGFloat _kPadding = 10;
   } else {
     _kPadding = 10;
   }
-  CGFloat rectSize = self.frame.size.width - _kPadding * 2;
-  CGFloat rectSize2 = rectSize;
-  if (self.frame.size.width > self.frame.size.height) {
-    rectSize2 = self.frame.size.height - _kPadding * 2;
+  CGFloat maxWidth = self.frame.size.width - _kPadding * 2;
+  CGFloat maxHeight = self.frame.size.height - _kPadding * 2;
+  CGFloat rectWidth;
+  CGFloat rectHeight;
+  if (self.customFrameWidth > 0 && self.customFrameHeight > 0) {
+    // Honor the frameWidth/frameHeight requested through the capture options,
+    // clamped to the screen. This sizes both the drawn rectangle and — through
+    // applyRectOfInterest — the area ZXCapture actually decodes.
+    rectWidth = MIN(self.customFrameWidth, maxWidth);
+    rectHeight = MIN(self.customFrameHeight, maxHeight);
+  } else {
+    rectWidth = maxWidth;
+    rectHeight = (self.frame.size.width > self.frame.size.height) ? maxHeight : rectWidth;
   }
-  _cropRect = CGRectMake(_kPadding, (self.frame.size.height - rectSize2) / 2, rectSize, rectSize2);
+  _cropRect = CGRectMake((self.frame.size.width - rectWidth) / 2,
+                         (self.frame.size.height - rectHeight) / 2,
+                         rectWidth,
+                         rectHeight);
 
   if (_cancelButton) {
     CGSize theSize = CGSizeMake(100, 50);
@@ -91,10 +103,30 @@ CGFloat _kPadding = 10;
   CGContextRef c = UIGraphicsGetCurrentContext();
 
   if (_showRectangle) {
+    // Darken everything outside the scan area, matching the Android viewfinder.
+    CGContextSaveGState(c);
+    CGContextSetFillColorWithColor(c, [UIColor colorWithWhite:0 alpha:0.4].CGColor);
+    CGContextFillRect(c, CGRectMake(0, 0, rect.size.width, _cropRect.origin.y));
+    CGContextFillRect(c, CGRectMake(0, CGRectGetMaxY(_cropRect), rect.size.width, rect.size.height - CGRectGetMaxY(_cropRect)));
+    CGContextFillRect(c, CGRectMake(0, _cropRect.origin.y, _cropRect.origin.x, _cropRect.size.height));
+    CGContextFillRect(c, CGRectMake(CGRectGetMaxX(_cropRect), _cropRect.origin.y, rect.size.width - CGRectGetMaxX(_cropRect), _cropRect.size.height));
+    CGContextRestoreGState(c);
+
     CGFloat white[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
     CGContextSetStrokeColor(c, white);
     CGContextSetFillColor(c, white);
     [self drawRect:_cropRect inContext:c];
+
+    // Red "laser" line through the middle of the scan area, matching the
+    // Android viewfinder, so the user can aim at a specific barcode.
+    CGContextSaveGState(c);
+    CGContextSetStrokeColorWithColor(c, [UIColor redColor].CGColor);
+    CGContextSetLineWidth(c, 2);
+    CGContextBeginPath(c);
+    CGContextMoveToPoint(c, CGRectGetMinX(_cropRect) + 2, CGRectGetMidY(_cropRect));
+    CGContextAddLineToPoint(c, CGRectGetMaxX(_cropRect) - 2, CGRectGetMidY(_cropRect));
+    CGContextStrokePath(c);
+    CGContextRestoreGState(c);
     CGContextSaveGState(c);
     UIFont *font = [UIFont systemFontOfSize:18];
     NSMutableParagraphStyle *textStyle = [[NSMutableParagraphStyle alloc] init];
