@@ -20,6 +20,7 @@
   TiViewProxy *_overlayViewProxy;
   BOOL keepOpen;
   ZXCapture *zxCapture;
+  NSString *_lastScannedText;
 }
 
 - (NSNumber *)canShow:(id)unused;
