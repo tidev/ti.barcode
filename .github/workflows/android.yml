@@ -17,7 +17,7 @@ jobs:
     env:
       CCACHE_DIR: ${{ github.workspace }}/.ccache
       USE_CCACHE: 1
-      SDK_VERSION: 13.2.0.GA
+      SDK_VERSION: 13.3.1.GA
       MODULE_ID: ti.barcode
     steps:
     - uses: actions/checkout@v6
@@ -25,7 +25,7 @@ jobs:
     - name: Use Node.js
       uses: actions/setup-node@v6
       with:
-        node-version: '20.x'
+        node-version: '24.x'
 
     - uses: actions/setup-java@v4
       with:
@@ -82,17 +82,19 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-ccache-
 
-    # TODO: connection issues - removing it for now
-    # - name: Build and Test
-    #   uses: reactivecircus/android-emulator-runner@v2
-    #   with:
-    #     api-level: 33
-    #     target: google_apis
-    #     arch: x86_64
-    #     script: npm run test:android -- --sdkVersion ${{ env.SDK_VERSION }}
-    #     emulator-options: -no-snapshot -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
-    #     disable-animations: true
+    - run: ti build -p android --build-only
+      name: Build module
+      working-directory: android
 
+    # Tests are currently disabled; remove the `if: false` to re-enable them.
+    - name: Test
+      if: false
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 29
+        target: playstore
+        script: npm run test:android -- --sdkVersion ${{ env.SDK_VERSION }}
+        disable-animations: false # defaulting to true, the commands sent to emulator to do this sometimes run too quickly after boot and cause "adb: device offline" failures
 
     - name: Show summary of ccache configuration and statistics counters
       run: ccache --show-stats
