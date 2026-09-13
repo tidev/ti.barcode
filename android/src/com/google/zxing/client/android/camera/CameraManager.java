@@ -320,6 +320,10 @@ public final class CameraManager {
     return framingRectInPreview;
   }
 
+  public synchronized Point getPreviewSizeOnScreen() {
+    return configManager.getPreviewSizeOnScreen();
+  }
+
   
   /**
    * Allows third party apps to specify the camera ID, rather than determine
