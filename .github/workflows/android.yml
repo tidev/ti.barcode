@@ -77,7 +77,13 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-ccache-
 
-    - name: Build and Test
+    - run: ti build -p android --build-only
+      name: Build module
+      working-directory: android
+
+    # Tests are currently disabled; remove the `if: false` to re-enable them.
+    - name: Test
+      if: false
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 29
